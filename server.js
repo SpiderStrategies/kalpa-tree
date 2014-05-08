@@ -1,6 +1,7 @@
 var http = require('http')
   , fs = require('fs')
   , url = require('url')
+  , d3 = require('d3')
   , tree = require('./tree')
 
 http.createServer(function (req, res) {
@@ -11,6 +12,11 @@ http.createServer(function (req, res) {
     return fs.createReadStream('./bundle.js').pipe(res)
   }
 
-  res.end(JSON.stringify(tree(url.parse(req.url, true).query.depth || 5)))
-
+  res.end(JSON.stringify(d3.layout.tree().nodes(tree(url.parse(req.url, true).query.depth || 5)), function (key, value) {
+    if (key === 'parent') {
+      return value.id
+    } else {
+      return value
+    }
+  }))
 }).listen(3000)
