@@ -1,0 +1,27 @@
+{
+  "name": "d3-tree-poc",
+  "version": "0.0.1",
+  "description": "yada",
+  "main": "server.js",
+  "dependencies": {
+    "d3": "^3.4.6",
+    "lodash": "^2.4.1"
+  },
+  "devDependencies": {
+    "browserify": "^3.46.0"
+  },
+  "scripts": {
+    "bundle": "./node_modules/.bin/browserify app.js > bundle.js -d",
+    "start": "node server.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/SpiderStrategies/d3-tree-poc.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/SpiderStrategies/d3-tree-poc/issues"
+  },
+  "homepage": "https://github.com/SpiderStrategies/d3-tree-poc"
+}

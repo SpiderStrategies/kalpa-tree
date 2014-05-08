@@ -1,37 +1,16 @@
 var http = require('http')
-  , colors = [ 'ff0000', '00ff00', '00ffff', '0000ff' ]
-  , _ = require('lodash')
+  , fs = require('fs')
+  , url = require('url')
+  , tree = require('./tree')
 
 http.createServer(function (req, res) {
-  var id = 0
+  if (req.url == '/index.html' || req.url == '/') {
+    return fs.createReadStream('./index.html').pipe(res)
+  }
+  if (req.url == '/bundle.js') {
+    return fs.createReadStream('./bundle.js').pipe(res)
+  }
 
-   var scorecardTree = [{
-     id: ++id,
-     label: 'Scorecard Node ' + id,
-     color: colors[id%4]
-   }]
+  res.end(JSON.stringify(tree(url.parse(req.url, true).query.depth || 5)))
 
-   function generateChildren (numChildren, subLevels) {
-     var nodes = []
-     _.times(numChildren, function () {
-       var node = {
-         id: ++id,
-         label: 'Scorecard Node ' + id,
-         color: colors[id%4]
-       }
-
-       node.children = subLevels === 0 ? [] : generateChildren(numChildren, subLevels-1)
-
-       nodes.push(node)
-     })
-
-     return nodes
-   }
-
-  res.end(JSON.stringify({
-    id: ++id,
-    label: 'Node ' + id ,
-    color: colors[id % 4],
-    children: generateChildren(10, 1)
-  }))
 }).listen(3000)

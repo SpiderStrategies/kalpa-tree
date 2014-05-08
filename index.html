@@ -32,7 +32,7 @@
     .append('g')
       .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
-  d3.json('tree-light.json', function (error, scorecards) {
+  d3.json('tree.json?depth=2', function (error, scorecards) {
     scorecards.x0 = 0
     scorecards.y0 = 0
     update(root = scorecards)
