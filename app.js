@@ -1,7 +1,7 @@
 var d3 = require('d3')
   , http = require('http')
   , JSONStream = require('JSONStream')
-  , es = require('event-stream')
+  , tree = d3.layout.tree().nodeSize([0, 20])
   , margin = {top: 30, right: 20, bottom: 30, left: 20}
   , width = 800 - margin.left - margin.right
   , barHeight = 20
@@ -9,23 +9,40 @@ var d3 = require('d3')
   , duration = 400
   , root
 
-// Build the svg
 var svg = d3.select('body').append('svg')
     .attr('width', width + margin.left + margin.right)
   .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
+var node = svg.selectAll('g.node')
+  , root
 
-http.get({ path : '/tree.json?depth=2' }, function (res) {
-  res.pipe(JSONStream.parse([true]).on('data', function (node) {
-    // Add node
+http.get({ path : '/tree.json?depth=10' }, function (res) {
+  res.pipe(JSONStream.parse([true]).on('data', function (n) {
+    // Add node to its parent
+    if (n.parent) {
+      var p = nodes.filter(function (node) {
+        return node.id === n.parent
+      })[0]
+      if (p.children) {
+        p.children.push(n);
+      } else {
+        p.children = [n]
+      }
+      nodes.push(n)
+    } else {
+      // root
+      n.x = n.x0
+      n.y = n.y0
+      n.parent = n
+      root = n
+      nodes = tree(root)
+    }
+    draw()
   }))
 })
 
-function update (source) {
-
-  var nodes = tree.nodes(root)
-
+function draw () {
   var height = Math.max(500, nodes.length * barHeight + margin.top + margin.bottom)
 
   d3.select('svg').transition()
@@ -36,21 +53,15 @@ function update (source) {
       .duration(duration)
       .style('height', height + 'px')
 
-  // Compute the 'layout'.
-  nodes.forEach(function (n, i) {
-    n.x = i * barHeight
+  node = node.data(tree.nodes(root), function (d) {
+    return d.id
   })
-
-  // Update the nodes…
-  var node = svg.selectAll('g.node')
-      .data(nodes, function (d) { return d.id || (d.id = ++i) })
 
   var enter = node.enter().append('g')
       .attr('class', 'node')
-      .attr('transform', function (d) { return 'translate(' + source.y0 + ',' + source.x0 + ')' })
+      .attr('transform', function (d) { return 'translate(' + d.parent.y0 + ',' + d.parent.x0 + ')' })
       .on('click', toggle)
 
-  // Enter any new nodes at the parent's previous position.
   enter.append('rect')
       .attr('y', -barHeight / 2)
       .attr('height', barHeight)
@@ -70,7 +81,10 @@ function update (source) {
       .attr('dx', 5.5)
       .text(function (d) { return d.label })
 
-  // Transition nodes to their new position.
+  nodes.forEach(function (n, i) {
+    n.x = i * barHeight
+  })
+
   enter.attr('transform', function (d) { return 'translate(' + d.y + ',' + d.x + ')' })
 
   node.attr('transform', function (d) { return 'translate(' + d.y + ',' + d.x + ')' })
@@ -79,26 +93,17 @@ function update (source) {
         return d.color
       })
 
-  // Transition exiting nodes to the parent's new position.
   node.exit()
-      .attr('transform', function (d) { return 'translate(' + source.y + ',' + source.x + ')' })
+      .attr('transform', function (d) { return 'translate(' + d.parent.y + ',' + d.parent.x + ')' })
       .remove()
 
-  // Stash the old positions for transition.
   nodes.forEach(function (d) {
     d.x0 = d.x
     d.y0 = d.y
   })
 }
 
-// Toggle children on click.
+
 function toggle (d) {
-  if (d.children) {
-    d._children = d.children
-    d.children = null
-  } else {
-    d.children = d._children
-    d._children = null
-  }
-  update(d)
+  console.log('todo')
 }
