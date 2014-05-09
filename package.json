@@ -12,6 +12,7 @@
   },
   "scripts": {
     "bundle": "./node_modules/.bin/browserify app.js > bundle.js -d",
+    "watch": "./node_modules/.bin/watchify app.js -o bundle.js -d",
     "start": "node server.js"
   },
   "repository": {
