@@ -29,9 +29,9 @@ http.get({ path : '/tree.json?depth=10' }, function (res) {
         }
       })(nodes)
       if (p.children) {
-        p.children.push(n);
+        p._children.push(n)
       } else {
-        p.children = [n]
+        p._children = [n]
       }
       nodes.push(n)
     } else {
