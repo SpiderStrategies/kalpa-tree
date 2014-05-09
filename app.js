@@ -43,7 +43,9 @@ http.get({ path : '/tree.json?depth=10' }, function (res) {
       nodes = tree(root)
     }
     draw()
-  }))
+  })).on('end', function () {
+    console.log('all done')
+  })
 })
 
 function draw () {
