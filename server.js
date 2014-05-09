@@ -13,6 +13,8 @@ http.createServer(function (req, res) {
     return fs.createReadStream('./index.html').pipe(res)
   } else if (path == '/bundle.js') {
     return fs.createReadStream('./bundle.js').pipe(res)
+  } else if (path == '/large-tree.json') {
+    return fs.createReadStream('./15-meg-tree.json').pipe(res)
   } else if (path == '/tree.json') {
     res.end(JSON.stringify(d3.layout.tree().nodes(tree(_url.query.depth || 5)), function (key, value) {
       if (key === 'parent') {
