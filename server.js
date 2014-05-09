@@ -17,6 +17,8 @@ http.createServer(function (req, res) {
     res.end(JSON.stringify(d3.layout.tree().nodes(tree(_url.query.depth || 5)), function (key, value) {
       if (key === 'parent') {
         return value.id
+      } else if (key === 'children'){
+        return undefined
       } else {
         return value
       }
