@@ -21,9 +21,13 @@ http.get({ path : '/tree.json?depth=10' }, function (res) {
   res.pipe(JSONStream.parse([true]).on('data', function (n) {
     // Add node to its parent
     if (n.parent) {
-      var p = nodes.filter(function (node) {
-        return node.id === n.parent
-      })[0]
+      var p = (function (nodes) {
+        for (var i = nodes.length - 1; i >= 0; i--) {
+          if (nodes[i].id === n.parent) {
+            return nodes[i]
+          }
+        }
+      })(nodes)
       if (p.children) {
         p.children.push(n);
       } else {
