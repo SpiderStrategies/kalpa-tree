@@ -17,7 +17,7 @@ var svg = d3.select('body').append('svg')
 var node = svg.selectAll('g.node')
   , root
 
-http.get({ path : '/tree.json?depth=10' }, function (res) {
+http.get({ path : '/tree.json?depth=5' }, function (res) {
   res.pipe(JSONStream.parse([true]).on('data', function (n) {
     // Add node to its parent
     if (n.parent) {
@@ -29,9 +29,9 @@ http.get({ path : '/tree.json?depth=10' }, function (res) {
         }
       })(nodes)
       if (p.children) {
-        p._children.push(n)
+        p.children.push(n)
       } else {
-        p._children = [n]
+        p.children = [n]
       }
       nodes.push(n)
     } else {
