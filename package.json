@@ -1,6 +1,6 @@
 {
   "name": "d3-tree-poc",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "yada",
   "main": "server.js",
   "dependencies": {
