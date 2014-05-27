@@ -1,14 +1,14 @@
 {
-  "name": "d3-tree-poc",
+  "name": "d3-tree",
   "version": "0.0.2",
-  "description": "yada",
-  "main": "server.js",
+  "description": "A tree rendered with d3",
+  "main": "index.js",
   "dependencies": {
     "d3": "^3.4.6",
-    "lodash": "^2.4.1",
     "JSONStream": "^0.8.2"
   },
   "devDependencies": {
+    "lodash": "^2.4.1",
     "browserify": "^3.46.0"
   },
   "scripts": {
