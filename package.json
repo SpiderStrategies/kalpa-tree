@@ -1,6 +1,6 @@
 {
   "name": "d3-tree-poc",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "yada",
   "main": "server.js",
   "dependencies": {
@@ -12,9 +12,9 @@
     "browserify": "^3.46.0"
   },
   "scripts": {
-    "bundle": "./node_modules/.bin/browserify app.js > bundle.js -d",
-    "watch": "./node_modules/.bin/watchify app.js -o bundle.js -d",
-    "start": "node server.js"
+    "bundle": "./node_modules/.bin/browserify example/app.js > example/bundle.js -d",
+    "watch": "./node_modules/.bin/watchify example/app.js -o example/bundle.js -d",
+    "start": "node example/server.js"
   },
   "repository": {
     "type": "git",
