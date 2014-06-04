@@ -27,9 +27,6 @@ var Tree = function (options) {
 
   var node = svg.selectAll('g.node')
 
-  var xhr = new XMLHttpRequest()
-  xhr.open('get', options.url)
-
   http.get(options.url, function (res) {
     res.pipe(JSONStream.parse([true]).on('data', function (n) {
       // Add node to its parent
