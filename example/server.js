@@ -17,7 +17,10 @@ http.createServer(function (req, res) {
     var less = spawn('./node_modules/less/bin/lessc', ['-x', 'tree.less'])
     less.stdout.pipe(res)
     less.stderr.pipe(process.stderr)
-  }  else if (path == '/bundle.js') {
+  } else if (path === '/icons.svg') {
+    return fs.createReadStream(__dirname + '/icons.svg').pipe(res)
+  } else if (path == '/bundle.js') {
+    res.writeHead(200, {'Content-Type': 'application/javascript'})
     return fs.createReadStream(__dirname + '/bundle.js').pipe(res)
   } else if (path == '/tree.json') {
     res.end(JSON.stringify(d3.layout.tree().nodes(tree(_url.query.depth || 5)), function (key, value) {

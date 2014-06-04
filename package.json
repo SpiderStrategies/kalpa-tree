@@ -10,11 +10,12 @@
   "devDependencies": {
     "lodash": "^2.4.1",
     "browserify": "^3.46.0",
-    "less": "^1.7.0"
+    "less": "^1.7.0",
+    "watchify": "^0.10.2"
   },
   "scripts": {
-    "bundle": "./node_modules/.bin/browserify example/app.js > example/bundle.js -d",
-    "watch": "./node_modules/.bin/watchify example/app.js -o example/bundle.js -d",
+    "bundle": "./node_modules/.bin/browserify -r ./index.js:tree > example/bundle.js -d",
+    "watch": "./node_modules/.bin/watchify -r ./index.js:tree -o example/bundle.js -d",
     "start": "node example/server.js"
   },
   "repository": {

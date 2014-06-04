@@ -1,5 +1,113 @@
-.node text {
-  font: 10px sans-serif;
-  pointer-events: none;
-  fill: pink;
+svg {
+  width: 100%;
+  height: 100%;
+  background-color: #393c40;
+
+  defs {
+    #grad {
+      .stop-0 {
+        stop-color: #393c40;
+        stop-opacity: 0;
+      }
+
+      .stop-50 {
+        stop-color: #393c40;
+        stop-opacity: 1;
+      }
+    }
+
+    #grad-selected {
+      .stop-0 {
+        stop-color: #2d3135;
+        stop-opacity: 0;
+      }
+
+      .stop-50 {
+        stop-color: #2d3135;
+        stop-opacity: 50;
+      }
+    }
+  }
+
+  .node {
+    cursor: pointer;
+
+    &:not(:first-child).hover {
+      .toggle-icon {
+        display: block;
+      }
+    }
+
+    &:not(.selected) {
+      .icon {
+        fill: grey !important;
+      }
+    }
+
+    .toggle-group {
+
+      rect {
+        fill: transparent;
+      }
+
+      .toggle-icon {
+        /*display: none;*/
+
+        -webkit-transform-origin: 18px 0px;
+        -webkit-transform: rotate(0deg);
+        -webkit-transition: -webkit-transform 400ms;
+
+        &.expanded {
+          -webkit-transform: rotate(90deg);
+        }
+
+        &.leaf {
+          display: none !important;
+        }
+      }
+    }
+
+    text {
+      fill: #818b8f;
+      font-size: 13px;
+      text-shadow: 0 1px 0 rgba(0,0,0,.23);
+      -webkit-user-select: none;
+    }
+
+    rect.node-fill {
+      fill: #393c40;
+    }
+
+    .text-cover {
+      fill: url(#grad);
+    }
+
+    &.selected {
+      .text-cover {
+        fill: url(#grad-selected);
+      }
+
+      rect.node-fill {
+        fill: #2d3135;
+      }
+
+      text {
+        fill: #e1e8eb;
+      }
+    }
+
+  }
+
+}
+
+.indicator.yellow, .yellow {
+  fill: #fbcc3c;
+}
+
+.indicator.green, .green {
+  fill: #96cd00;
+}
+
+.indicator.red, .red {
+  fill: #f35132;
 }
