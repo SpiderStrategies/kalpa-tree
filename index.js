@@ -1,5 +1,5 @@
 var d3 = require('d3')
-  , XhrStream = require('./lib/xhr-stream')
+  , http = require('http')
   , JSONStream = require('JSONStream')
   , tree = d3.layout.tree().nodeSize([0, 20])
   , margin = {top: 30, right: 20, bottom: 30, left: 20}
@@ -16,7 +16,7 @@ var d3 = require('d3')
  * appended to the DOM
  * - url: the URL containing the nodes to render
  */
-var Tree = function(options) {
+var Tree = function (options) {
   var self = this
   this.options = options
 
@@ -30,33 +30,35 @@ var Tree = function(options) {
   var xhr = new XMLHttpRequest()
   xhr.open('get', options.url)
 
-  new XhrStream(xhr).pipe(JSONStream.parse([true]).on('data', function (n) {
-    // Add node to its parent
-    if (n.parent) {
-      var p = (function (nodes) {
-        for (var i = nodes.length - 1; i >= 0; i--) {
-          if (nodes[i].id === n.parent) {
-            return nodes[i]
+  http.get(options.url, function (res) {
+    res.pipe(JSONStream.parse([true]).on('data', function (n) {
+      // Add node to its parent
+      if (n.parent) {
+        var p = (function (nodes) {
+          for (var i = nodes.length - 1; i >= 0; i--) {
+            if (nodes[i].id === n.parent) {
+              return nodes[i]
+            }
           }
+        })(nodes)
+        if (p.children) {
+          p.children.push(n)
+        } else {
+          p.children = [n]
         }
-      })(nodes)
-      if (p.children) {
-        p.children.push(n)
+        nodes.push(n)
       } else {
-        p.children = [n]
+        // root
+        n.x = n.x0
+        n.y = n.y0
+        n.parent = n
+        self.root = n
+        nodes = tree(self.root)
       }
-      nodes.push(n)
-    } else {
-      // root
-      n.x = n.x0
-      n.y = n.y0
-      n.parent = n
-      self.root = n
-      nodes = tree(self.root)
-    }
-    self.draw(node)
-  })).on('end', function () {
-    console.log('all done')
+      self.draw(node)
+    })).on('end', function () {
+      console.log('all done')
+    })
   })
 }
 
