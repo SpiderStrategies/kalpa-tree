@@ -25,7 +25,7 @@ var Tree = function (options) {
   .append('g')
     .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
 
-  var node = svg.selectAll('g.node')
+  this.node = svg.selectAll('g.node')
 
   http.get(options.url, function (res) {
     res.pipe(JSONStream.parse([true]).on('data', function (n) {
@@ -52,14 +52,14 @@ var Tree = function (options) {
         self.root = n
         nodes = tree(self.root)
       }
-      self.draw(node)
+      self.draw()
     })).on('end', function () {
       console.log('all done')
     })
   })
 }
 
-Tree.prototype.draw = function(node) {
+Tree.prototype.draw = function () {
   var height = Math.max(500, nodes.length * barHeight + margin.top + margin.bottom)
 
   d3.select('svg').transition()
@@ -70,11 +70,11 @@ Tree.prototype.draw = function(node) {
       .duration(duration)
       .style('height', height + 'px')
 
-  node = node.data(tree.nodes(this.root), function (d) {
+  this.node = this.node.data(tree.nodes(this.root), function (d) {
     return d.id
   })
 
-  var enter = node.enter().append('g')
+  var enter = this.node.enter().append('g')
       .attr('class', 'node')
       .attr('transform', function (d) { return 'translate(' + d.parent.y0 + ',' + d.parent.x0 + ')' })
       .on('click', this.toggle)
@@ -104,13 +104,13 @@ Tree.prototype.draw = function(node) {
 
   enter.attr('transform', function (d) { return 'translate(' + d.y + ',' + d.x + ')' })
 
-  node.attr('transform', function (d) { return 'translate(' + d.y + ',' + d.x + ')' })
+  this.node.attr('transform', function (d) { return 'translate(' + d.y + ',' + d.x + ')' })
       .select('circle')
       .style('fill', function (d) {
         return d.color
       })
 
-  node.exit()
+  this.node.exit()
       .attr('transform', function (d) { return 'translate(' + d.parent.y + ',' + d.parent.x + ')' })
       .remove()
 
