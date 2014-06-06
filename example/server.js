@@ -3,6 +3,7 @@ var http = require('http')
   , url = require('url')
   , d3 = require('d3')
   , tree = require('./tree')
+  , spawn = require('child_process').spawn
   , flat = require('./tree-flat')
 
 http.createServer(function (req, res) {
@@ -11,7 +12,12 @@ http.createServer(function (req, res) {
 
   if (path == '/index.html' || path == '/') {
     return fs.createReadStream(__dirname + '/index.html').pipe(res)
-  } else if (path == '/bundle.js') {
+  } else if (path == '/tree.css') {
+    res.writeHead(200, { 'Content-Type': 'text/css' })
+    var less = spawn('./node_modules/less/bin/lessc', ['-x', 'tree.less'])
+    less.stdout.pipe(res)
+    less.stderr.pipe(process.stderr)
+  }  else if (path == '/bundle.js') {
     return fs.createReadStream(__dirname + '/bundle.js').pipe(res)
   } else if (path == '/tree.json') {
     res.end(JSON.stringify(d3.layout.tree().nodes(tree(_url.query.depth || 5)), function (key, value) {
