@@ -50,7 +50,7 @@
   ;[].forEach.call(document.querySelectorAll('.coord'), function (coord) {
     coord.addEventListener('blur', function () {
       container.style[this.id] = this.value  + 'px'
-      $(container).trigger('resize')
+      tree.resize()
     })
   })
 
@@ -76,9 +76,10 @@
       },
       stops: [0, 50]
     }]
-  }, $(container))
+  })
 
-  tree.render()
+  $(container).append(tree.render().el.node())
+
 
 </script>
 
