@@ -153,7 +153,7 @@ Tree.prototype.draw = function (source) {
                        .attr('class', 'toggle-group')
   toggler.append('use')
          .attr('class', 'toggle-icon')
-         .attr('xlink:href', 'icons.svg#collapsed')
+         .attr('xlink:href', this.options.icons + '#collapsed')
          .attr('x', 15) // manually center the toggle icon in the click area
          .attr('y', -5)
   toggler.append('rect')
