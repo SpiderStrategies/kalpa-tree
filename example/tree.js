@@ -12,7 +12,7 @@ module.exports = function (depth) {
     _.times(numChildren, function () {
       var node = {
         id: ++id,
-        label: 'Scorecard Node ' + id + (crypto.randomBytes(_.random(0, 40)).toString('hex')),
+        label: 'Scorecard ñode ' + id + (crypto.randomBytes(_.random(0, 40)).toString('hex')),
         icon: icons[id % 4],
         color: colors[id % 3]
       }

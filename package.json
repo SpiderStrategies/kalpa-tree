@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "d3": "^3.4.6",
-    "JSONStream": "^0.8.2"
+    "JSONStream": "https://github.com/SpiderStrategies/JSONStream/tarball/master"
   },
   "devDependencies": {
     "lodash": "^2.4.1",
