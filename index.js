@@ -1,16 +1,15 @@
 var d3 = require('d3')
   , http = require('http')
   , JSONStream = require('JSONStream')
-  , height = 36
-  , depth = 20
-  , margin = {
-    top: height / 2,
-    left: 0
+  , resize = require('./lib/resize')
+  , defs = require('./lib/defs')
+  , defaults = {
+    depth: 20, // indentation depth
+    height: 36, // height of each row
+    marginLeft: 0,
+    marginTop:  18,
+    duration: 400
   }
-  , tree = d3.layout.tree()
-                    .nodeSize([0, depth])
-  , resize = require('./lib/resize')()
-  , defs = require('./lib/defs')()
 
 function toggleClass (clazz, state, node) {
   this.node.filter(function (d) {
@@ -26,26 +25,43 @@ function toggleClass (clazz, state, node) {
 }
 
 /**
- * Create a new d3 tree with the given options.  The currently supported
+ * Create a new d3 tree with the given config.  The currently supported
  * options are:
  *
  * - container: a jquery object. ridiculously lame.
  * - url: the URL containing the nodes to render
  */
-var Tree = function (options) {
-  this.options = options
-  this.options.container.on('resize', this.resize.bind(this))
+var Tree = function (options, container) {
+  if (!options) {
+    throw new Error('options are required')
+  }
+  if (!options.url) {
+    throw new Error('options.url is required')
+  }
+
+  this.options = defaults
+  for (var p in options) {
+    this.options[p] = options[p]
+  }
+  this.container = container
+  this.container.on('resize', this.resize.bind(this))
+
+  this.defs = defs(this.options)
+  this.resizer = resize(this.options)
+
+  this.tree = d3.layout.tree()
+                       .nodeSize([0, this.options.depth])
 }
 
 Tree.prototype.render = function () {
   var self = this
 
-  this.svg = d3.select(this.options.container.get(0)) // Super lame. Figure out how to avoid jquery
+  this.svg = d3.select(this.container.get(0)) // Super lame. Figure out how to avoid jquery
                .append('svg')
-               .call(defs)
+               .call(this.defs)
 
   this.node = this.svg.append('g')
-                        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+                        .attr('transform', 'translate(' + this.options.marginLeft + ',' + this.options.marginTop + ')')
                         .selectAll('g.node')
 
   http.get(this.options.url, function (res) {
@@ -74,14 +90,14 @@ Tree.prototype.render = function () {
 }
 
 Tree.prototype.resize = function () {
-  var box = this.options.container.get(0).getBoundingClientRect()
-  resize.width(parseInt(box.width, 10))
-  resize.height(height)
-  this.node.call(resize)
+  var box = this.container.get(0).getBoundingClientRect()
+  this.resizer.width(parseInt(box.width, 10))
+  this.resizer.height(this.options.height)
+  this.node.call(this.resizer)
 }
 
 Tree.prototype.draw = function (source) {
-  var nodes = this.nodes = tree.nodes(this.root)
+  var nodes = this.nodes = this.tree.nodes(this.root)
     , self = this
 
   this.node = this.node.data(nodes, function (d) {
@@ -104,8 +120,8 @@ Tree.prototype.draw = function (source) {
   enter.append('rect')
          .attr('class', 'node-fill')
          .attr('width', '100%')
-         .attr('height', height)
-         .attr('y', height / - 2)
+         .attr('height', this.options.height)
+         .attr('y', this.options.height / - 2)
 
   var contents = enter.append('g')
                         .attr('class', 'node-contents')
@@ -141,8 +157,8 @@ Tree.prototype.draw = function (source) {
          .attr('x', 15) // manually center the toggle icon in the click area
          .attr('y', -5)
   toggler.append('rect')
-           .attr('width', height)
-           .attr('height', height)
+           .attr('width', this.options.height)
+           .attr('height', this.options.height)
            .on('click', this.toggle.bind(this))
 
   // Update the color if it changed
@@ -175,9 +191,9 @@ Tree.prototype.draw = function (source) {
   // If this node has been removed, let's remove it.
   this.node.exit()
       .transition()
-      .duration(400)
+      .duration(this.options.duration)
       .attr('transform', function (d) {
-        return 'translate(' + -depth + ',' + source._y + ')'
+        return 'translate(' + -self.options.depth + ',' + source._y + ')'
       })
       .style('opacity', 0)
       .remove()

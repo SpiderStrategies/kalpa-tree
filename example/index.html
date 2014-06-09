@@ -56,12 +56,30 @@
 
   var tree = new Tree({
     url: '/tree.json?depth=2',
-    container: $(container) // any event emitter will do
-  })
+    gradients: [{
+      attrs: {
+        id: 'grad',
+        x1: '0%',
+        y1: '0%',
+        x2: '70%',
+        y2: '0%'
+      },
+      stops: [0, 50]
+    }, {
+      attrs: {
+        id: 'grad-selected',
+        x1: '0%',
+        y1: '0%',
+        x2: '70%',
+        y2: '0%'
+      },
+      stops: [0, 50]
+    }]
+  }, $(container))
 
   tree.render()
 
-  </script>
+</script>
 
 
 </script>
