@@ -25,13 +25,9 @@ function toggleClass (clazz, state, node) {
 }
 
 /**
- * Create a new d3 tree with the given config.  The currently supported
- * options are:
- *
- * - container: a jquery object. ridiculously lame.
- * - url: the URL containing the nodes to render
+ * Create a new d3 tree with the given config.
  */
-var Tree = function (options, container) {
+var Tree = function (options) {
   if (!options) {
     throw new Error('options are required')
   }
@@ -43,8 +39,6 @@ var Tree = function (options, container) {
   for (var p in options) {
     this.options[p] = options[p]
   }
-  this.container = container
-  this.container.on('resize', this.resize.bind(this))
 
   this.defs = defs(this.options)
   this.resizer = resize(this.options)
@@ -56,11 +50,10 @@ var Tree = function (options, container) {
 Tree.prototype.render = function () {
   var self = this
 
-  this.svg = d3.select(this.container.get(0)) // Super lame. Figure out how to avoid jquery
-               .append('svg')
+  this.el = d3.select(document.createElementNS('http://www.w3.org/2000/svg', 'svg'))
                .call(this.defs)
 
-  this.node = this.svg.append('g')
+  this.node = this.el.append('g')
                         .attr('transform', 'translate(' + this.options.marginLeft + ',' + this.options.marginTop + ')')
                         .selectAll('g.node')
 
@@ -87,10 +80,12 @@ Tree.prototype.render = function () {
       self.draw()
     }))
   })
+
+  return this
 }
 
 Tree.prototype.resize = function () {
-  var box = this.container.get(0).getBoundingClientRect()
+  var box = this.el.node().parentNode.getBoundingClientRect()
   this.resizer.width(parseInt(box.width, 10))
   this.resizer.height(this.options.height)
   this.node.call(this.resizer)
