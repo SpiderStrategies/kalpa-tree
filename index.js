@@ -1,33 +1,55 @@
 var d3 = require('d3')
   , http = require('http')
   , JSONStream = require('JSONStream')
-  , tree = d3.layout.tree().nodeSize([0, 20])
-  , margin = {top: 30, right: 20, bottom: 30, left: 20}
-  , width = 800 - margin.left - margin.right
-  , barHeight = 20
-  , barWidth = width * .8
-  , duration = 400
+  , height = 36
+  , depth = 20
+  , margin = {
+    top: height / 2,
+    left: 0
+  }
+  , tree = d3.layout.tree()
+                    .nodeSize([0, depth])
+  , resize = require('./lib/resize')()
+  , defs = require('./lib/defs')()
+
+function toggleClass (clazz, state, node) {
+  this.node.filter(function (d) {
+    if (d == node) {
+      return true
+    }
+    while (d = d.parent) {
+      if (d === node) {
+        return true
+      }
+    }
+  }).classed(clazz, state)
+}
 
 /**
  * Create a new d3 tree with the given options.  The currently supported
  * options are:
  *
- * - selector: a CSS selector expression that specifies where the tree should be
- * appended to the DOM
+ * - container: a jquery object. ridiculously lame.
  * - url: the URL containing the nodes to render
  */
 var Tree = function (options) {
-  var self = this
   this.options = options
+  this.options.container.on('resize', this.resize.bind(this))
+}
 
-  var svg = d3.select(options.selector).append('svg')
-    .attr('width', width + margin.left + margin.right)
-  .append('g')
-    .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+Tree.prototype.render = function () {
+  var self = this
 
-  this.node = svg.selectAll('g.node')
+  this.svg = d3.select(this.options.container.get(0)) // Super lame. Figure out how to avoid jquery
+               .append('svg')
+               .call(defs)
 
-  http.get(options.url, function (res) {
+  this.node = this.svg.append('g')
+                        .attr('transform', 'translate(' + margin.left + ',' + margin.top + ')')
+                        .selectAll('g.node')
+
+  http.get(this.options.url, function (res) {
+    // TODO, this actually kills the browser processing each node individually
     res.pipe(JSONStream.parse([true]).on('data', function (n) {
       // Add node to its parent
       if (n.parent) {
@@ -37,91 +59,163 @@ var Tree = function (options) {
               return nodes[i]
             }
           }
-        })(nodes)
+        })(self.nodes)
         if (p.children) {
           p.children.push(n)
         } else {
           p.children = [n]
         }
-        nodes.push(n)
       } else {
-        // root
-        n.x = n.x0
-        n.y = n.y0
-        n.parent = n
         self.root = n
-        nodes = tree(self.root)
       }
       self.draw()
-    })).on('end', function () {
-      console.log('all done')
-    })
+    }))
   })
 }
 
-Tree.prototype.draw = function () {
-  var height = Math.max(500, nodes.length * barHeight + margin.top + margin.bottom)
+Tree.prototype.resize = function () {
+  var box = this.options.container.get(0).getBoundingClientRect()
+  resize.width(parseInt(box.width, 10))
+  resize.height(height)
+  this.node.call(resize)
+}
 
-  d3.select('svg').transition()
-      .duration(duration)
-      .attr('height', height)
+Tree.prototype.draw = function (source) {
+  var nodes = this.nodes = tree.nodes(this.root)
+    , self = this
 
-  d3.select(self.frameElement).transition()
-      .duration(duration)
-      .style('height', height + 'px')
-
-  this.node = this.node.data(tree.nodes(this.root), function (d) {
+  this.node = this.node.data(nodes, function (d) {
     return d.id
   })
 
   var enter = this.node.enter().append('g')
       .attr('class', 'node')
-      .attr('transform', function (d) { return 'translate(' + d.parent.y0 + ',' + d.parent.x0 + ')' })
-      .on('click', this.toggle)
+      .on('mouseover', toggleClass.bind(this, 'hover', true))
+      .on('mouseout', toggleClass.bind(this, 'hover', false))
+      .on('click', function (d, i) {
+        self.select.call(this, self, d, i)
+      })
+      .attr('transform', function (d, i) {
+        return 'translate(0,' + (source ? source._y : d.y) + ')'
+      })
+      .style('opacity', 1e-6)
 
+  // Filler element
   enter.append('rect')
-      .attr('y', -barHeight / 2)
-      .attr('height', barHeight)
-      .attr('width', barWidth)
-      .style('fill', '#fff')
+         .attr('class', 'node-fill')
+         .attr('width', '100%')
+         .attr('height', height)
+         .attr('y', height / - 2)
 
-  enter.append('path')
+  var contents = enter.append('g')
+                        .attr('class', 'node-contents')
+                        .attr('transform', function (d) {
+                          return 'translate(' + (d.parent ? d.parent._x : 0) + ',0)'
+                        })
+
+  contents.append('use')
+         .attr('class', 'icon')
+         .attr('x', 14) // manually position the icon
+         .attr('y', -6)
+
+  contents.append('text')
+         .attr('class', 'label')
+         .attr('dy', 4) // manually position the label
+         .attr('dx', 35)
+
+  contents.append('rect')
+       .attr('class', 'text-cover')
+
+  contents.append('circle')
       .attr('class', 'indicator')
-      .attr('d', d3.svg.symbol().type('circle'))
-      .attr('transform', 'translate(' + (barWidth - 10 )+ ',0)')
-      .style('fill', function (d) {
-        return d.color
+      .attr('cx', -7) // manually position the indicator circle
+      .attr('cy', 0)
+      .attr('r', 2.5) // the circle is 5px wide
+
+  // Put this after content, so the toggler click icon works
+  var toggler = enter.append('g')
+                       .attr('class', 'toggle-group')
+  toggler.append('use')
+         .attr('class', 'toggle-icon')
+         .attr('xlink:href', 'icons.svg#collapsed')
+         .attr('x', 15) // manually center the toggle icon in the click area
+         .attr('y', -5)
+  toggler.append('rect')
+           .attr('width', height)
+           .attr('height', height)
+           .on('click', this.toggle.bind(this))
+
+  // Update the color if it changed
+  this.node.selectAll('circle.indicator')
+      .attr('class', function (d) {
+        return 'indicator ' + d.color
       })
 
-  enter.append('text')
-      .attr('dy', 3.5)
-      .attr('dx', 5.5)
-      .text(function (d) { return d.label })
+  // The icon maybe changed
+  this.node.selectAll('use.icon')
+           .attr('class', function (d) {
+             return 'icon ' + d.color
+           })
+           .attr('xlink:href', function (d) {
+             return 'icons.svg#' + d.icon
+           })
 
-  nodes.forEach(function (n, i) {
-    n.x = i * barHeight
-  })
+  // change the state of the toggle icon by adjusting its class
+  this.node.selectAll('use.toggle-icon')
+           .attr('class', function (d) {
+             return 'toggle-icon ' + (d._children ? 'collapsed' : d.children ? 'expanded' : 'leaf')
+           })
 
-  enter.attr('transform', function (d) { return 'translate(' + d.y + ',' + d.x + ')' })
+  // Perhaps the name changed
+  this.node.selectAll('text.label')
+            .text(function (d) {
+              return d.label
+            })
 
-  this.node.attr('transform', function (d) { return 'translate(' + d.y + ',' + d.x + ')' })
-      .select('circle')
-      .style('fill', function (d) {
-        return d.color
-      })
-
+  // If this node has been removed, let's remove it.
   this.node.exit()
-      .attr('transform', function (d) { return 'translate(' + d.parent.y + ',' + d.parent.x + ')' })
+      .transition()
+      .duration(400)
+      .attr('transform', function (d) {
+        return 'translate(' + -depth + ',' + source._y + ')'
+      })
+      .style('opacity', 0)
       .remove()
 
-  nodes.forEach(function (d) {
-    d.x0 = d.x
-    d.y0 = d.y
-  })
+  // Now resize things
+  this.resize()
 }
 
-Tree.prototype.toggle = function(d) {
-  console.log(d)
+Tree.prototype.select = function (tree, d, i) {
+  var el = d3.select(this)
+    , prev = el.classed('selected')
+
+  if (tree._selected) {
+    tree._selected.classed('selected', false)
+  }
+
+  tree._selected = el
+  el.classed('selected', true)
+
+  if (prev) {
+    tree.toggle(d)
+  } else if (d._children) {
+    d.children = d._children
+    d._children = null
+    tree.draw(d)
+  }
+}
+
+Tree.prototype.toggle = function (d) {
+  if (d.children) {
+    d._children = d.children
+    d.children = null
+  } else {
+    d.children = d._children
+    d._children = null
+  }
+  this.draw(d)
+  d3.event.stopPropagation()
 }
 
 module.exports = Tree

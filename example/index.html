@@ -1,13 +1,67 @@
 <!DOCTYPE html>
-<meta charset="utf-8">
-<link rel="stylesheet" type="text/css" href="tree.css" />
-<style>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" type="text/css" href="tree.css" />
+    <link href="//fonts.googleapis.com/css?family=Source+Sans Pro:200italic,200,300italic,300,400italic,400,600italic,600,700italic,700,900italic,900" rel="stylesheet" type="text/css">
+    <style>
 
-  body {
-    background: #fff;
-  }
+      body {
+        text-align: center;
+        font-family: 'Source Sans Pro';
+      }
 
-</style>
-<body>
+      .container {
+        display: inline-block;
+        position: relative;
+        width: 600px;
+        height: 1000px;
+      }
+
+      .coords {
+        position: absolute;
+        top: 10;
+        left: 10;
+      }
+
+    </style>
+  </head>
+  <body>
+    <div class="coords">
+      <div>
+        <label for="height">Height</label>
+        <input type="text" id="height" class="coord">
+      </div>
+      <div>
+        <label for="width">Width</label>
+        <input type="text" id="width" class="coord">
+      </div>
+    </div>
+    <div class="container"></div>
+  </body>
+</html>
 <script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="./bundle.js"></script>
+<script>
+  var Tree = require('tree')
+    , container = document.querySelector('.container')
+
+  ;[].forEach.call(document.querySelectorAll('.coord'), function (coord) {
+    coord.addEventListener('blur', function () {
+      container.style[this.id] = this.value  + 'px'
+      $(container).trigger('resize')
+    })
+  })
+
+  var tree = new Tree({
+    url: '/tree.json?depth=2',
+    container: $(container) // any event emitter will do
+  })
+
+  tree.render()
+
+  </script>
+
+
+</script>
