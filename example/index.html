@@ -40,8 +40,6 @@
     <div class="container"></div>
   </body>
 </html>
-<script src="http://d3js.org/d3.v3.min.js"></script>
-<script src="http://code.jquery.com/jquery-2.1.1.min.js"></script>
 <script src="./bundle.js"></script>
 <script>
   var Tree = require('tree')
@@ -78,8 +76,7 @@
     }]
   })
 
-  $(container).append(tree.render().el.node())
-
+  container.appendChild(tree.render().el.node())
 
 </script>
 
