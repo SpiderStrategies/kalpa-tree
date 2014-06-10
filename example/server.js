@@ -3,6 +3,7 @@ var http = require('http')
   , url = require('url')
   , d3 = require('d3')
   , tree = require('./tree')
+  , request = require('request')
   , spawn = require('child_process').spawn
   , flat = require('./tree-flat')
 
@@ -17,6 +18,8 @@ http.createServer(function (req, res) {
     var less = spawn('./node_modules/less/bin/lessc', ['-x', 'tree.less'])
     less.stdout.pipe(res)
     less.stderr.pipe(process.stderr)
+  } else if (path === '/matt-tree.json') {
+    request('https://gist.githubusercontent.com/mattsgarlata/c331e9bdf264f7526850/raw/e989f2bd1e8eb9ac7d2caff48aba21025863514d/gistfile1.json').pipe(res)
   } else if (path === '/icons.svg') {
     return fs.createReadStream(__dirname + '/icons.svg').pipe(res)
   } else if (path == '/bundle.js') {
