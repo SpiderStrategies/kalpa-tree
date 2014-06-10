@@ -57,27 +57,31 @@ Tree.prototype.render = function () {
                         .attr('transform', 'translate(' + this.options.marginLeft + ',' + this.options.marginTop + ')')
                         .selectAll('g.node')
 
+  this._nodeData = []
   http.get(this.options.url, function (res) {
-    // TODO, this actually kills the browser processing each node individually
     res.pipe(JSONStream.parse([true]).on('data', function (n) {
-      // Add node to its parent
-      if (n.parent) {
-        var p = (function (nodes) {
-          for (var i = nodes.length - 1; i >= 0; i--) {
-            if (nodes[i].id === n.parent) {
-              return nodes[i]
-            }
+      var p = (function (nodes) {
+        for (var i = nodes.length - 1; i >= 0; i--) {
+          if (nodes[i].id === n.parent) {
+            return nodes[i]
           }
-        })(self.nodes)
-        if (p.children) {
-          p.children.push(n)
+        }
+      })(self._nodeData)
+
+      self._nodeData.push(n)
+      if (p) {
+        if (p == self._nodeData[0]) {
+          // if parent is the root, then push unto children so it's visible
+          (p.children || (p.children = [])).push(n)
+          self.draw()
         } else {
-          p.children = [n]
+          // push to _children so it's hidden, no need to draw
+          (p._children || (p._children = [])).push(n)
         }
       } else {
-        self.root = n
+        // root, draw it.
+        self.draw()
       }
-      self.draw()
     }))
   })
 
@@ -92,10 +96,9 @@ Tree.prototype.resize = function () {
 }
 
 Tree.prototype.draw = function (source) {
-  var nodes = this.nodes = this.tree.nodes(this.root)
-    , self = this
+  var self = this
 
-  this.node = this.node.data(nodes, function (d) {
+  this.node = this.node.data(this.tree.nodes(this._nodeData[0]), function (d) {
     return d.id
   })
 
@@ -168,7 +171,7 @@ Tree.prototype.draw = function (source) {
              return 'icon ' + d.color
            })
            .attr('xlink:href', function (d) {
-             return self.options.icons + '#' + d.icon
+              return self.options.icons + '#' + d.icon
            })
 
   // change the state of the toggle icon by adjusting its class
