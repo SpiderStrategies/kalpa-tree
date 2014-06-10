@@ -59,7 +59,6 @@ Tree.prototype.render = function () {
 
   this._nodeData = []
   http.get(this.options.url, function (res) {
-    // TODO, this actually kills the browser processing each node individually
     res.pipe(JSONStream.parse([true]).on('data', function (n) {
       var p = (function (nodes) {
         for (var i = nodes.length - 1; i >= 0; i--) {
@@ -69,17 +68,20 @@ Tree.prototype.render = function () {
         }
       })(self._nodeData)
 
+      self._nodeData.push(n)
       if (p) {
         if (p == self._nodeData[0]) {
           // if parent is the root, then push unto children so it's visible
           (p.children || (p.children = [])).push(n)
+          self.draw()
         } else {
-          // push to _children so it's hidden
+          // push to _children so it's hidden, no need to draw
           (p._children || (p._children = [])).push(n)
         }
+      } else {
+        // root, draw it.
+        self.draw()
       }
-      self._nodeData.push(n)
-      self.draw()
     }))
   })
 
