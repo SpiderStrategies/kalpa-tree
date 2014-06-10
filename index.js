@@ -168,7 +168,7 @@ Tree.prototype.draw = function (source) {
              return 'icon ' + d.color
            })
            .attr('xlink:href', function (d) {
-             return 'icons.svg#' + d.icon
+             return self.options.icons + '#' + d.icon
            })
 
   // change the state of the toggle icon by adjusting its class
