@@ -45,6 +45,10 @@ var Tree = function (options) {
 
   this.tree = d3.layout.tree()
                        .nodeSize([0, this.options.depth])
+
+  d3.xml(this.options.icons, 'image/svg+xml', function (xml) {
+    document.body.appendChild(xml.documentElement)
+  })
 }
 
 Tree.prototype.render = function () {
@@ -151,7 +155,7 @@ Tree.prototype.draw = function (source) {
                        .attr('class', 'toggle-group')
   toggler.append('use')
          .attr('class', 'toggle-icon')
-         .attr('xlink:href', this.options.icons + '#collapsed')
+         .attr('xlink:href', '#collapsed')
          .attr('x', 15) // manually center the toggle icon in the click area
          .attr('y', -5)
   toggler.append('rect')
@@ -171,7 +175,7 @@ Tree.prototype.draw = function (source) {
              return 'icon ' + d.color
            })
            .attr('xlink:href', function (d) {
-              return self.options.icons + '#' + d.icon
+              return '#' + d.icon
            })
 
   // change the state of the toggle icon by adjusting its class
