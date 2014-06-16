@@ -46,9 +46,11 @@ var Tree = function (options) {
   this.tree = d3.layout.tree()
                        .nodeSize([0, this.options.depth])
 
-  d3.xml(this.options.icons, 'image/svg+xml', function (xml) {
-    document.body.appendChild(xml.documentElement)
-  })
+  if (typeof this.options.icons === 'string') {
+    d3.xml(this.options.icons, 'image/svg+xml', function (xml) {
+      document.body.appendChild(xml.documentElement)
+    })
+  }
 }
 
 util.inherits(Tree, EventEmitter)
