@@ -1,5 +1,4 @@
 var d3 = require('d3')
-  , JSONStream = require('JSONStream')
   , resize = require('./lib/resize')
   , defs = require('./lib/defs')
   , defaults = {
@@ -57,7 +56,7 @@ Tree.prototype.render = function () {
                         .selectAll('g.node')
 
   this._nodeData = []
-  this.options.stream.pipe(JSONStream.parse([true]).on('data', function (n) {
+  this.options.stream.on('data', function (n) {
     var p = (function (nodes) {
       for (var i = nodes.length - 1; i >= 0; i--) {
         if (nodes[i].id === n.parent) {
@@ -80,7 +79,7 @@ Tree.prototype.render = function () {
       // root, draw it.
       self.draw()
     }
-  }))
+  })
 
   return this
 }
