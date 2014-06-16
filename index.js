@@ -1,6 +1,4 @@
 var d3 = require('d3')
-  , http = require('http')
-  , JSONStream = require('JSONStream')
   , resize = require('./lib/resize')
   , defs = require('./lib/defs')
   , defaults = {
@@ -31,8 +29,8 @@ var Tree = function (options) {
   if (!options) {
     throw new Error('options are required')
   }
-  if (!options.url) {
-    throw new Error('options.url is required')
+  if (!options.stream) {
+    throw new Error('options.stream is required')
   }
 
   this.options = defaults
@@ -58,31 +56,29 @@ Tree.prototype.render = function () {
                         .selectAll('g.node')
 
   this._nodeData = []
-  http.get(this.options.url, function (res) {
-    res.pipe(JSONStream.parse([true]).on('data', function (n) {
-      var p = (function (nodes) {
-        for (var i = nodes.length - 1; i >= 0; i--) {
-          if (nodes[i].id === n.parent) {
-            return nodes[i]
-          }
+  this.options.stream.on('data', function (n) {
+    var p = (function (nodes) {
+      for (var i = nodes.length - 1; i >= 0; i--) {
+        if (nodes[i].id === n.parent) {
+          return nodes[i]
         }
-      })(self._nodeData)
-
-      self._nodeData.push(n)
-      if (p) {
-        if (p == self._nodeData[0]) {
-          // if parent is the root, then push unto children so it's visible
-          (p.children || (p.children = [])).push(n)
-          self.draw()
-        } else {
-          // push to _children so it's hidden, no need to draw
-          (p._children || (p._children = [])).push(n)
-        }
-      } else {
-        // root, draw it.
-        self.draw()
       }
-    }))
+    })(self._nodeData)
+
+    self._nodeData.push(n)
+    if (p) {
+      if (p == self._nodeData[0]) {
+        // if parent is the root, then push unto children so it's visible
+        (p.children || (p.children = [])).push(n)
+        self.draw()
+      } else {
+        // push to _children so it's hidden, no need to draw
+        (p._children || (p._children = [])).push(n)
+      }
+    } else {
+      // root, draw it.
+      self.draw()
+    }
   })
 
   return this

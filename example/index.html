@@ -43,6 +43,8 @@
 <script src="./bundle.js"></script>
 <script>
   var Tree = require('tree')
+    , http = require('http')
+    , JSONStream = require('JSONStream')
     , container = document.querySelector('.container')
 
   ;[].forEach.call(document.querySelectorAll('.coord'), function (coord) {
@@ -52,31 +54,33 @@
     })
   })
 
-  var tree = new Tree({
-    url: '/tree.json?depth=4',
-    icons: 'icons.svg',
-    gradients: [{
-      attrs: {
-        id: 'grad',
-        x1: '0%',
-        y1: '0%',
-        x2: '70%',
-        y2: '0%'
-      },
-      stops: [0, 50]
-    }, {
-      attrs: {
-        id: 'grad-selected',
-        x1: '0%',
-        y1: '0%',
-        x2: '70%',
-        y2: '0%'
-      },
-      stops: [0, 50]
-    }]
-  })
+  http.get('/tree.json?depth=4', function (res) {
+    var tree = new Tree({
+      stream: res.pipe(JSONStream.parse([true])),
+      icons: 'icons.svg',
+      gradients: [{
+        attrs: {
+          id: 'grad',
+          x1: '0%',
+          y1: '0%',
+          x2: '70%',
+          y2: '0%'
+        },
+        stops: [0, 50]
+      }, {
+        attrs: {
+          id: 'grad-selected',
+          x1: '0%',
+          y1: '0%',
+          x2: '70%',
+          y2: '0%'
+        },
+        stops: [0, 50]
+      }]
+    })
 
-  container.appendChild(tree.render().el.node())
+    container.appendChild(tree.render().el.node())
+  })
 
 </script>
 
