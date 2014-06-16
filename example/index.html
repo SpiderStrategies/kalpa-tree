@@ -80,6 +80,10 @@
     })
 
     container.appendChild(tree.render().el.node())
+
+    tree.on('selected', function (node) {
+      console.log(node)
+    })
   })
 
 </script>

@@ -1,4 +1,6 @@
 var d3 = require('d3')
+  , EventEmitter = require('events').EventEmitter
+  , util = require('util')
   , resize = require('./lib/resize')
   , defs = require('./lib/defs')
   , defaults = {
@@ -48,6 +50,8 @@ var Tree = function (options) {
     document.body.appendChild(xml.documentElement)
   })
 }
+
+util.inherits(Tree, EventEmitter)
 
 Tree.prototype.render = function () {
   var self = this
@@ -210,6 +214,7 @@ Tree.prototype.select = function (tree, d, i) {
 
   tree._selected = el
   el.classed('selected', true)
+  tree.emit('selected', d)
 
   if (prev) {
     tree.toggle(d)
