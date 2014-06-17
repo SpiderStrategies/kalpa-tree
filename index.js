@@ -77,6 +77,7 @@ Tree.prototype.render = function () {
 
     self._nodeData.push(n)
     if (p) {
+      n.parent = p
       if (p == self._nodeData[0]) {
         // if parent is the root, then push unto children so it's visible
         (p.children || (p.children = [])).push(n)
