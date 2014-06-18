@@ -8,7 +8,13 @@ var d3 = require('d3')
     height: 36, // height of each row
     marginLeft: 0,
     marginTop:  18,
-    duration: 400
+    duration: 400,
+    accessors: {
+      id: 'id',
+      label: 'label',
+      icon: 'icon',
+      color: 'color'
+    }
   }
 
 function toggleClass (clazz, state, node) {
@@ -37,7 +43,13 @@ var Tree = function (options) {
 
   this.options = defaults
   for (var p in options) {
-    this.options[p] = options[p]
+    if (p === 'accessors') {
+      for (var pp in options.accessors) {
+        this.options.accessors[pp] = options.accessors[pp]
+      }
+    } else {
+      this.options[p] = options[p]
+    }
   }
 
   this.defs = defs(this.options)
@@ -106,7 +118,7 @@ Tree.prototype.draw = function (source) {
   var self = this
 
   this.node = this.node.data(this.tree.nodes(this._nodeData[0]), function (d) {
-    return d.id
+    return d[self.options.accessors.id]
   })
 
   var enter = this.node.enter().append('g')
@@ -167,16 +179,16 @@ Tree.prototype.draw = function (source) {
   // Update the color if it changed
   this.node.selectAll('circle.indicator')
       .attr('class', function (d) {
-        return 'indicator ' + d.color
+        return 'indicator ' + d[self.options.accessors.color]
       })
 
   // The icon maybe changed
   this.node.selectAll('use.icon')
            .attr('class', function (d) {
-             return 'icon ' + d.color
+             return 'icon ' + d[self.options.accessors.color]
            })
            .attr('xlink:href', function (d) {
-              return '#' + d.icon
+              return '#' + d[self.options.accessors.icon]
            })
 
   // change the state of the toggle icon by adjusting its class
@@ -188,7 +200,7 @@ Tree.prototype.draw = function (source) {
   // Perhaps the name changed
   this.node.selectAll('text.label')
             .text(function (d) {
-              return d.label
+              return d[self.options.accessors.label]
             })
 
   // if we are manipulating a single node, we may have to adjust selected properties
