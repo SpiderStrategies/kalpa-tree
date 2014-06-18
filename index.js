@@ -77,6 +77,7 @@ Tree.prototype.render = function () {
 
     self._nodeData.push(n)
     if (p) {
+      n.parent = p
       if (p == self._nodeData[0]) {
         // if parent is the root, then push unto children so it's visible
         (p.children || (p.children = [])).push(n)
@@ -112,9 +113,7 @@ Tree.prototype.draw = function (source) {
       .attr('class', 'node')
       .on('mouseover', toggleClass.bind(this, 'hover', true))
       .on('mouseout', toggleClass.bind(this, 'hover', false))
-      .on('click', function (d, i) {
-        self.select.call(this, self, d, i)
-      })
+      .on('click', this._onSelect.bind(this))
       .attr('transform', function (d, i) {
         return 'translate(0,' + (source ? source._y : d.y) + ')'
       })
@@ -192,6 +191,13 @@ Tree.prototype.draw = function (source) {
               return d.label
             })
 
+  // if we are manipulating a single node, we may have to adjust selected properties
+  if (source) {
+    this.node.classed('selected', function (d) {
+      return d.selected
+    })
+  }
+
   // If this node has been removed, let's remove it.
   this.node.exit()
       .transition()
@@ -206,28 +212,34 @@ Tree.prototype.draw = function (source) {
   this.resize()
 }
 
-Tree.prototype.select = function (tree, d, i) {
-  var el = d3.select(this)
-    , prev = el.classed('selected')
+Tree.prototype.select = function (id) {
+  var d = null
+  this._nodeData.some(function (_d) {
+    return _d.id == id && (d = _d, true)
+  })
 
-  if (tree._selected) {
-    tree._selected.classed('selected', false)
-  }
-
-  tree._selected = el
-  el.classed('selected', true)
-  tree.emit('selected', d)
-
-  if (prev) {
-    tree.toggle(d)
-  } else if (d._children) {
-    d.children = d._children
-    d._children = null
-    tree.draw(d)
+  if (d) {
+    tree._onSelect(d)
   }
 }
 
+Tree.prototype._onSelect = function (d) {
+  // tree_.selected stores a previously selected node
+  if (tree._selected) {
+    // delete the selected field from that node
+    delete tree._selected.selected
+  }
+  d.selected = true
+  tree.emit('selected', d)
+  tree._selected = d
+  this.toggle(d)
+}
+
 Tree.prototype.toggle = function (d) {
+  // make sure all parents are visible
+  while (d.parent._children) {
+    this.toggle(d.parent)
+  }
   if (d.children) {
     d._children = d.children
     d.children = null
@@ -236,7 +248,9 @@ Tree.prototype.toggle = function (d) {
     d._children = null
   }
   this.draw(d)
-  d3.event.stopPropagation()
+  if (d3.event) {
+    d3.event.stopPropagation()
+  }
 }
 
 module.exports = Tree
