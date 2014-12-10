@@ -1,7 +1,6 @@
 var d3 = require('d3')
   , EventEmitter = require('events').EventEmitter
   , util = require('util')
-  , resize = require('./lib/resize')
   , defaults = {
     depth: 20, // indentation depth
     height: 36, // height of each row
@@ -12,6 +11,18 @@ var d3 = require('d3')
       color: 'color'
     }
   }
+  , prefix = (function () {
+    if ('-webkit-transform' in document.body.style) {
+      return '-webkit-'
+    } else if ('-moz-transform' in document.body.style) {
+      return '-moz-'
+    } else if ('-ms' in document.body.style) {
+      return '-ms-'
+    } else {
+      return ''
+    }
+  })()
+  , resize = require('./lib/resize')
 
 /**
  * Create a new d3 tree with the given config.
@@ -35,7 +46,7 @@ var Tree = function (options) {
     }
   }
 
-  this.resizer = resize(this.options)
+  this.resizer = resize(prefix)
 
   this.tree = d3.layout.tree()
                        .nodeSize([0, this.options.depth])
@@ -104,7 +115,7 @@ Tree.prototype.draw = function (source) {
   var enter = this.node.enter().append('li')
       .attr('class', 'node')
       .on('click', this._onSelect.bind(this))
-      .style('transform', function (d) {
+      .style(prefix + 'transform', function (d) {
         return 'translate(0px,' + (source ? source._y : d.y) + 'px)'
       })
       .style('opacity', 1e-6)
@@ -112,7 +123,7 @@ Tree.prototype.draw = function (source) {
   // Add the node contents
   var contents = enter.append('div')
                         .attr('class', 'node-contents')
-                        .style('transform', function (d) {
+                        .style(prefix + 'transform', function (d) {
                           return 'translate(' + ((d.parent ? d.parent._x : 0) - 10) + 'px,0px)'
                         })
 
@@ -173,7 +184,7 @@ Tree.prototype.draw = function (source) {
 
   // If this node has been removed, let's remove it.
   this.node.exit()
-      .style('transform', function (d) {
+      .style(prefix + 'transform', function (d) {
         return 'translate(' + -self.options.depth + 'px,' + source._y + 'px)'
       })
       .style('opacity', 1e-6)
