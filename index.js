@@ -2,7 +2,6 @@ var d3 = require('d3')
   , EventEmitter = require('events').EventEmitter
   , util = require('util')
   , resize = require('./lib/resize')
-  , defs = require('./lib/defs')
   , defaults = {
     depth: 20, // indentation depth
     height: 36, // height of each row
@@ -52,7 +51,6 @@ var Tree = function (options) {
     }
   }
 
-  this.defs = defs(this.options)
   this.resizer = resize(this.options)
 
   this.tree = d3.layout.tree()
@@ -70,12 +68,11 @@ util.inherits(Tree, EventEmitter)
 Tree.prototype.render = function () {
   var self = this
 
-  this.el = d3.select(document.createElementNS('http://www.w3.org/2000/svg', 'svg'))
-               .call(this.defs)
+  this.el = d3.select(document.createElement('div'))
+              .attr('class', 'tree')
 
-  this.node = this.el.append('g')
-                        .attr('transform', 'translate(' + this.options.marginLeft + ',' + this.options.marginTop + ')')
-                        .selectAll('g.node')
+  this.node = this.el.append('ul')
+                     .selectAll('li.node')
 
   this._nodeData = []
   this.options.stream.on('data', function (n) {
@@ -121,84 +118,66 @@ Tree.prototype.draw = function (source) {
     return d[self.options.accessors.id]
   })
 
-  var enter = this.node.enter().append('g')
+  var enter = this.node.enter().append('li')
       .attr('class', 'node')
       .on('mouseover', toggleClass.bind(this, 'hover', true))
       .on('mouseout', toggleClass.bind(this, 'hover', false))
       .on('click', this._onSelect.bind(this))
-      .attr('transform', function (d, i) {
-        return 'translate(0,' + (source ? source._y : d.y) + ')'
+      .style('transform', function (d) {
+        return 'translate(0,' + (source ? source._y : d.y) + 'px)'
       })
-      .style('opacity', 1e-6)
 
-  // Filler element
-  enter.append('rect')
-         .attr('class', 'node-fill')
-         .attr('width', '100%')
-         .attr('height', this.options.height)
-         .attr('y', this.options.height / - 2)
-
-  var contents = enter.append('g')
+  // Add the node contents
+  var contents = enter.append('div')
                         .attr('class', 'node-contents')
-                        .attr('transform', function (d) {
-                          return 'translate(' + (d.parent ? d.parent._x : 0) + ',0)'
+                        .style('transform', function (d) {
+                          return 'translate(' + ((d.parent ? d.parent._x : 0) - 10) + 'px,0px)'
                         })
 
-  contents.append('use')
-         .attr('class', 'icon')
-         .attr('x', 14) // manually position the icon
-         .attr('y', -6)
+  // Add the toggler
+  contents.append('div')
+          .attr('class', 'toggler')
+            .append('svg')
+              .append('use')
+                .attr('xlink:href', '#collapsed')
 
-  contents.append('text')
+  // icon to represent the node tpye
+  contents.append('svg')
+          .attr('class', 'icon')
+            .append('use')
+
+  contents.append('span')
          .attr('class', 'label')
-         .attr('dy', 4) // manually position the label
-         .attr('dx', 35)
 
-  contents.append('rect')
-       .attr('class', 'text-cover')
-
-  contents.append('circle')
-      .attr('class', 'indicator')
-      .attr('cx', -7) // manually position the indicator circle
-      .attr('cy', 0)
-      .attr('r', 2.5) // the circle is 5px wide
-
-  // Put this after content, so the toggler click icon works
-  var toggler = enter.append('g')
-                       .attr('class', 'toggle-group')
-  toggler.append('use')
-         .attr('class', 'toggle-icon')
-         .attr('xlink:href', '#collapsed')
-         .attr('x', 15) // manually center the toggle icon in the click area
-         .attr('y', -5)
-  toggler.append('rect')
-           .attr('width', this.options.height)
-           .attr('height', this.options.height)
-           .on('click', this.toggle.bind(this))
+  // Now the indicator light
+  enter.append('span')
+          .attr('class', 'indicator')
 
   // Update the color if it changed
-  this.node.selectAll('circle.indicator')
+  this.node.selectAll('span.indicator')
       .attr('class', function (d) {
         return 'indicator ' + d[self.options.accessors.color]
       })
 
   // The icon maybe changed
-  this.node.selectAll('use.icon')
+  this.node.selectAll('svg.icon')
+           // .attr('viewBox', '0 0 32 32')
            .attr('class', function (d) {
              return 'icon ' + d[self.options.accessors.color]
            })
-           .attr('xlink:href', function (d) {
+           .selectAll('use')
+            .attr('xlink:href', function (d) {
               return '#' + d[self.options.accessors.icon]
-           })
+            })
 
   // change the state of the toggle icon by adjusting its class
-  this.node.selectAll('use.toggle-icon')
+  this.node.selectAll('.toggler')
            .attr('class', function (d) {
-             return 'toggle-icon ' + (d._children ? 'collapsed' : d.children ? 'expanded' : 'leaf')
+             return 'toggler ' + (d._children ? 'collapsed' : d.children ? 'expanded' : 'leaf')
            })
 
   // Perhaps the name changed
-  this.node.selectAll('text.label')
+  this.node.selectAll('span.label')
             .text(function (d) {
               return d[self.options.accessors.label]
             })
@@ -214,10 +193,10 @@ Tree.prototype.draw = function (source) {
   this.node.exit()
       .transition()
       .duration(this.options.duration)
-      .attr('transform', function (d) {
-        return 'translate(' + -self.options.depth + ',' + source._y + ')'
-      })
-      .style('opacity', 0)
+      // .attr('transform', function (d) {
+      //   return 'translate(' + -self.options.depth + ',' + source._y + ')'
+      // })
+      // .style('opacity', 0)
       .remove()
 
   // Now resize things
