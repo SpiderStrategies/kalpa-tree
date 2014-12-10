@@ -183,9 +183,14 @@ Tree.prototype.draw = function (source) {
   }
 
   // If this node has been removed, let's remove it.
-  this.node.exit()
+  var exit = this.node.exit()
+  exit.selectAll('div.node-contents')
       .style(prefix + 'transform', function (d) {
-        return 'translate(' + -self.options.depth + 'px,' + source._y + 'px)'
+        return 'translate(' + -self.options.depth + 'px,0px)'
+      })
+
+  exit.style(prefix + 'transform', function (d) {
+        return 'translate(0px,' + source._y + 'px)'
       })
       .style('opacity', 1e-6)
       .transition()
