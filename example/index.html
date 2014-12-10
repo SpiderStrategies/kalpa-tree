@@ -66,26 +66,7 @@
   http.get('/tree.json?depth=4', function (res) {
     tree = new Tree({
       stream: res.pipe(JSONStream.parse([true])),
-      icons: 'icons.svg',
-      gradients: [{
-        attrs: {
-          id: 'grad',
-          x1: '0%',
-          y1: '0%',
-          x2: '70%',
-          y2: '0%'
-        },
-        stops: [0, 50]
-      }, {
-        attrs: {
-          id: 'grad-selected',
-          x1: '0%',
-          y1: '0%',
-          x2: '70%',
-          y2: '0%'
-        },
-        stops: [0, 50]
-      }]
+      icons: 'icons.svg'
     })
 
     container.appendChild(tree.render().el.node())
