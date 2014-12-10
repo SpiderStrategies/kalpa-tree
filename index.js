@@ -189,7 +189,7 @@ Tree.prototype.draw = function (source) {
       })
       .style('opacity', 1e-6)
       .transition()
-      .duration(200) // copied in css
+      .duration(300) // copied in css
       .remove()
 
   // Now resize things
