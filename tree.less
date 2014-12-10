@@ -9,20 +9,22 @@ div.tree {
   height: 100%;
   background-color: #393c40;
 
+  &:hover {
+   ul li.node:not(:first-child) {
+    div.node-contents {
+      .toggler {
+        visibility: visible;
+      }
+    }
+   }
+  }
+
   ul {
     list-style-type: none !important;
     padding: 0px;
     margin: 0px;
 
     li.node {
-      &:not(:first-child).hover {
-        div.node-contents {
-          .toggler {
-            visibility: visible;
-          }
-        }
-      }
-
       cursor: pointer;
       list-style: none;
       position: absolute;

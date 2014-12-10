@@ -13,19 +13,6 @@ var d3 = require('d3')
     }
   }
 
-function toggleClass (clazz, state, node) {
-  this.node.filter(function (d) {
-    if (d == node) {
-      return true
-    }
-    while (d = d.parent) {
-      if (d === node) {
-        return true
-      }
-    }
-  }).classed(clazz, state)
-}
-
 /**
  * Create a new d3 tree with the given config.
  */
@@ -116,8 +103,6 @@ Tree.prototype.draw = function (source) {
 
   var enter = this.node.enter().append('li')
       .attr('class', 'node')
-      .on('mouseover', toggleClass.bind(this, 'hover', true))
-      .on('mouseout', toggleClass.bind(this, 'hover', false))
       .on('click', this._onSelect.bind(this))
       .style('transform', function (d) {
         return 'translate(0px,' + (source ? source._y : d.y) + 'px)'
