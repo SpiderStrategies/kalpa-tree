@@ -3,24 +3,24 @@
 @yellow: #fbcc3c;
 @green: #96cd00;
 @red: #f35132;
+@transition: 300ms ease-out;
 
 .container {
   background-color: #393c40;
+  // Show the expand/collapse indicators on hover
+  
+  &:hover {
+    li.node:not(:first-child) {
+      .toggler { .lh-opacity(1); }
+    }
+  }
 }
 
-div.tree {
-  &:hover {
-   ul li.node:not(:first-child) {
-    div.node-contents {
-      .toggler {
-        visibility: visible;
-      }
-    }
-   }
-  }
+.tree {
+  .lh-user-select(none);
 
   ul {
-    list-style-type: none !important;
+    list-style-type: none;
     padding: 0px;
     margin: 0px;
 
@@ -33,131 +33,90 @@ div.tree {
       top: 0;
       left: 0;
       overflow-x: hidden;
+      .lh-transition(transform @transition, opacity @transition);
 
-      .lh-transition(transform 300ms ease-out, opacity 300ms ease-out);
-
-      div.node-contents {
+      .node-contents {
         margin: 6px;
         text-align: left;
         white-space: nowrap;
-        .lh-transition(transform 300ms ease-out, opacity 300ms ease-out);
+        .lh-transition(transform @transition, opacity @transition);
 
         .toggler {
+          display: inline-block;
+          vertical-align: middle;
           width: 14px;
           height: 14px;
-          //visibility: hidden;
-          display: inline-block;
-          -webkit-transform: rotate(0deg);
-          -webkit-transform-origin: 2px 4px;
-          -webkit-transition: -webkit-transform 300ms;
+          .lh-opacity(0);
+          .lh-transform(rotate(0deg));
+          .lh-transform-origin(7px 7px);
+          .lh-transition(all @transition);
 
           svg {
+            position: absolute;
             width: 100%;
             height: 100%;
-            position: absolute;
+            fill: #818b8f;
           }
 
-          &.expanded {
-            -webkit-transform: rotate(90deg);
-          }
-
-          &.leaf {
-            visibility: hidden !important;
-          }
+          &.expanded { .lh-transform(rotate(90deg)); }
+          &.leaf { visibility: hidden !important; }
         }
 
         svg.icon {
-          width: 20px;
+          display: inline-block;
+          vertical-align: middle;
+          margin-left: 4px;
+          width: 14px;
           height: 14px;
 
-          &.yellow {
-            fill: @yellow;
-          }
-
-          &.green {
-            fill: @green;
-          }
-
-          &.red {
-            fill: @red;
-          }
+          &.yellow { fill: @yellow; }
+          &.green { fill: @green; }
+          &.red { fill: @red; }
         }
 
-        span.label {
-          color: #818b8f;
+        .label {
+          display: inline-block;
+          vertical-align: middle;
+          margin-left: 8px;
+          color: #ADB8BC;
           font-size: 13px;
-          text-shadow: 0 1px 0 rgba(0,0,0,.23);
-          -webkit-user-select: none;
+          text-shadow: 0 1px 0 rgba(0, 0, 0, 0.23);
         }
       }
 
       .indicator {
-        &:before {
-          content: "";
-          pointer-events: none;
-          position: absolute;
-          width: 100px;
-          height: 100%;
-          top: 0;
-          right: 0;
+        position: absolute;
+        width: 100px;
+        height: 100%;
+        top: 0;
+        right: 0;
+        .lh-background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 50%));
 
-          .lh-background-image(linear-gradient(left, rgba(0,0,0,0) 0%, #393c40 80%,  #393c40 100%));
-        }
 
         &:after {
           content: "";
-          pointer-events: none;
           position: absolute;
-          width: 6px;
-          height: 6px;
-          top: 12px;
-          right: 8px;
-          -moz-border-radius: 50%;
-          -webkit-border-radius: 50%;
+          width: 5px;
+          height: 5px;
+          top: 16px;
+          right: 12px;
           border-radius: 50%;
         }
-
-        &.yellow {
-          &:after {
-            background-color: @yellow;
-          }
-        }
-
-        &.green {
-          &:after {
-            background-color: @green;
-          }
-        }
-
-        &.red {
-          &:after {
-            background-color: @red;
-          }
-        }
+        &.yellow:after { background-color: @yellow; }
+        &.green:after { background-color: @green; }
+        &.red:after { background-color: @red; }
       }
 
       &:not(.selected) {
-        .icon {
-          fill: grey !important;
-        }
+        .icon { fill: grey !important; }
       }
 
       &.selected {
         background-color: #2d3135;
 
-        div.node-contents {
-          span.label {
-            color: #e1e8eb;
-          }
-        }
-
-        .indicator {
-          &:before {
-            .lh-background-image(linear-gradient(left, rgba(0,0,0,0) 0%, #2d3135 50%));
-          }
-        }
+        .label { color: #E1E8EB; }
+        .indicator { .lh-background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 50%)); }
       }
     }
   }
 }
-

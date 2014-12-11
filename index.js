@@ -139,15 +139,15 @@ Tree.prototype.draw = function (source) {
           .attr('class', 'icon')
             .append('use')
 
-  contents.append('span')
+  contents.append('div')
          .attr('class', 'label')
 
   // Now the indicator light
-  enter.append('span')
+  enter.append('div')
           .attr('class', 'indicator')
 
   // Update the color if it changed
-  this.node.selectAll('span.indicator')
+  this.node.selectAll('div.indicator')
       .attr('class', function (d) {
         return 'indicator ' + d[self.options.accessors.color]
       })
@@ -170,7 +170,7 @@ Tree.prototype.draw = function (source) {
            })
 
   // Perhaps the name changed
-  this.node.selectAll('span.label')
+  this.node.selectAll('div.label')
             .text(function (d) {
               return d[self.options.accessors.label]
             })
