@@ -11,17 +11,14 @@ var d3 = require('d3')
       color: 'color'
     }
   }
-  , prefix = (function () {
-    if ('-webkit-transform' in document.body.style) {
-      return '-webkit-'
-    } else if ('-moz-transform' in document.body.style) {
-      return '-moz-'
-    } else if ('-ms' in document.body.style) {
-      return '-ms-'
-    } else {
-      return ''
+  , prefix = (function (p) {
+    for (var i = 0; i < p.length; i++) {
+      if (p[i] + 'Transform' in document.body.style) {
+        return '-' + p[i] + '-'
+      }
     }
-  })()
+    return ''
+  })([ 'webkit', 'ms', 'Moz', 'O' ])
   , resize = require('./lib/resize')
 
 /**
