@@ -4,7 +4,6 @@ var d3 = require('d3')
   , defaults = {
     depth: 20, // indentation depth
     height: 36, // height of each row
-    padding: 10, // padding for each node to adjust for the toggler
     accessors: {
       id: 'id',
       label: 'label',
@@ -103,7 +102,6 @@ Tree.prototype.render = function () {
 Tree.prototype.resize = function () {
   var box = this.el.node().parentNode.getBoundingClientRect()
   this.resizer.height(this.options.height)
-  this.resizer.padding(this.options.padding)
   this.node.call(this.resizer)
 }
 
@@ -126,7 +124,7 @@ Tree.prototype.draw = function (source) {
   var contents = enter.append('div')
                         .attr('class', 'node-contents')
                         .style(prefix + 'transform', function (d) {
-                          return 'translate(' + ((d.parent ? d.parent._x : 0) - self.options.padding) + 'px,0px)'
+                          return 'translate(' + (d.parent ? d.parent._x : 0) + 'px,0px)'
                         })
 
   // Add the toggler
@@ -188,7 +186,7 @@ Tree.prototype.draw = function (source) {
   var exit = this.node.exit()
   exit.selectAll('div.node-contents')
       .style(prefix + 'transform', function (d) {
-        return 'translate(' + (d.parent._x - self.options.padding) + 'px,0px)'
+        return 'translate(' + d.parent._x + 'px,0px)'
       })
 
   exit.style(prefix + 'transform', function (d) {

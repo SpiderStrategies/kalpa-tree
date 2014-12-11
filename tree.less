@@ -8,7 +8,7 @@
 .container {
   background-color: #393c40;
   // Show the expand/collapse indicators on hover
-  
+
   &:hover {
     li.node:not(:first-child) {
       .toggler { .lh-opacity(1); }
@@ -23,6 +23,7 @@
     list-style-type: none;
     padding: 0px;
     margin: 0px;
+    transform: translateX(-10px); // Shift over 10 px since we don't show the toggler on the root node
 
     li.node {
       cursor: pointer;
