@@ -86,6 +86,7 @@ Tree.prototype.render = function () {
       self.draw()
     }
   })
+  .on('end', self.draw.bind(self))
 
   return this
 }
