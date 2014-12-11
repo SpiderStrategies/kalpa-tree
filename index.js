@@ -114,8 +114,8 @@ Tree.prototype.draw = function (source) {
   // Add the node contents
   var contents = enter.append('div')
                         .attr('class', 'node-contents')
-                        .style(prefix + 'transform', function (d) {
-                          return 'translate(' + (d.parent ? d.parent._x : 0) + 'px,0px)'
+                        .attr('style', function (d) {
+                          return prefix + 'transform:' + 'translate(' + (d.parent ? d.parent._x : 0) + 'px,0px)'
                         })
 
   // Add the toggler
