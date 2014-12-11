@@ -188,7 +188,7 @@ Tree.prototype.draw = function (source) {
   var exit = this.node.exit()
   exit.selectAll('div.node-contents')
       .style(prefix + 'transform', function (d) {
-        return 'translate(' + -self.options.depth + 'px,0px)'
+        return 'translate(' + (d.parent._x - self.options.padding) + 'px,0px)'
       })
 
   exit.style(prefix + 'transform', function (d) {
