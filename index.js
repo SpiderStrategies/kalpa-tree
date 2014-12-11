@@ -203,7 +203,8 @@ Tree.prototype.select = function (id) {
   }
 }
 
-Tree.prototype._onSelect = function (d) {
+Tree.prototype._onSelect = function (d, i) {
+  if (i === 0) { return } // Root node shouldn't do anything
   // tree_.selected stores a previously selected node
   if (tree._selected) {
     // delete the selected field from that node
