@@ -64,7 +64,7 @@ Tree.prototype.render = function () {
   this.options.stream.on('data', function (n) {
     var p = (function (nodes) {
       for (var i = nodes.length - 1; i >= 0; i--) {
-        if (nodes[i].id === n.parent) {
+        if (nodes[i].id === n.parentId) {
           return nodes[i]
         }
       }
