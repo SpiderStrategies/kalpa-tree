@@ -1,113 +1,123 @@
-svg {
-  width: 100%;
-  height: 100%;
+@import "node_modules/lesshat/build/lesshat-prefixed";
+
+@yellow: #fbcc3c;
+@green: #96cd00;
+@red: #f35132;
+@transition: 300ms ease-out;
+
+.container {
   background-color: #393c40;
+  // Show the expand/collapse indicators on hover
 
-  defs {
-    #grad {
-      .stop-0 {
-        stop-color: #393c40;
-        stop-opacity: 0;
-      }
-
-      .stop-50 {
-        stop-color: #393c40;
-        stop-opacity: 1;
-      }
+  &:hover {
+    li.node:not(:first-child) {
+      .toggler { .lh-opacity(1); }
     }
+  }
+}
 
-    #grad-selected {
-      .stop-0 {
-        stop-color: #2d3135;
-        stop-opacity: 0;
+.tree {
+  .lh-user-select(none);
+
+  ul {
+    list-style-type: none;
+    padding: 0px;
+    margin: 0px;
+    transform: translateX(-10px); // Shift over 10 px since we don't show the toggler on the root node
+
+    li.node {
+      cursor: pointer;
+      list-style: none;
+      position: absolute;
+      width: 100%;
+      height: 36px;
+      top: 0;
+      left: 0;
+      overflow-x: hidden;
+      .lh-transition(transform @transition, opacity @transition);
+
+      .node-contents {
+        margin: 6px;
+        text-align: left;
+        white-space: nowrap;
+        .lh-transition(transform @transition, opacity @transition);
+
+        .toggler {
+          display: inline-block;
+          vertical-align: middle;
+          width: 14px;
+          height: 14px;
+          .lh-opacity(0);
+          .lh-transform(rotate(0deg));
+          .lh-transform-origin(7px 7px);
+          .lh-transition(all @transition);
+
+          svg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            fill: #818b8f;
+          }
+
+          &.expanded { .lh-transform(rotate(90deg)); }
+          &.leaf { visibility: hidden !important; }
+        }
+
+        svg.icon {
+          display: inline-block;
+          vertical-align: middle;
+          margin-left: 4px;
+          width: 14px;
+          height: 14px;
+
+          &.yellow { fill: @yellow; }
+          &.green { fill: @green; }
+          &.red { fill: @red; }
+        }
+
+        .label {
+          display: inline-block;
+          vertical-align: middle;
+          margin-left: 8px;
+          color: #ADB8BC;
+          font-size: 13px;
+          text-shadow: 0 1px 0 rgba(0, 0, 0, 0.23);
+        }
       }
 
-      .stop-50 {
-        stop-color: #2d3135;
-        stop-opacity: 50;
+      .indicator {
+        position: absolute;
+        width: 100px;
+        height: 100%;
+        top: 0;
+        right: 0;
+        .lh-background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 50%));
+
+
+        &:after {
+          content: "";
+          position: absolute;
+          width: 5px;
+          height: 5px;
+          top: 16px;
+          right: 12px;
+          border-radius: 50%;
+        }
+        &.yellow:after { background-color: @yellow; }
+        &.green:after { background-color: @green; }
+        &.red:after { background-color: @red; }
+      }
+
+      &:not(.selected) {
+        .icon { fill: grey !important; }
+      }
+
+      &.selected {
+        background-color: #2d3135;
+
+        .label { color: #E1E8EB; }
+        .indicator { .lh-background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 50%)); }
       }
     }
   }
-
-  .node {
-    cursor: pointer;
-
-    &:not(:first-child).hover {
-      .toggle-icon {
-        display: block;
-      }
-    }
-
-    &:not(.selected) {
-      .icon {
-        fill: grey !important;
-      }
-    }
-
-    .toggle-group {
-
-      rect {
-        fill: transparent;
-      }
-
-      .toggle-icon {
-        display: none;
-
-        -webkit-transform-origin: 18px 0px;
-        -webkit-transform: rotate(0deg);
-        -webkit-transition: -webkit-transform 400ms;
-
-        &.expanded {
-          -webkit-transform: rotate(90deg);
-        }
-
-        &.leaf {
-          display: none !important;
-        }
-      }
-    }
-
-    text {
-      fill: #818b8f;
-      font-size: 13px;
-      text-shadow: 0 1px 0 rgba(0,0,0,.23);
-      -webkit-user-select: none;
-    }
-
-    rect.node-fill {
-      fill: #393c40;
-    }
-
-    .text-cover {
-      fill: url(#grad);
-    }
-
-    &.selected {
-      .text-cover {
-        fill: url(#grad-selected);
-      }
-
-      rect.node-fill {
-        fill: #2d3135;
-      }
-
-      text {
-        fill: #e1e8eb;
-      }
-    }
-
-  }
-
-}
-
-.indicator.yellow, .yellow {
-  fill: #fbcc3c;
-}
-
-.indicator.green, .green {
-  fill: #96cd00;
-}
-
-.indicator.red, .red {
-  fill: #f35132;
 }

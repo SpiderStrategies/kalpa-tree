@@ -4,7 +4,8 @@
   "description": "A tree rendered with d3",
   "main": "index.js",
   "dependencies": {
-    "d3": "^3.4.6"
+    "d3": "^3.5.2",
+    "lesshat": "^3.0.2"
   },
   "devDependencies": {
     "lodash": "^2.4.1",

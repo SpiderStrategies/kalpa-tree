@@ -20,8 +20,6 @@ http.createServer(function (req, res) {
     less.stderr.pipe(process.stderr)
   } else if (path === '/matt-tree.json') {
     request('https://gist.githubusercontent.com/mattsgarlata/c331e9bdf264f7526850/raw/e989f2bd1e8eb9ac7d2caff48aba21025863514d/gistfile1.json').pipe(res)
-  } else if (path === '/icons.svg') {
-    return fs.createReadStream(__dirname + '/icons.svg').pipe(res)
   } else if (path == '/bundle.js') {
     res.writeHead(200, {'Content-Type': 'application/javascript'})
     return fs.createReadStream(__dirname + '/bundle.js').pipe(res)
