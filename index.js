@@ -200,20 +200,20 @@ Tree.prototype.select = function (id) {
   })
 
   if (d) {
-    tree._onSelect(d)
+    this._onSelect(d)
   }
 }
 
 Tree.prototype._onSelect = function (d, i) {
   if (i === 0) { return } // Root node shouldn't do anything
   // tree_.selected stores a previously selected node
-  if (tree._selected) {
+  if (this._selected) {
     // delete the selected field from that node
-    delete tree._selected.selected
+    delete this._selected.selected
   }
   d.selected = true
-  tree.emit('selected', d)
-  tree._selected = d
+  this.emit('selected', d)
+  this._selected = d
   this.toggle(d)
 }
 
