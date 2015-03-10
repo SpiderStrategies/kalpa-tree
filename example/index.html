@@ -67,33 +67,37 @@
 </html>
 <script src="./bundle.js"></script>
 <script>
-  var Tree = require('tree')
-    , http = require('http')
-    , JSONStream = require('JSONStream')
-    , container = document.querySelector('.container')
-    , tree
+  (function () {
+    var Tree = require('tree')
+      , http = require('http')
+      , JSONStream = require('JSONStream')
+      , container = document.querySelector('.container')
+      , tree
 
-  ;[].forEach.call(document.querySelectorAll('.coord'), function (coord) {
-    coord.addEventListener('blur', function () {
-      container.style[this.id] = this.value  + 'px'
-      tree.resize()
-    })
-  })
-
-  document.querySelector('#select').addEventListener('change', function () {
-    tree.select(this.value)
-  })
-
-  http.get('/tree.json?depth=4', function (res) {
-    tree = new Tree({
-      stream: res.pipe(JSONStream.parse([true]))
+    ;[].forEach.call(document.querySelectorAll('.coord'), function (coord) {
+      coord.addEventListener('blur', function () {
+        container.style[this.id] = this.value  + 'px'
+        tree.resize()
+      })
     })
 
-    container.appendChild(tree.render().el.node())
-
-    tree.on('selected', function (node) {
-      console.log(node)
+    document.querySelector('#select').addEventListener('change', function () {
+      tree.select(this.value)
     })
-  })
+
+    http.get('/sms-tree.json?depth=4', function (res) {
+      tree = new Tree({
+        stream: res.pipe(JSONStream.parse([true])),
+        accessors: {
+          icon: 'nodeType'
+        }
+      })
+      container.appendChild(tree.render().el.node())
+
+      tree.on('selected', function (node) {
+        console.log(node)
+      })
+    })
+  })()
 
 </script>
