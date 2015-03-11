@@ -6,7 +6,7 @@
       1002,
       1058
     ],
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "root"
   },
   {
@@ -20,7 +20,7 @@
       1036,
       1047
     ],
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "perspective"
   },
   {
@@ -34,7 +34,7 @@
       1092,
       1103
     ],
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "perspective"
   },
   {
@@ -53,7 +53,7 @@
       1012,
       1013
     ],
-    "color": "EDEDED",
+    "color": "yellow",
     "nodeType": "objective"
   },
   {
@@ -72,7 +72,7 @@
       1023,
       1024
     ],
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "objective"
   },
   {
@@ -91,7 +91,7 @@
       1034,
       1035
     ],
-    "color": "EDEDED",
+    "color": "yellow",
     "nodeType": "objective"
   },
   {
@@ -110,7 +110,7 @@
       1045,
       1046
     ],
-    "color": "EDEDED",
+    "color": "yellow",
     "nodeType": "objective"
   },
   {
@@ -129,7 +129,7 @@
       1056,
       1057
     ],
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "objective"
   },
   {
@@ -148,7 +148,7 @@
       1068,
       1069
     ],
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "objective"
   },
   {
@@ -167,7 +167,7 @@
       1079,
       1080
     ],
-    "color": "EDEDED",
+    "color": "yellow",
     "nodeType": "objective"
   },
   {
@@ -186,7 +186,7 @@
       1090,
       1091
     ],
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "objective"
   },
   {
@@ -205,7 +205,7 @@
       1101,
       1102
     ],
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "objective"
   },
   {
@@ -224,707 +224,707 @@
       1112,
       1113
     ],
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "objective"
   },
   {
     "id": 1004,
     "label": "M1",
     "parentId": 1003,
-    "color": "EDEDED",
+    "color": "yellow",
     "nodeType": "metric"
   },
   {
     "id": 1005,
     "label": "M2",
     "parentId": 1003,
-    "color": "EDEDED",
+    "color": "yellow",
     "nodeType": "metric"
   },
   {
     "id": 1006,
     "label": "M3",
     "parentId": 1003,
-    "color": "EDEDED",
+    "color": "yellow",
     "nodeType": "metric"
   },
   {
     "id": 1007,
     "label": "M4",
     "parentId": 1003,
-    "color": "EDEDED",
+    "color": "yellow",
     "nodeType": "metric"
   },
   {
     "id": 1008,
     "label": "M5",
     "parentId": 1003,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1009,
     "label": "M6",
     "parentId": 1003,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1010,
     "label": "M7",
     "parentId": 1003,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1011,
     "label": "M8",
     "parentId": 1003,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1012,
     "label": "M9",
     "parentId": 1003,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1013,
     "label": "M10",
     "parentId": 1003,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1015,
     "label": "M1",
     "parentId": 1014,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1016,
     "label": "M2",
     "parentId": 1014,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1017,
     "label": "M3",
     "parentId": 1014,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1018,
     "label": "M4",
     "parentId": 1014,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1019,
     "label": "M5",
     "parentId": 1014,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1020,
     "label": "M6",
     "parentId": 1014,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1021,
     "label": "M7",
     "parentId": 1014,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1022,
     "label": "M8",
     "parentId": 1014,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1023,
     "label": "M9",
     "parentId": 1014,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1024,
     "label": "M10",
     "parentId": 1014,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1026,
     "label": "M1",
     "parentId": 1025,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1027,
     "label": "M2",
     "parentId": 1025,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1028,
     "label": "M3",
     "parentId": 1025,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1029,
     "label": "M4",
     "parentId": 1025,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1030,
     "label": "M5",
     "parentId": 1025,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1031,
     "label": "M6",
     "parentId": 1025,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1032,
     "label": "M7",
     "parentId": 1025,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1033,
     "label": "M8",
     "parentId": 1025,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1034,
     "label": "M9",
     "parentId": 1025,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1035,
     "label": "M10",
     "parentId": 1025,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1037,
     "label": "M1",
     "parentId": 1036,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1038,
     "label": "M2",
     "parentId": 1036,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1039,
     "label": "M3",
     "parentId": 1036,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1040,
     "label": "M4",
     "parentId": 1036,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1041,
     "label": "M5",
     "parentId": 1036,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1042,
     "label": "M6",
     "parentId": 1036,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1043,
     "label": "M7",
     "parentId": 1036,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1044,
     "label": "M8",
     "parentId": 1036,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1045,
     "label": "M9",
     "parentId": 1036,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1046,
     "label": "M10",
     "parentId": 1036,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1048,
     "label": "M1",
     "parentId": 1047,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1049,
     "label": "M2",
     "parentId": 1047,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1050,
     "label": "M3",
     "parentId": 1047,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1051,
     "label": "M4",
     "parentId": 1047,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1052,
     "label": "M5",
     "parentId": 1047,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1053,
     "label": "M6",
     "parentId": 1047,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1054,
     "label": "M7",
     "parentId": 1047,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1055,
     "label": "M8",
     "parentId": 1047,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1056,
     "label": "M9",
     "parentId": 1047,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1057,
     "label": "M10",
     "parentId": 1047,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1060,
     "label": "M1",
     "parentId": 1059,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1061,
     "label": "M2",
     "parentId": 1059,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1062,
     "label": "M3",
     "parentId": 1059,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1063,
     "label": "M4",
     "parentId": 1059,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1064,
     "label": "M5",
     "parentId": 1059,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1065,
     "label": "M6",
     "parentId": 1059,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1066,
     "label": "M7",
     "parentId": 1059,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1067,
     "label": "M8",
     "parentId": 1059,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1068,
     "label": "M9",
     "parentId": 1059,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1069,
     "label": "M10",
     "parentId": 1059,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1071,
     "label": "M1",
     "parentId": 1070,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1072,
     "label": "M2",
     "parentId": 1070,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1073,
     "label": "M3",
     "parentId": 1070,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1074,
     "label": "M4",
     "parentId": 1070,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1075,
     "label": "M5",
     "parentId": 1070,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1076,
     "label": "M6",
     "parentId": 1070,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1077,
     "label": "M7",
     "parentId": 1070,
-    "color": "EDEDED",
+    "color": "yellow",
     "nodeType": "metric"
   },
   {
     "id": 1078,
     "label": "M8",
     "parentId": 1070,
-    "color": "EDEDED",
+    "color": "yellow",
     "nodeType": "metric"
   },
   {
     "id": 1079,
     "label": "M9",
     "parentId": 1070,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1080,
     "label": "M10",
     "parentId": 1070,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1082,
     "label": "M1",
     "parentId": 1081,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1083,
     "label": "M2",
     "parentId": 1081,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1084,
     "label": "M3",
     "parentId": 1081,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1085,
     "label": "M4",
     "parentId": 1081,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1086,
     "label": "M5",
     "parentId": 1081,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1087,
     "label": "M6",
     "parentId": 1081,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1088,
     "label": "M7",
     "parentId": 1081,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1089,
     "label": "M8",
     "parentId": 1081,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1090,
     "label": "M9",
     "parentId": 1081,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1091,
     "label": "M10",
     "parentId": 1081,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1093,
     "label": "M1",
     "parentId": 1092,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1094,
     "label": "M2",
     "parentId": 1092,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1095,
     "label": "M3",
     "parentId": 1092,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1096,
     "label": "M4",
     "parentId": 1092,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1097,
     "label": "M5",
     "parentId": 1092,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1098,
     "label": "M6",
     "parentId": 1092,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1099,
     "label": "M7",
     "parentId": 1092,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1100,
     "label": "M8",
     "parentId": 1092,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1101,
     "label": "M9",
     "parentId": 1092,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1102,
     "label": "M10",
     "parentId": 1092,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1104,
     "label": "M1",
     "parentId": 1103,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1105,
     "label": "M2",
     "parentId": 1103,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1106,
     "label": "M3",
     "parentId": 1103,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1107,
     "label": "M4",
     "parentId": 1103,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1108,
     "label": "M5",
     "parentId": 1103,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1109,
     "label": "M6",
     "parentId": 1103,
-    "color": "EDEDED",
+    "color": "red",
     "nodeType": "metric"
   },
   {
     "id": 1110,
     "label": "M7",
     "parentId": 1103,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1111,
     "label": "M8",
     "parentId": 1103,
-    "color": "EDEDED",
+    "color": "yellow",
     "nodeType": "metric"
   },
   {
     "id": 1112,
     "label": "M9",
     "parentId": 1103,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   },
   {
     "id": 1113,
     "label": "M10",
     "parentId": 1103,
-    "color": "EDEDED",
+    "color": "green",
     "nodeType": "metric"
   }
 ]
