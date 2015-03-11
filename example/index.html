@@ -136,6 +136,22 @@
       , bt = document.querySelector('.tree-bottom-toolbar')
       , tree
 
+    var flip = false // hack
+    bt.querySelector('.expand-all').onclick = function () {
+      if (flip) {
+        tree.collapseAll()
+        this.innerHTML = 'Expand All'
+      } else {
+        tree.expandAll()
+        this.innerHTML = 'Collapse All'
+      }
+      flip = !flip
+    }
+
+    bt.querySelector('.state-toggler').onclick = function () {
+      tree.editable()
+    }
+
     ;[].forEach.call(document.querySelectorAll('.coord'), function (coord) {
       coord.addEventListener('blur', function () {
         container.style[this.id] = this.value  + 'px'

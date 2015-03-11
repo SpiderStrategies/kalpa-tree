@@ -212,11 +212,42 @@ Tree.prototype._onSelect = function (d, i) {
   this.toggle(d)
 }
 
-Tree.prototype.toggle = function (d) {
-  // make sure all parents are visible
-  while (d.parent._children) {
-    this.toggle(d.parent)
+Tree.prototype.editable = function () {
+  var t = this.el.select('.tree')
+  t.classed('editable', !t.classed('editable'))
+}
+
+/*
+ * Toggle all isn't necessary the best name, because it doesn't toggle the root node,
+ * since the first children are always visible
+ */
+Tree.prototype._toggleAll = function (fn) {
+  for (var i = 1; i < this._nodeData.length; i++) {
+    var d = this._nodeData[i]
+    fn(d)
   }
+  this.draw(this._nodeData[0])
+}
+
+Tree.prototype.expandAll = function () {
+  this._toggleAll(function (d) {
+    if (d._children) {
+      d.children = d._children
+      d._children = null
+    }
+  })
+}
+
+Tree.prototype.collapseAll = function () {
+  this._toggleAll(function (d) {
+    if (d.children) {
+      d._children = d.children
+      d.children = null
+    }
+  })
+}
+
+Tree.prototype.toggle = function (d) {
   if (d.children) {
     d._children = d.children
     d.children = null
