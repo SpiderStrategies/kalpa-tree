@@ -11,14 +11,7 @@ var d3 = require('d3')
       color: 'color'
     }
   }
-  , prefix = (function (p) {
-    for (var i = 0; i < p.length; i++) {
-      if (p[i] + 'Transform' in document.body.style) {
-        return '-' + p[i] + '-'
-      }
-    }
-    return ''
-  })([ 'webkit', 'ms', 'Moz', 'O' ])
+  , prefix = require('./lib/prefix')
   , resize = require('./lib/resize')
 
 /**
@@ -43,7 +36,7 @@ var Tree = function (options) {
     }
   }
 
-  this.resizer = resize(prefix)
+  this.resizer = resize(prefix())
 
   this.tree = d3.layout.tree()
                        .nodeSize([0, this.options.depth])
@@ -109,7 +102,7 @@ Tree.prototype.draw = function (source) {
   var enter = this.node.enter().append('li')
       .attr('class', 'node')
       .on('click', this._onSelect.bind(this))
-      .style(prefix + 'transform', function (d) {
+      .style(prefix() + 'transform', function (d) {
         return 'translate(0px,' + (source ? source._y : d.y) + 'px)'
       })
       .style('opacity', 1e-6)
@@ -118,7 +111,7 @@ Tree.prototype.draw = function (source) {
   var contents = enter.append('div')
                         .attr('class', 'node-contents')
                         .attr('style', function (d) {
-                          return prefix + 'transform:' + 'translate(' + (d.parent ? d.parent._x : 0) + 'px,0px)'
+                          return prefix() + 'transform:' + 'translate(' + (d.parent ? d.parent._x : 0) + 'px,0px)'
                         })
 
   // Add the toggler
@@ -178,11 +171,11 @@ Tree.prototype.draw = function (source) {
   // If this node has been removed, let's remove it.
   var exit = this.node.exit()
   exit.selectAll('div.node-contents')
-      .style(prefix + 'transform', function (d) {
+      .style(prefix() + 'transform', function (d) {
         return 'translate(' + d.parent._x + 'px,0px)'
       })
 
-  exit.style(prefix + 'transform', function (d) {
+  exit.style(prefix() + 'transform', function (d) {
         return 'translate(0px,' + source._y + 'px)'
       })
       .style('opacity', 1e-6)
