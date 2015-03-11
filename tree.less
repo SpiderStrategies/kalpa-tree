@@ -5,118 +5,120 @@
 @red: #f35132;
 @transition: 300ms ease-out;
 
-.container {
+.tree-container {
   background-color: #393c40;
-  // Show the expand/collapse indicators on hover
+  width: 100%;
+  height: 100%;
 
-  &:hover {
-    li.node:not(:first-child) {
-      .toggler { .lh-opacity(1); }
+  .tree {
+    .lh-user-select(none);
+
+    // Show the expand/collapse indicators on hover
+    &:hover {
+      li.node:not(:first-child) {
+        .toggler { .lh-opacity(1); }
+      }
     }
-  }
-}
 
-.tree {
-  .lh-user-select(none);
+    ul {
+      list-style-type: none;
+      padding: 0px;
+      margin: 0px;
+      transform: translateX(-10px); // Shift over 10 px since we don't show the toggler on the root node
 
-  ul {
-    list-style-type: none;
-    padding: 0px;
-    margin: 0px;
-    transform: translateX(-10px); // Shift over 10 px since we don't show the toggler on the root node
-
-    li.node {
-      cursor: pointer;
-      list-style: none;
-      position: absolute;
-      width: 100%;
-      height: 36px;
-      top: 0;
-      left: 0;
-      overflow-x: hidden;
-      .lh-transition(transform @transition, opacity @transition);
-
-      .node-contents {
-        margin: 6px;
-        text-align: left;
-        white-space: nowrap;
+      li.node {
+        cursor: pointer;
+        list-style: none;
+        position: absolute;
+        width: 100%;
+        height: 36px;
+        top: 0;
+        left: 0;
+        overflow-x: hidden;
         .lh-transition(transform @transition, opacity @transition);
 
-        .toggler {
-          display: inline-block;
-          vertical-align: middle;
-          width: 14px;
-          height: 14px;
-          .lh-opacity(0);
-          .lh-transform(rotate(0deg));
-          .lh-transform-origin(7px 7px);
-          .lh-transition(all @transition);
+        .node-contents {
+          margin: 6px;
+          text-align: left;
+          white-space: nowrap;
+          .lh-transition(transform @transition, opacity @transition);
 
-          svg {
-            position: absolute;
-            width: 100%;
-            height: 100%;
-            fill: #818b8f;
+          .toggler {
+            display: inline-block;
+            vertical-align: middle;
+            width: 14px;
+            height: 14px;
+            .lh-opacity(0);
+            .lh-transform(rotate(0deg));
+            .lh-transform-origin(7px 7px);
+            .lh-transition(all @transition);
+
+            svg {
+              position: absolute;
+              width: 100%;
+              height: 100%;
+              fill: #818b8f;
+            }
+
+            &.expanded { .lh-transform(rotate(90deg)); }
+            &.leaf { visibility: hidden !important; }
           }
 
-          &.expanded { .lh-transform(rotate(90deg)); }
-          &.leaf { visibility: hidden !important; }
+          svg.icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 4px;
+            width: 14px;
+            height: 14px;
+
+            &.yellow { fill: @yellow; }
+            &.green { fill: @green; }
+            &.red { fill: @red; }
+          }
+
+          .label {
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+            color: #ADB8BC;
+            font-size: 13px;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.23);
+          }
         }
 
-        svg.icon {
-          display: inline-block;
-          vertical-align: middle;
-          margin-left: 4px;
-          width: 14px;
-          height: 14px;
-
-          &.yellow { fill: @yellow; }
-          &.green { fill: @green; }
-          &.red { fill: @red; }
-        }
-
-        .label {
-          display: inline-block;
-          vertical-align: middle;
-          margin-left: 8px;
-          color: #ADB8BC;
-          font-size: 13px;
-          text-shadow: 0 1px 0 rgba(0, 0, 0, 0.23);
-        }
-      }
-
-      .indicator {
-        position: absolute;
-        width: 100px;
-        height: 100%;
-        top: 0;
-        right: 0;
-        .lh-background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 50%));
-
-
-        &:after {
-          content: "";
+        .indicator {
           position: absolute;
-          width: 5px;
-          height: 5px;
-          top: 16px;
-          right: 12px;
-          border-radius: 50%;
+          width: 100px;
+          height: 100%;
+          top: 0;
+          right: 0;
+          .lh-background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 50%));
+
+
+          &:after {
+            content: "";
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            top: 16px;
+            right: 12px;
+            border-radius: 50%;
+          }
+          &.yellow:after { background-color: @yellow; }
+          &.green:after { background-color: @green; }
+          &.red:after { background-color: @red; }
         }
-        &.yellow:after { background-color: @yellow; }
-        &.green:after { background-color: @green; }
-        &.red:after { background-color: @red; }
-      }
 
-      &:not(.selected) {
-        .icon { fill: grey !important; }
-      }
+        &:not(.selected) {
+          .icon { fill: grey !important; }
+        }
 
-      &.selected {
-        background-color: #2d3135;
+        &.selected {
+          background-color: #2d3135;
 
-        .label { color: #E1E8EB; }
-        .indicator { .lh-background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 50%)); }
+          .label { color: #E1E8EB; }
+          .indicator { .lh-background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 50%)); }
+        }
       }
     }
   }

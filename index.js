@@ -55,10 +55,12 @@ Tree.prototype.render = function () {
   var self = this
 
   this.el = d3.select(document.createElement('div'))
-              .attr('class', 'tree')
+              .attr('class', 'tree-container')
 
-  this.node = this.el.append('ul')
-                     .selectAll('li.node')
+  this.node = this.el.append('div')
+                       .attr('class', 'tree')
+                       .append('ul')
+                         .selectAll('li.node')
 
   this._nodeData = []
   this.options.stream.on('data', function (n) {
@@ -92,7 +94,7 @@ Tree.prototype.render = function () {
 }
 
 Tree.prototype.resize = function () {
-  var box = this.el.node().parentNode.getBoundingClientRect()
+  var box = this.el.select('div.tree').node().parentNode.getBoundingClientRect()
   this.resizer.height(this.options.height)
   this.node.call(this.resizer)
 }
