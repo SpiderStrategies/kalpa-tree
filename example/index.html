@@ -11,7 +11,7 @@
         font-family: 'Source Sans Pro';
       }
 
-      .container {
+      .tree-pane {
         position: absolute;
         width: 600px;
         height: 700px;
@@ -22,6 +22,55 @@
         position: absolute;
         top: 10px;
         left: 10px;
+      }
+
+      .container {
+        width: 100%;
+        height: 100%;
+      }
+
+      .tree-search {
+        height: 45px;
+        background-color: #2d3135;
+        position: relative;
+      }
+
+      .tree-search input[type=search] {
+        -webkit-appearance: textfield;
+        font-size: 12px;
+        border: 1px inset #000;
+        border-radius: 10px;
+        width: 95%;
+        padding: 3px;
+        padding-left: 20px;
+        margin-top: 10px;
+        background-color: #2d3135;
+        color: #E1E8EB;
+      }
+
+      .tree-toolbar {
+        height: 50px;
+        width: 100%;
+      }
+
+      .tree-toolbar button:first-child {
+        border-right: 1px solid black;
+      }
+
+      .tree-toolbar button {
+         outline: 0;
+         background-color: #2d3135;
+         border: 0;
+         border-top: 1px solid black;
+         float: left;
+         width: 50%;
+         height: 100%;
+         color: #ADB8BC;
+         font-size: 13px;
+      }
+
+      .container {
+        border-top: 1px solid black;
       }
 
     </style>
@@ -61,7 +110,20 @@
         <input type="text" id="select">
       </div>
     </div>
-    <div class="container"></div>
+    <div class="tree-pane">
+      <div class="tree-search">
+        <input type="search" placeholder="Find"></input>
+      </div>
+      <div class="tree-toolbar tree-top-toolbar">
+        <button class="add-folder">Add Folder</button>
+        <button class="add-report">Add Report</button>
+      </div>
+      <div class="container"></div>
+      <div class="tree-toolbar tree-bottom-toolbar">
+        <button class="expand-all">Expand All</button>
+        <button class="state-toggler">Edit</button>
+      </div>
+    </div>
   </body>
 </html>
 <script src="./bundle.js"></script>
@@ -71,6 +133,7 @@
       , http = require('http')
       , JSONStream = require('JSONStream')
       , container = document.querySelector('.container')
+      , bt = document.querySelector('.tree-bottom-toolbar')
       , tree
 
     ;[].forEach.call(document.querySelectorAll('.coord'), function (coord) {
@@ -84,13 +147,14 @@
       tree.select(this.value)
     })
 
-    http.get('/sms-tree.json?depth=4', function (res) {
+    http.get('/sms-tree.json', function (res) {
       tree = new Tree({
         stream: res.pipe(JSONStream.parse([true])),
         accessors: {
           icon: 'nodeType'
         }
       })
+
       container.appendChild(tree.render().el.node())
 
       tree.on('selected', function (node) {
