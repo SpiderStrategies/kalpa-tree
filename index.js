@@ -126,7 +126,7 @@ Tree.prototype.draw = function (source) {
           .attr('class', 'toggler')
             .append('svg')
               .append('use')
-                .attr('xlink:href', '#collapsed')
+                .attr('xlink:href', '#icon-collapsed')
 
   // icon to represent the node tpye
   contents.append('svg')
@@ -148,13 +148,12 @@ Tree.prototype.draw = function (source) {
 
   // The icon maybe changed
   this.node.selectAll('svg.icon')
-           // .attr('viewBox', '0 0 32 32')
            .attr('class', function (d) {
              return 'icon ' + d[self.options.accessors.color]
            })
            .selectAll('use')
             .attr('xlink:href', function (d) {
-              return '#' + d[self.options.accessors.icon]
+              return '#icon-' + d[self.options.accessors.icon]
             })
 
   // change the state of the toggle icon by adjusting its class
