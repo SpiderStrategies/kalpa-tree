@@ -12,7 +12,7 @@ var d3 = require('d3')
     }
   }
   , styles = window.getComputedStyle(document.documentElement, '')
-  , prefix = (Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['-o-']))[0]
+  , prefix = Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/)[0]
   , resize = require('./lib/resize')
 
 /**
