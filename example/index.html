@@ -155,6 +155,9 @@
         }
       })
 
+      // Let's be naughty for demo usage
+      window.tree = tree
+
       container.appendChild(tree.render().el.node())
 
       tree.on('selected', function (node) {
