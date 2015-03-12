@@ -13,7 +13,7 @@ module.exports = function (depth) {
       var node = {
         id: ++id,
         label: 'Scorecard ñode ' + id + (crypto.randomBytes(_.random(0, 40)).toString('hex')),
-        icon: icons[id % 4],
+        nodeType: icons[id % 4],
         color: colors[id % 3]
       }
 
@@ -29,7 +29,7 @@ module.exports = function (depth) {
     id: ++id,
     label: 'Node ' + id ,
     color: colors[id % 3],
-    icon: 'root',
+    nodeType: 'root',
     children: generateChildren(depth, 2)
   }
 }

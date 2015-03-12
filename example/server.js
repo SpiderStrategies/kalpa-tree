@@ -5,7 +5,6 @@ var http = require('http')
   , tree = require('./tree')
   , request = require('request')
   , spawn = require('child_process').spawn
-  , flat = require('./tree-flat')
 
 http.createServer(function (req, res) {
   var _url = url.parse(req.url, true)
@@ -26,17 +25,12 @@ http.createServer(function (req, res) {
   } else if (path == '/sms-tree.json') {
     return fs.createReadStream(__dirname + '/tree.json').pipe(res)
   } else if (path == '/tree.json') {
-    res.end(JSON.stringify(d3.layout.tree().nodes(tree(_url.query.depth || 5)), function (key, value) {
-      if (key === 'parent') {
-        return value.id
-      } else if (key === 'children'){
-        return undefined
-      } else {
-        return value
-      }
-    }))
-  } else if (path == '/tree-flat.json') {
-    res.end(JSON.stringify(flat()))
+    res.end(JSON.stringify(d3.layout.tree().nodes(tree(_url.query.depth || 5)).map(function (n) {
+      n.parentId = n.parent && n.parent.id
+      delete n.children
+      delete n.parent
+      return n
+    })))
   } else {
     res.writeHead(404, {'Content-Type': 'text/plain'})
     res.write('Not found')
