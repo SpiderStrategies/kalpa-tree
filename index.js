@@ -11,14 +11,8 @@ var d3 = require('d3')
       color: 'color'
     }
   }
-  , prefix = (function (p) {
-    for (var i = 0; i < p.length; i++) {
-      if (p[i] + 'Transform' in document.body.style) {
-        return '-' + p[i] + '-'
-      }
-    }
-    return ''
-  })([ 'webkit', 'ms', 'Moz', 'O' ])
+  , styles = window.getComputedStyle(document.documentElement, '')
+  , prefix = (Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/) || (styles.OLink === '' && ['-o-']))[0]
   , resize = require('./lib/resize')
 
 /**
