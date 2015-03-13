@@ -28,7 +28,6 @@
       transform: translateX(-10px); // Shift over 10 px since we don't show the toggler on the root node
 
       li.node {
-        cursor: pointer;
         list-style: none;
         position: absolute;
         width: 100%;
@@ -95,7 +94,6 @@
           right: 0;
           .lh-background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 50%));
 
-
           &:after {
             content: "";
             position: absolute;
@@ -120,6 +118,12 @@
           .label { color: #E1E8EB; }
           .indicator { .lh-background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 50%)); }
         }
+      }
+    }
+
+    &.editable {
+      li {
+        cursor: pointer;
       }
     }
   }
