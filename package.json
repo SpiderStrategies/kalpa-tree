@@ -1,7 +1,7 @@
 {
-  "name": "d3-tree",
+  "name": "scoreboard-tree",
   "version": "0.0.2",
-  "description": "A tree rendered with d3",
+  "description": "A Scoreboard tree rendered from a stream using d3",
   "main": "index.js",
   "dependencies": {
     "d3": "^3.5.2",
@@ -22,12 +22,12 @@
   },
   "repository": {
     "type": "git",
-    "url": "git://github.com/SpiderStrategies/d3-tree-poc.git"
+    "url": "git://github.com/SpiderStrategies/scoreboard-tree.git"
   },
   "author": "",
   "license": "ISC",
   "bugs": {
-    "url": "https://github.com/SpiderStrategies/d3-tree-poc/issues"
+    "url": "https://github.com/SpiderStrategies/scoreboard-tree/issues"
   },
-  "homepage": "https://github.com/SpiderStrategies/d3-tree-poc"
+  "homepage": "https://github.com/SpiderStrategies/scoreboard-tree"
 }
