@@ -188,19 +188,25 @@ Tree.prototype.draw = function (source) {
   this.resize()
 }
 
-Tree.prototype.select = function (id) {
+Tree.prototype.select = function (id, opt) {
+  opt = opt || {}
   var d = null
   this._nodeData.some(function (_d) {
     return _d.id == id && (d = _d, true)
   })
 
   if (d) {
-    this._onSelect(d)
+    this._onSelect(d, null, opt)
   }
 }
 
-Tree.prototype._onSelect = function (d, i) {
-  this.emit('select', d)
+Tree.prototype._onSelect = function (d, i, opt) {
+  opt = opt || {}
+
+  if (!opt.silent) {
+    this.emit('select', d)
+  }
+
   if (i === 0) { return } // Root node shouldn't do anything
   // tree_.selected stores a previously selected node
   if (this._selected) {
