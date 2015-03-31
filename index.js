@@ -202,6 +202,10 @@ Tree.prototype.select = function (id, opt) {
 }
 
 Tree.prototype._onSelect = function (d, i, opt) {
+  // determines if we should toggle the node. We don't toggle if it's the root node
+  // or the node is already expanded, but not selected.
+  var toggle = !(d.children && !d.selected) && i !== 0
+
   opt = opt || {}
 
   if (!opt.silent) {
@@ -217,24 +221,25 @@ Tree.prototype._onSelect = function (d, i, opt) {
   d.selected = true
   this._selected = d
 
-  if (i === 0) {
-    // The root node should just be redrawn. No need to check ancestors or toggle since it's always expanded
-    this.draw(d)
-    return
-  }
-
   // Make sure all ancestors are visible
   ;(function e (node) {
+    if (!node) {
+      return
+    }
     if (node._children) {
       node.children = node._children
       node._children = null
     }
-    if (node.parent) {
+    if (node && node.parent) {
       e(node.parent)
     }
   })(d.parent)
 
-  this.toggle(d)
+  if (toggle) {
+    this.toggle(d)
+  } else {
+    this.draw(d)
+  }
 }
 
 Tree.prototype._onToggle = function (d) {
