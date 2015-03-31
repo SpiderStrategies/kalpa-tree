@@ -134,7 +134,7 @@
   },
   {
     "id": 1059,
-    "label": "O1",
+    "label": "This is a super long label and we need to be careful about ripping out css that looks like it might not be used.",
     "parentId": 1058,
     "childIds": [
       1060,
