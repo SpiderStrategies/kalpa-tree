@@ -190,14 +190,23 @@ Tree.prototype.draw = function (source) {
 
 Tree.prototype.select = function (id, opt) {
   opt = opt || {}
-  var d = null
-  this._nodeData.some(function (_d) {
-    return _d.id == id && (d = _d, true)
-  })
+  var d = this.get(id)
 
   if (d) {
     this._onSelect(d, null, opt)
   }
+}
+
+/*
+ * Returns a node object. This searches all the underlying data, not
+ * just the visible nodes
+ */
+Tree.prototype.get = function (id) {
+  var node = null
+  this._nodeData.some(function (d) {
+    return d.id == id && (node = d, true)
+  })
+  return node
 }
 
 /*
