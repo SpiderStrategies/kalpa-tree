@@ -35,7 +35,7 @@
       list-style-type: none;
       padding: 0px;
       margin: 0px;
-      .lh-translateX(-10px); // Shift over 10 px since we don't show the toggler on the root node
+      .lh-translateX(0); // Specify 0 transform, otherwise we get overflow on nodes
 
       li.node {
         list-style: none;
@@ -56,6 +56,7 @@
 
         .node-contents {
           margin: 6px;
+          margin-left: -6px;
           text-align: left;
           white-space: nowrap;
           .lh-transition(transform @transition, opacity @transition);
