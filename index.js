@@ -200,6 +200,25 @@ Tree.prototype.select = function (id, opt) {
   }
 }
 
+/*
+ * Returns the currently selected d3 selection. This is the d3 object that contains
+ * the currently selected node. The underlying dom node can be accessed by invoking
+ * .node() on the selection.
+ *
+ * e.g.
+ *    tree.getSelected().node()
+ */
+Tree.prototype.getSelected = function () {
+  if (!this._selected) {
+    return
+  }
+
+  var self = this
+  return this.node.filter(function (d) {
+    return d == self._selected
+  })
+}
+
 Tree.prototype._onSelect = function (d, i, opt) {
   opt = opt || {}
 
