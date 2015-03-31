@@ -190,14 +190,42 @@ Tree.prototype.draw = function (source) {
 
 Tree.prototype.select = function (id, opt) {
   opt = opt || {}
-  var d = null
-  this._nodeData.some(function (_d) {
-    return _d.id == id && (d = _d, true)
-  })
+  var d = this.get(id)
 
   if (d) {
     this._onSelect(d, null, opt)
   }
+}
+
+/*
+ * Returns a node object. This searches all the underlying data, not
+ * just the visible nodes
+ */
+Tree.prototype.get = function (id) {
+  var node = null
+  this._nodeData.some(function (d) {
+    return d.id == id && (node = d, true)
+  })
+  return node
+}
+
+/*
+ * Returns the currently selected d3 selection. This is the d3 object that contains
+ * the currently selected node. The underlying dom node can be accessed by invoking
+ * .node() on the selection.
+ *
+ * e.g.
+ *    tree.getSelected().node()
+ */
+Tree.prototype.getSelected = function () {
+  if (!this._selected) {
+    return
+  }
+
+  var self = this
+  return this.node.filter(function (d) {
+    return d == self._selected
+  })
 }
 
 Tree.prototype._onSelect = function (d, i, opt) {
