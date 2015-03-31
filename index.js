@@ -207,7 +207,11 @@ Tree.prototype._onSelect = function (d, i, opt) {
     this.emit('select', d)
   }
 
-  if (i === 0) { return } // Root node shouldn't do anything
+  if (i === 0) {
+    // Root node shouldn't do anything
+    return
+  }
+
   // tree_.selected stores a previously selected node
   if (this._selected) {
     // delete the selected field from that node
@@ -215,6 +219,18 @@ Tree.prototype._onSelect = function (d, i, opt) {
   }
   d.selected = true
   this._selected = d
+
+  // Make sure all ancestors are visible
+  ;(function e(node) {
+    if (node._children) {
+      node.children = node._children
+      node._children = null
+    }
+    if (node.parent) {
+      e(node.parent)
+    }
+  })(d.parent)
+
   this.toggle(d)
 }
 
