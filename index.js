@@ -207,11 +207,6 @@ Tree.prototype._onSelect = function (d, i, opt) {
     this.emit('select', d)
   }
 
-  if (i === 0) {
-    // Root node shouldn't do anything
-    return
-  }
-
   // tree_.selected stores a previously selected node
   if (this._selected) {
     // delete the selected field from that node
@@ -220,8 +215,14 @@ Tree.prototype._onSelect = function (d, i, opt) {
   d.selected = true
   this._selected = d
 
+  if (i === 0) {
+    // The root node should just be redrawn. No need to check ancestors or toggle since it's always expanded
+    this.draw(d)
+    return
+  }
+
   // Make sure all ancestors are visible
-  ;(function e(node) {
+  ;(function e (node) {
     if (node._children) {
       node.children = node._children
       node._children = null
