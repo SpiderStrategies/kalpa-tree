@@ -119,6 +119,7 @@ Tree.prototype.draw = function (source) {
   contents.append('div')
           .attr('class', 'toggler')
             .append('svg')
+            .on('click', this._onToggle.bind(this))
               .append('use')
                 .attr('xlink:href', '#icon-collapsed')
 
@@ -212,6 +213,7 @@ Tree.prototype._onSelect = function (d, i, opt) {
     // delete the selected field from that node
     delete this._selected.selected
   }
+
   d.selected = true
   this._selected = d
 
@@ -232,6 +234,11 @@ Tree.prototype._onSelect = function (d, i, opt) {
     }
   })(d.parent)
 
+  this.toggle(d)
+}
+
+Tree.prototype._onToggle = function (d) {
+  d3.event.stopPropagation()
   this.toggle(d)
 }
 
