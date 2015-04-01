@@ -285,6 +285,16 @@ Tree.prototype._onToggle = function (d, i) {
   this.toggle(d)
 }
 
+/*
+ * Returns if the tree is in edit mode.
+ */
+Tree.prototype.isEditable = function () {
+  return this.el.select('.tree').classed('editable')
+}
+
+/*
+ * Toggles the tree's editable state
+ */
 Tree.prototype.editable = function () {
   var t = this.el.select('.tree')
   t.classed('editable', !t.classed('editable'))
