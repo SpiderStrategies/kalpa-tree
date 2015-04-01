@@ -167,17 +167,12 @@
 
 
     http.get('/sms-tree.json', function (res) {
-      var s = res.pipe(JSONStream.parse([true]))
-
       tree = new Tree({
-        stream: s,
+        stream: res.pipe(JSONStream.parse([true])),
         accessors: {
           icon: 'nodeType'
-        }
-      })
-
-      s.on('end', function () {
-        tree.select(1005)
+        },
+        preselect: 1005
       })
 
       // Let's be naughty for demo usage

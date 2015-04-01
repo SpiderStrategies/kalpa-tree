@@ -69,10 +69,21 @@ Tree.prototype.render = function () {
     self._nodeData.push(n)
     if (p) {
       n.parent = p
-      if (p == self._nodeData[0]) {
-        // if parent is the root, then push unto children so it's visible
+      if (p == self._nodeData[0] || p.children) {
+        // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
         (p.children || (p.children = [])).push(n)
         self.draw()
+      } else if (self.options.preselect === n.id) {
+        // There's a preselect option equal to this node
+        if (p._children) {
+          // This parent has hidden children. Transfer them so they are visible
+          p.children = p._children
+          p._children = null
+        }
+        // Push this node onto the parents visible children
+        (p.children || (p.children = [])).push(n)
+        // And select it
+        self.select(n.id)
       } else {
         // push to _children so it's hidden, no need to draw
         (p._children || (p._children = [])).push(n)
