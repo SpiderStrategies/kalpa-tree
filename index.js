@@ -199,10 +199,16 @@ Tree.prototype.select = function (id, opt) {
 }
 
 /*
- * Returns a node object. This searches all the underlying data, not
- * just the visible nodes
+ * Returns a node object by id. This searches all the underlying data, not
+ * just the visible nodes.
+ *
+ * if no id is sent, returns the root, essentially the entire tree
  */
 Tree.prototype.get = function (id) {
+  if (typeof id === 'undefined') {
+    return this._nodeData[0]
+  }
+
   var node = null
   this._nodeData.some(function (d) {
     return d.id == id && (node = d, true)
