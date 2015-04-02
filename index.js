@@ -72,7 +72,11 @@ Tree.prototype.render = function () {
       if (p == self._nodeData[0] || p.children) {
         // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
         (p.children || (p.children = [])).push(n)
-        self.draw()
+        if (self.options.initialSelection === n.id) {
+          self.select(n.id)
+        } else {
+          self.draw()
+        }
       } else if (self.options.initialSelection === n.id) {
         // There's a initialSelection option equal to this node
         if (p._children) {
