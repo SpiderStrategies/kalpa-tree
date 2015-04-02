@@ -2,6 +2,7 @@ var d3 = require('d3')
   , EventEmitter = require('events').EventEmitter
   , util = require('util')
   , defaults = {
+    toggleOnSelect: true, // By default each select will toggle the node if needed. This prevents the toggle
     depth: 20, // indentation depth
     height: 36, // height of each row
     accessors: {
@@ -14,6 +15,7 @@ var d3 = require('d3')
   , styles = window.getComputedStyle(document.documentElement, '')
   , prefix = Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/)[0]
   , resize = require('./lib/resize')
+  , partialRight = require('./lib/partial-right')
 
 /**
  * Create a new d3 tree with the given config.
@@ -117,7 +119,7 @@ Tree.prototype.draw = function (source) {
 
   var enter = this.node.enter().append('li')
       .attr('class', 'node')
-      .on('click', this._onSelect.bind(this))
+      .on('click', partialRight(this._onSelect.bind(this), self.options))
       .style(prefix + 'transform', function (d) {
         return 'translate(0px,' + (source ? source._y : d.y) + 'px)'
       })
@@ -251,11 +253,11 @@ Tree.prototype.getSelected = function () {
 }
 
 Tree.prototype._onSelect = function (d, i, j, opt) {
+  opt = opt || {}
+
   // determines if we should toggle the node. We don't toggle if it's the root node
   // or the node is already expanded, but not selected.
-  var toggle = !(d.children && !d.selected) && i !== 0
-
-  opt = opt || {}
+  var toggle = opt.toggleOnSelect && !(d.children && !d.selected) && i !== 0
 
   if (!opt.silent) {
     this.emit('select', d)
