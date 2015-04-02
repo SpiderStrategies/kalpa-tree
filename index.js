@@ -209,7 +209,7 @@ Tree.prototype.select = function (id, opt) {
   var d = this.get(id)
 
   if (d) {
-    this._onSelect(d, null, opt)
+    this._onSelect(d, null, null, opt)
   }
 }
 
@@ -250,7 +250,7 @@ Tree.prototype.getSelected = function () {
   })
 }
 
-Tree.prototype._onSelect = function (d, i, opt) {
+Tree.prototype._onSelect = function (d, i, j, opt) {
   // determines if we should toggle the node. We don't toggle if it's the root node
   // or the node is already expanded, but not selected.
   var toggle = !(d.children && !d.selected) && i !== 0
