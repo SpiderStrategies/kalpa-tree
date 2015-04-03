@@ -7,11 +7,12 @@ var Readable = require('stream').Readable
  */
 module.exports = function () {
   var stream = new Readable({objectMode: true})
+    , clone = JSON.parse(JSON.stringify(data)) // poor man's clone
     , i = 0
 
   stream._read = function () {
-    if (data[i]) {
-      return stream.push(data[i++])
+    if (clone[i]) {
+      return stream.push(clone[i++])
     }
     stream.push(null)
   }
