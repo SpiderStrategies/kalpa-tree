@@ -259,10 +259,6 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
   // or the node is already expanded, but not selected.
   var toggle = opt.toggleOnSelect && !(d.children && !d.selected) && i !== 0
 
-  if (!opt.silent) {
-    this.emit('select', d)
-  }
-
   // tree_.selected stores a previously selected node
   if (this._selected) {
     // delete the selected field from that node
@@ -290,6 +286,10 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
     this.toggle(d)
   } else {
     this.draw(d)
+  }
+
+  if (!opt.silent) {
+    this.emit('select', d)
   }
 }
 
