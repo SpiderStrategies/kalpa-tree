@@ -110,7 +110,9 @@ Tree.prototype.resize = function () {
   this.node.call(this.resizer)
 }
 
-Tree.prototype.draw = function (source) {
+Tree.prototype.draw = function (source, opt) {
+  opt = opt || {}
+
   var self = this
 
   this.node = this.node.data(this.tree.nodes(this._nodeData[0]), function (d) {
@@ -151,6 +153,9 @@ Tree.prototype.draw = function (source) {
   // Now the indicator light
   enter.append('div')
           .attr('class', 'indicator')
+
+  // disable animations if necessary
+  this.node.classed('notransition', opt.animate === false)
 
   // Update the color if it changed
   this.node.selectAll('div.indicator')
@@ -204,6 +209,13 @@ Tree.prototype.draw = function (source) {
 
   // Now resize things
   this.resize()
+
+  // Now remove the notransition class
+  if (opt.animate === false) {
+    process.nextTick(function () {
+      self.node.classed('notransition', false)
+    })
+  }
 }
 
 Tree.prototype.select = function (id, opt) {
@@ -283,9 +295,9 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
   })(d.parent)
 
   if (toggle) {
-    this.toggle(d)
+    this.toggle(d, opt)
   } else {
-    this.draw(d)
+    this.draw(d, opt)
   }
 
   if (!opt.silent) {
@@ -347,7 +359,7 @@ Tree.prototype.collapseAll = function () {
   })
 }
 
-Tree.prototype.toggle = function (d) {
+Tree.prototype.toggle = function (d, opt) {
   if (d.children) {
     d._children = d.children
     d.children = null
@@ -355,7 +367,7 @@ Tree.prototype.toggle = function (d) {
     d.children = d._children
     d._children = null
   }
-  this.draw(d)
+  this.draw(d, opt)
 }
 
 module.exports = Tree
