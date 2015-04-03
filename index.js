@@ -207,7 +207,7 @@ Tree.prototype.draw = function (source) {
 }
 
 Tree.prototype.select = function (id, opt) {
-  opt = opt || {}
+  opt = opt || this.options
   var d = this.get(id)
 
   if (d) {
