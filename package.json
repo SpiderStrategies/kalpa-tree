@@ -16,8 +16,8 @@
     "watchify": "^0.10.2"
   },
   "scripts": {
-    "bundle": "./node_modules/.bin/browserify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
-    "watch": "./node_modules/.bin/watchify -r ./index.js:tree -r http -r JSONStream -o example/bundle.js -d",
+    "bundle": "browserify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
+    "watch": "watchify -r ./index.js:tree -r http -r JSONStream -o example/bundle.js -d",
     "start": "node example/server.js"
   },
   "repository": {
