@@ -4,6 +4,72 @@ var test = require('tape').test
   , stream = require('./tree-stream')
   , data = require('./tree.json')
 
+test('get', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+
+  t.deepEqual(tree.get(), tree._nodeData[0], 'get returns root by default')
+  t.deepEqual(tree.get(1002), tree._nodeData[0].children[0], 'get returns a node by id')
+  t.ok(tree.get(1006), 'get returns nodes that are hidden')
+  tree.el.remove()
+  t.end()
+})
+
+test('selects a node', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+  tree.select(1003)
+
+  var selected = tree.getSelected()
+  t.deepEqual(selected.datum(), tree.get(1003), 'getSelected gives us the selected node')
+  t.ok(tree.get(1003).selected,  'selected node is selected')
+  t.ok(tree.get(1003).children, 'selected node is expanded')
+
+  tree.collapseAll()
+  setTimeout(function () {
+    // wait for the tree to be collapsed, then select a deep leaf.
+    tree.select(1004)
+    // Make sure all ancestors of the selected node are also expanded.
+    var leaf = tree.getSelected().datum()
+    t.ok(leaf.parent.children, '01 has children')
+    t.ok(leaf.parent.parent.children, 'P1 has children')
+    t.ok(leaf.parent.parent.parent.children, 'Root has children')
+    tree.el.remove()
+    t.end()
+  }, 400)
+})
+
+test('selects a node with options', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , calls = 0
+
+  tree.on('select', function (d) {
+    t.ok(d._children, 'selected node is not expanded')
+  })
+
+  tree.select(1058, {silent: true})
+  tree.select(1003, {toggleOnSelect: false})
+
+  t.ok(++calls, 1, 'select only fired once')
+  tree.el.remove()
+  t.end()
+})
+
+
+test('editable', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  tree.editable()
+  t.ok(el.querySelector('.tree.editable'), 'there is an tree editable object')
+  t.ok(tree.isEditable(), 'the tree is editable')
+
+  tree.editable()
+  t.ok(!el.querySelector('.tree.editable'), 'there is not an tree editable object')
+  t.ok(!tree.isEditable(), 'the tree is not editable')
+
+  tree.el.remove()
+  t.end()
+})
+
 test('expand all', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()
