@@ -40,6 +40,13 @@
         overflow-x: hidden;
         .lh-transition(transform @transition, opacity @transition);
 
+        &.notransition {
+          .lh-transition(none) !important;
+          .node-contents {
+            .lh-transition(none) !important;
+          }
+        }
+
         .node-contents {
           margin: 6px;
           text-align: left;

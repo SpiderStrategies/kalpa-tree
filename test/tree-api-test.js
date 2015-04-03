@@ -37,6 +37,22 @@ test('selects a node', function (t) {
   }, 400)
 })
 
+test('selects a node without animations', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , tick = process.nextTick
+
+  process.nextTick = function (fn) {
+    process.nextTick = tick // back to normal
+
+    t.ok(tree.node.classed('notransition'), 'tree nodes have notransition class applied')
+    fn()
+    t.ok(!tree.node.classed('notransition'), 'tree nodes notransition class removed')
+    tree.el.remove()
+    t.end()
+  }
+  tree.select(1003, {animate: false})
+})
+
 test('select will not toggle an already expanded node', function (t) {
   var tree = new Tree({stream: stream()}).render()
 
