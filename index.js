@@ -135,8 +135,8 @@ Tree.prototype.draw = function (source) {
   // Add the toggler
   contents.append('div')
           .attr('class', 'toggler')
-            .append('svg')
             .on('click', this._onToggle.bind(this))
+            .append('svg')
               .append('use')
                 .attr('xlink:href', '#icon-collapsed')
 
@@ -356,9 +356,6 @@ Tree.prototype.toggle = function (d) {
     d._children = null
   }
   this.draw(d)
-  if (d3.event) {
-    d3.event.stopPropagation()
-  }
 }
 
 module.exports = Tree
