@@ -37,6 +37,17 @@ test('selects a node', function (t) {
   }, 400)
 })
 
+test('select will not toggle an already expanded node', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+
+  tree.expandAll()
+  tree.select(1003)
+  t.ok(tree.get(1003).children, 'previously expanded node is still expanded after select')
+
+  tree.el.remove()
+  t.end()
+})
+
 test('selects a node with options', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , calls = 0
@@ -52,7 +63,6 @@ test('selects a node with options', function (t) {
   tree.el.remove()
   t.end()
 })
-
 
 test('editable', function (t) {
   var tree = new Tree({stream: stream()}).render()
