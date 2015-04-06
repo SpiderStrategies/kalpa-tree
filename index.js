@@ -89,7 +89,7 @@ Tree.prototype.render = function () {
         // Push this node onto the parents visible children
         (p.children || (p.children = [])).push(n)
         // And select it
-        self.select(n.id)
+        self.select(n.id, { silent: true })
       } else {
         // push to _children so it's hidden, no need to draw
         (p._children || (p._children = [])).push(n)
