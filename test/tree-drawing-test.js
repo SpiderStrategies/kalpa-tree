@@ -22,7 +22,13 @@ test('displays a node as selected on render', function (t) {
   var tree = new Tree({
     stream: stream(),
     initialSelection: 1003
-  }).render()
+  })
+
+  tree.on('select', function () {
+    t.fail('should not fire select on initial selection')
+  })
+
+  tree.render()
   t.equal(tree.node.size(), 8, '3 nodes by default')
   tree.el.remove()
   t.end()
