@@ -75,7 +75,7 @@ Tree.prototype.render = function () {
         // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
         (p.children || (p.children = [])).push(n)
         if (self.options.initialSelection === n.id) {
-          self.select(n.id)
+          self.select(n.id, { silent: true })
         } else {
           self.draw()
         }
@@ -89,7 +89,7 @@ Tree.prototype.render = function () {
         // Push this node onto the parents visible children
         (p.children || (p.children = [])).push(n)
         // And select it
-        self.select(n.id)
+        self.select(n.id, { silent: true })
       } else {
         // push to _children so it's hidden, no need to draw
         (p._children || (p._children = [])).push(n)
