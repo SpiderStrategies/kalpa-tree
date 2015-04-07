@@ -234,11 +234,7 @@ Tree.prototype.get = function (id) {
     return this.root
   }
 
-  var node = null
-  this._nodeData.some(function (d) {
-    return d.id == id && (node = d, true)
-  })
-  return node
+  return this._nodeData[id]
 }
 
 /*
