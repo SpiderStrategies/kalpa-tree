@@ -190,7 +190,7 @@ test('adds a node to a parent and before sibling', function (t) {
     label: 'Newest node sibling',
     color: 'green',
     nodeType: 'metric'
-  }, 1003, 1005) // 1005 is the second node
+  }, 1003, 1) // Add as the second node
 
   t.equal(tree.get(1003).children.indexOf(d), 1, 'new node index is correct in parent\'s children')
   t.deepEqual(d.parent.children[2], tree.get(1005), 'sibling 1005 is after the new node')

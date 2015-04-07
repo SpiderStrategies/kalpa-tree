@@ -311,11 +311,10 @@ Tree.prototype._onToggle = function (d, i) {
 /*
  * Adds a new node to the tree. Pass in d as the data that represents
  * the node, parent (which can be the parent object or an id), and an optional
- * sibling (object or id). The node will be inserted before the sibling, otherwise inserted as
- * the last child of the parent
- *
+ * index. If the index is sent, the node will be inserted at that index within the
+ * parent's children.
  */
-Tree.prototype.add = function (d, parent, sibling) {
+Tree.prototype.add = function (d, parent, idx) {
   if (this.get(d.id)) {
     // can't add a node that we already have
     return
@@ -326,17 +325,12 @@ Tree.prototype.add = function (d, parent, sibling) {
     return
   }
 
-  if (typeof sibling !== 'undefined') {
-    sibling = this.get(typeof sibling === 'object' ? sibling.id : sibling)
-  }
-
   var children = parent.children || parent._children
   this._nodeData[d.id] = d
 
   d.parent = parent
 
-  if (sibling) {
-    var idx = children.indexOf(sibling)
+  if (typeof idx !== 'undefined') {
     children.splice(idx, 0, d)
   } else {
     if (!children) {
