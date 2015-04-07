@@ -59,19 +59,15 @@ Tree.prototype.render = function () {
                          .selectAll('li.node')
 
   this._nodeData = []
-  this.options.stream.on('data', function (n) {
-    var p = (function (nodes) {
-      for (var i = nodes.length - 1; i >= 0; i--) {
-        if (nodes[i].id === n.parentId) {
-          return nodes[i]
-        }
-      }
-    })(self._nodeData)
+  this.root = null
 
-    self._nodeData.push(n)
+  this.options.stream.on('data', function (n) {
+    var p = self._nodeData[n.parentId]
+    self._nodeData[n.id] = n
+
     if (p) {
       n.parent = p
-      if (p == self._nodeData[0] || p.children) {
+      if (p == self.root || p.children) {
         // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
         (p.children || (p.children = [])).push(n)
         if (self.options.initialSelection === n.id) {
@@ -95,6 +91,7 @@ Tree.prototype.render = function () {
         (p._children || (p._children = [])).push(n)
       }
     } else {
+      self.root = n
       // root, draw it.
       self.draw()
     }
@@ -114,8 +111,7 @@ Tree.prototype.draw = function (source, opt) {
   opt = opt || {}
 
   var self = this
-
-  this.node = this.node.data(this.tree.nodes(this._nodeData[0]), function (d) {
+  this.node = this.node.data(this.tree.nodes(this.root), function (d) {
     return d[self.options.accessors.id]
   })
 
@@ -235,7 +231,7 @@ Tree.prototype.select = function (id, opt) {
  */
 Tree.prototype.get = function (id) {
   if (typeof id === 'undefined') {
-    return this._nodeData[0]
+    return this.root
   }
 
   var node = null
@@ -334,11 +330,13 @@ Tree.prototype.editable = function () {
  * since the first children are always visible
  */
 Tree.prototype._toggleAll = function (fn) {
-  for (var i = 1; i < this._nodeData.length; i++) {
-    var d = this._nodeData[i]
-    fn(d)
-  }
-  this.draw(this._nodeData[0])
+  var self = this
+  this._nodeData.forEach(function (d) {
+    if (d != self.root) {
+      fn(d)
+    }
+  })
+  this.draw(this.root)
 }
 
 Tree.prototype.expandAll = function () {

@@ -6,7 +6,7 @@ var test = require('tape').test
 
 test('render populates data from stream', function (t) {
   var tree = new Tree({stream: stream()}).render()
-  t.equal(tree._nodeData.length, data.length, '_nodeData contains all data')
+  t.equal(Object.keys(tree._nodeData).length, data.length, '_nodeData contains all data')
   tree.el.remove()
   t.end()
 })
