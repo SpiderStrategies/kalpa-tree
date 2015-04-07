@@ -17,6 +17,8 @@ http.createServer(function (req, res) {
     var less = spawn('./node_modules/less/bin/lessc', ['-x', 'tree.less'])
     less.stdout.pipe(res)
     less.stderr.pipe(process.stderr)
+  } else if (path === '/tree-patch.json') {
+    return fs.createReadStream(__dirname + '/patch.json').pipe(res)
   } else if (path === '/matt-tree.json') {
     request('https://gist.githubusercontent.com/mattsgarlata/c331e9bdf264f7526850/raw/e989f2bd1e8eb9ac7d2caff48aba21025863514d/gistfile1.json').pipe(res)
   } else if (path == '/bundle.js') {

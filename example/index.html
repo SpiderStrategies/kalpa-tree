@@ -111,6 +111,9 @@
         <label for="select">Select a node</label>
         <input type="text" id="select">
       </div>
+      <div>
+        <button class="patch">Patch the tree</button>
+      </div>
     </div>
     <div class="tree-pane">
       <div class="tree-search">
@@ -149,6 +152,12 @@
       }
       flip = !flip
     }
+
+    document.querySelector('.patch').addEventListener('click', function () {
+      http.get('/tree-patch.json', function (res) {
+        tree.patch(res.pipe(JSONStream.parse([true])))
+      })
+    })
 
     bt.querySelector('.state-toggler').onclick = function () {
       tree.editable()

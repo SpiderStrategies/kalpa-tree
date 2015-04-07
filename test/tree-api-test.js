@@ -1,5 +1,6 @@
 var test = require('tape').test
   , d3 = require('d3')
+  , Readable = require('stream').Readable
   , Tree = require('../')
   , stream = require('./tree-stream')
   , data = require('./tree.json')
@@ -121,6 +122,136 @@ test('collapse all', function (t) {
     tree.el.remove()
     t.end()
   }, 400)
+})
+
+test('removes a node by id', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  tree.expandAll() // start expanded
+
+  t.equal(Object.keys(tree._nodeData).length, data.length, 'starts with all nodes')
+  tree.remove(1002)
+  t.equal(Object.keys(tree._nodeData).length, 11, 'nodes were removed from _nodeData')
+
+  setTimeout(function () {
+    var node = el.querySelector('.tree ul li:nth-child(2)')
+    t.equal(el.querySelectorAll('.tree ul li').length, 7, 'removed nodes no longer in the dom')
+    t.end()
+  }, 400)
+})
+
+test('removes a node by data object', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+  tree.remove(tree.get(1002))
+  t.equal(Object.keys(tree._nodeData).length, 11, 'nodes were removed from _nodeData')
+  t.end()
+})
+
+test('prevents add for a node w/ that id', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  var d = tree.add({
+    id: 1001
+  })
+  t.ok(!d, 'd is undefined')
+  t.end()
+})
+
+test('adds a node to a parent', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  tree.expandAll()
+
+  var d = tree.add({
+    id: 3020,
+    label: 'Newest node',
+    color: 'green',
+    nodeType: 'metric'
+  }, 1003)
+
+  t.deepEqual(d.parent, tree.get(1003), 'new node\'s parent is correct')
+  t.equal(tree._nodeData[3020], d, 'node was added to _nodeData')
+  t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node', 'new node label is correct')
+  t.end()
+})
+
+test('adds a node to a parent and before sibling', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  tree.expandAll()
+
+  var d = tree.add({
+    id: 3020,
+    label: 'Newest node sibling',
+    color: 'green',
+    nodeType: 'metric'
+  }, 1003, 1) // Add as the second node
+
+  t.equal(tree.get(1003).children.indexOf(d), 1, 'new node index is correct in parent\'s children')
+  t.deepEqual(d.parent.children[2], tree.get(1005), 'sibling 1005 is after the new node')
+  t.equal(tree._nodeData[3020], d, 'node was added to _nodeData')
+  t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node sibling', 'new node label is correct')
+  t.end()
+})
+
+test('edits a node', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  tree.edit({
+    id: 1001,
+    label: 'New label for root',
+    color: 'green'
+  })
+
+  var d = tree.get(1001)
+  t.equal(d.label, 'New label for root', 'label changed')
+  t.equal(d.color, 'green', 'color changed')
+  t.equal(d.nodeType, 'root', 'nodeType remained the same')
+
+  t.equal(el.querySelector('.tree ul li:nth-child(1) .label').innerHTML, 'New label for root', 'dom label changed')
+  t.end()
+})
+
+test('patch the tree by array of changes', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  tree.patch([{id: 1002, color: 'red', nodeType: 'perspective', label: 'Patched 1002'}])
+
+  var d = tree.get(1002)
+  t.equal(d.label, 'Patched 1002', 'labels are equal')
+  t.equal(d.color, 'red', 'colors are equal')
+  t.equal(d.nodeType, 'perspective', 'nodeType changed')
+
+  var node = el.querySelector('.tree ul li:nth-child(2)')
+  t.equal(node.querySelector('.label').innerHTML, 'Patched 1002', 'dom label changed')
+  t.ok(node.querySelector('.indicator.red'), 'red indicator exists')
+  t.end()
+})
+
+test('patch the tree with stream of data events containing the changes', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+    , patchStream = new Readable({objectMode: true})
+    , i = 1002
+
+  patchStream._read = function () {
+    var id = i++
+    if (id < 1004) {
+      return patchStream.push({id: id, label: 'Patched ' + id })
+    }
+    patchStream.push(null)
+  }
+  tree.patch(patchStream)
+  t.equal(tree.get(1002).label, 'Patched 1002', '1002 labels are equal')
+  t.equal(tree.get(1003).label, 'Patched 1003', '1003 labels are equal')
+  t.end()
 })
 
 test('toggle a specific node', function (t) {

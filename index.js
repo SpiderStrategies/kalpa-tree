@@ -1,5 +1,6 @@
 var d3 = require('d3')
   , EventEmitter = require('events').EventEmitter
+  , Stream = require('stream').Stream
   , util = require('util')
   , defaults = {
     toggleOnSelect: true, // By default each select will toggle the node if needed. This prevents the toggle
@@ -111,6 +112,7 @@ Tree.prototype.draw = function (source, opt) {
   opt = opt || {}
 
   var self = this
+
   this.node = this.node.data(this.tree.nodes(this.root), function (d) {
     return d[self.options.accessors.id]
   })
@@ -307,6 +309,41 @@ Tree.prototype._onToggle = function (d, i) {
 }
 
 /*
+ * Adds a new node to the tree. Pass in d as the data that represents
+ * the node, parent (which can be the parent object or an id), and an optional
+ * index. If the index is sent, the node will be inserted at that index within the
+ * parent's children.
+ */
+Tree.prototype.add = function (d, parent, idx) {
+  if (this.get(d.id)) {
+    // can't add a node that we already have
+    return
+  }
+  parent = this.get(typeof parent === 'object' ? parent.id : parent)
+
+  if (!parent) {
+    return
+  }
+
+  var children = parent.children || parent._children
+  this._nodeData[d.id] = d
+
+  d.parent = parent
+
+  if (typeof idx !== 'undefined') {
+    children.splice(idx, 0, d)
+  } else {
+    if (!children) {
+      children = parent.children = []
+    }
+    children.push(d)
+  }
+
+  this.draw(parent)
+  return this.get(d.id)
+}
+
+/*
  * Returns if the tree is in edit mode.
  */
 Tree.prototype.isEditable = function () {
@@ -319,6 +356,15 @@ Tree.prototype.isEditable = function () {
 Tree.prototype.editable = function () {
   var t = this.el.select('.tree')
   t.classed('editable', !t.classed('editable'))
+}
+
+/*
+ * Edits a node
+ */
+Tree.prototype.edit = function (d) {
+  if (d.id && this.get(d.id)) {
+    this._patch(d)
+  }
 }
 
 /*
@@ -351,6 +397,66 @@ Tree.prototype.collapseAll = function () {
       d.children = null
     }
   })
+}
+
+/*
+ * Receives an array of patch changes, or a stream that emits data events with
+ * the node and the changes.
+ */
+Tree.prototype.patch = function (obj) {
+  var self = this
+  if (obj instanceof Stream) {
+    obj.on('data', function (d) {
+      self._patch(d)
+    })
+  } else if (Array.isArray(obj)) {
+    obj.forEach(this._patch.bind(this))
+  }
+}
+
+/*
+ * Merges properties from obj into the data object in the tree with the same id
+ * as obj
+ */
+Tree.prototype._patch = function (obj) {
+  var d = this.get(obj.id)
+  if (d) {
+    for (var prop in obj) {
+      d[prop] = obj[prop]
+    }
+    this.draw(d)
+  }
+}
+
+/*
+ * Removes a node from the tree. obj can be the node id or the node itself
+ */
+Tree.prototype.remove = function (obj) {
+  var node = this.get(typeof obj === 'object' ? obj.id : obj)
+
+  if (!node) {
+    return
+  }
+
+  var parent = node.parent
+    , self = this
+  if (parent) {
+    // Remove the child from parent
+    var children = parent.children || parent._children
+    children.splice(children.indexOf(node), 1)
+    this.draw(parent)
+
+    // Cleanup _nodeData
+    ;[node].reduce(function reduce(p, c) {
+      var children = c.children || c._children
+      if (children) {
+        return p.concat(children.reduce(reduce, []))
+      }
+      return p.concat(c.id)
+    }, []).forEach(function (id) {
+      delete self._nodeData[id]
+    })
+  }
 }
 
 Tree.prototype.toggle = function (d, opt) {
