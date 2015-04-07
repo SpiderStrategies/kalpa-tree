@@ -7,8 +7,8 @@ var test = require('tape').test
 test('get', function (t) {
   var tree = new Tree({stream: stream()}).render()
 
-  t.deepEqual(tree.get(), tree._nodeData[0], 'get returns root by default')
-  t.deepEqual(tree.get(1002), tree._nodeData[0].children[0], 'get returns a node by id')
+  t.deepEqual(tree.get(), tree.root, 'get returns root by default')
+  t.deepEqual(tree.get(1002), tree.root.children[0], 'get returns a node by id')
   t.ok(tree.get(1006), 'get returns nodes that are hidden')
   tree.el.remove()
   t.end()
