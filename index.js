@@ -309,6 +309,47 @@ Tree.prototype._onToggle = function (d, i) {
 }
 
 /*
+ * Adds a new node to the tree. Pass in d as the data that represents
+ * the node, parent (which can be the parent object or an id), and an optional
+ * sibling (object or id). The node will be inserted before the sibling, otherwise inserted as
+ * the last child of the parent
+ *
+ */
+Tree.prototype.add = function (d, parent, sibling) {
+  if (this.get(d.id)) {
+    // can't add a node that we already have
+    return
+  }
+  parent = this.get(typeof parent === 'object' ? parent.id : parent)
+
+  if (!parent) {
+    return
+  }
+
+  if (typeof sibling !== 'undefined') {
+    sibling = this.get(typeof sibling === 'object' ? sibling.id : sibling)
+  }
+
+  var children = parent.children || parent._children
+  this._nodeData[d.id] = d
+
+  d.parent = parent
+
+  if (sibling) {
+    var idx = children.indexOf(sibling)
+    children.splice(idx, 0, d)
+  } else {
+    if (!children) {
+      children = parent.children = []
+    }
+    children.push(d)
+  }
+
+  this.draw(parent)
+  return this.get(d.id)
+}
+
+/*
  * Returns if the tree is in edit mode.
  */
 Tree.prototype.isEditable = function () {

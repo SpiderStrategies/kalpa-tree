@@ -149,6 +149,56 @@ test('removes a node by data object', function (t) {
   t.end()
 })
 
+test('prevents add for a node w/ that id', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  var d = tree.add({
+    id: 1001
+  })
+  t.ok(!d, 'd is undefined')
+  t.end()
+})
+
+test('adds a node to a parent', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  tree.expandAll()
+
+  var d = tree.add({
+    id: 3020,
+    label: 'Newest node',
+    color: 'green',
+    nodeType: 'metric'
+  }, 1003)
+
+  t.deepEqual(d.parent, tree.get(1003), 'new node\'s parent is correct')
+  t.equal(tree._nodeData[3020], d, 'node was added to _nodeData')
+  t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node', 'new node label is correct')
+  t.end()
+})
+
+test('adds a node to a parent and before sibling', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  tree.expandAll()
+
+  var d = tree.add({
+    id: 3020,
+    label: 'Newest node sibling',
+    color: 'green',
+    nodeType: 'metric'
+  }, 1003, 1005) // 1005 is the second node
+
+  t.equal(tree.get(1003).children.indexOf(d), 1, 'new node index is correct in parent\'s children')
+  t.deepEqual(d.parent.children[2], tree.get(1005), 'sibling 1005 is after the new node')
+  t.equal(tree._nodeData[3020], d, 'node was added to _nodeData')
+  t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node sibling', 'new node label is correct')
+  t.end()
+})
+
 test('edits a node', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()
