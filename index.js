@@ -324,6 +324,15 @@ Tree.prototype.editable = function () {
 }
 
 /*
+ * Edits a node
+ */
+Tree.prototype.edit = function (d) {
+  if (d.id && this.get(d.id)) {
+    this._patch(d)
+  }
+}
+
+/*
  * Toggle all isn't necessary the best name, because it doesn't toggle the root node,
  * since the first children are always visible
  */

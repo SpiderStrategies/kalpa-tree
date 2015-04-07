@@ -149,6 +149,25 @@ test('removes a node by data object', function (t) {
   t.end()
 })
 
+test('edits a node', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  tree.edit({
+    id: 1001,
+    label: 'New label for root',
+    color: 'green'
+  })
+
+  var d = tree.get(1001)
+  t.equal(d.label, 'New label for root', 'label changed')
+  t.equal(d.color, 'green', 'color changed')
+  t.equal(d.nodeType, 'root', 'nodeType remained the same')
+
+  t.equal(el.querySelector('.tree ul li:nth-child(1) .label').innerHTML, 'New label for root', 'dom label changed')
+  t.end()
+})
+
 test('patch the tree by array of changes', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()
