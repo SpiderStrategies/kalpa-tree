@@ -364,6 +364,7 @@ Tree.prototype.editable = function () {
 Tree.prototype.edit = function (d) {
   if (d.id && this.get(d.id)) {
     this._patch(d)
+    this.draw(d)
   }
 }
 
@@ -408,9 +409,11 @@ Tree.prototype.patch = function (obj) {
   if (obj instanceof Stream) {
     obj.on('data', function (d) {
       self._patch(d)
+      self.draw(d)
     })
   } else if (Array.isArray(obj)) {
     obj.forEach(this._patch.bind(this))
+    self.draw()
   }
 }
 
@@ -424,7 +427,6 @@ Tree.prototype._patch = function (obj) {
     for (var prop in obj) {
       d[prop] = obj[prop]
     }
-    this.draw(d)
   }
 }
 
