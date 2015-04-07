@@ -124,6 +124,31 @@ test('collapse all', function (t) {
   }, 400)
 })
 
+test('removes a node by id', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  tree.expandAll() // start expanded
+
+  t.equal(Object.keys(tree._nodeData).length, data.length, 'starts with all nodes')
+  tree.remove(1002)
+  t.equal(Object.keys(tree._nodeData).length, 11, 'nodes were removed from _nodeData')
+
+  setTimeout(function () {
+    var node = el.querySelector('.tree ul li:nth-child(2)')
+    t.equal(el.querySelectorAll('.tree ul li').length, 7, 'removed nodes no longer in the dom')
+    t.end()
+  }, 400)
+})
+
+test('removes a node by data object', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+  tree.remove(tree.get(1002))
+  t.equal(Object.keys(tree._nodeData).length, 11, 'nodes were removed from _nodeData')
+  t.end()
+})
+
 test('patch the tree by array of changes', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()

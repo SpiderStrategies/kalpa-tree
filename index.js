@@ -112,6 +112,7 @@ Tree.prototype.draw = function (source, opt) {
   opt = opt || {}
 
   var self = this
+
   this.node = this.node.data(this.tree.nodes(this.root), function (d) {
     return d[self.options.accessors.id]
   })
@@ -380,6 +381,37 @@ Tree.prototype._patch = function (obj) {
       d[prop] = obj[prop]
     }
     this.draw(d)
+  }
+}
+
+/*
+ * Removes a node from the tree. obj can be the node id or the node itself
+ */
+Tree.prototype.remove = function (obj) {
+  var node = this.get(typeof obj === 'object' ? obj.id : obj)
+
+  if (!node) {
+    return
+  }
+
+  var parent = node.parent
+    , self = this
+  if (parent) {
+    // Remove the child from parent
+    var children = parent.children || parent._children
+    children.splice(children.indexOf(node), 1)
+    this.draw(parent)
+
+    // Cleanup _nodeData
+    ;[node].reduce(function reduce(p, c) {
+      var children = c.children || c._children
+      if (children) {
+        return p.concat(children.reduce(reduce, []))
+      }
+      return p.concat(c.id)
+    }, []).forEach(function (id) {
+      delete self._nodeData[id]
+    })
   }
 }
 
