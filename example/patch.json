@@ -1,0 +1,22 @@
+[
+  {
+    "id": 1004,
+    "label": "M1 - Patched",
+    "color": "green"
+  },
+  {
+    "id": 1005,
+    "label": "M2 - Patched",
+    "color": "red"
+  },
+  {
+    "id": 1007,
+    "label": "M4 - Patched",
+    "color": "red"
+  },
+  {
+    "id": 1008,
+    "label": "M5 - Patched",
+    "color": "yellow"
+  }
+]

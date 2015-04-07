@@ -1,5 +1,6 @@
 var test = require('tape').test
   , d3 = require('d3')
+  , Readable = require('stream').Readable
   , Tree = require('../')
   , stream = require('./tree-stream')
   , data = require('./tree.json')
@@ -121,6 +122,42 @@ test('collapse all', function (t) {
     tree.el.remove()
     t.end()
   }, 400)
+})
+
+test('patch the tree by array of changes', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  tree.patch([{id: 1002, color: 'red', nodeType: 'perspective', label: 'Patched 1002'}])
+
+  var d = tree.get(1002)
+  t.equal(d.label, 'Patched 1002', 'labels are equal')
+  t.equal(d.color, 'red', 'colors are equal')
+  t.equal(d.nodeType, 'perspective', 'nodeType changed')
+
+  var node = el.querySelector('.tree ul li:nth-child(2)')
+  t.equal(node.querySelector('.label').innerHTML, 'Patched 1002', 'dom label changed')
+  t.ok(node.querySelector('.indicator.red'), 'red indicator exists')
+  t.end()
+})
+
+test('patch the tree with stream of data events containing the changes', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+    , patchStream = new Readable({objectMode: true})
+    , i = 1002
+
+  patchStream._read = function () {
+    var id = i++
+    if (id < 1004) {
+      return patchStream.push({id: id, label: 'Patched ' + id })
+    }
+    patchStream.push(null)
+  }
+  tree.patch(patchStream)
+  t.equal(tree.get(1002).label, 'Patched 1002', '1002 labels are equal')
+  t.equal(tree.get(1003).label, 'Patched 1003', '1003 labels are equal')
+  t.end()
 })
 
 test('toggle a specific node', function (t) {

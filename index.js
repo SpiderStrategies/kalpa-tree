@@ -1,5 +1,6 @@
 var d3 = require('d3')
   , EventEmitter = require('events').EventEmitter
+  , Stream = require('stream').Stream
   , util = require('util')
   , defaults = {
     toggleOnSelect: true, // By default each select will toggle the node if needed. This prevents the toggle
@@ -351,6 +352,35 @@ Tree.prototype.collapseAll = function () {
       d.children = null
     }
   })
+}
+
+/*
+ * Receives an array of patch changes, or a stream that emits data events with
+ * the node and the changes.
+ */
+Tree.prototype.patch = function (obj) {
+  var self = this
+  if (obj instanceof Stream) {
+    obj.on('data', function (d) {
+      self._patch(d)
+    })
+  } else if (Array.isArray(obj)) {
+    obj.forEach(this._patch.bind(this))
+  }
+}
+
+/*
+ * Merges properties from obj into the data object in the tree with the same id
+ * as obj
+ */
+Tree.prototype._patch = function (obj) {
+  var d = this.get(obj.id)
+  if (d) {
+    for (var prop in obj) {
+      d[prop] = obj[prop]
+    }
+    this.draw(d)
+  }
 }
 
 Tree.prototype.toggle = function (d, opt) {
