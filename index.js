@@ -267,7 +267,7 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
 
   // determines if we should toggle the node. We don't toggle if it's the root node
   // or the node is already expanded, but not selected.
-  var toggle = opt.toggleOnSelect && !(d.children && !d.selected) && i !== 0
+  var toggle = opt.toggleOnSelect && !(d.children && !d.selected) && d !== this.root
 
   // tree_.selected stores a previously selected node
   if (this._selected) {
