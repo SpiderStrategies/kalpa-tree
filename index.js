@@ -68,7 +68,11 @@ Tree.prototype.render = function () {
 
     if (p) {
       n.parent = p
-      if (p == self.root || p.children) {
+
+      if (n.visible === false) {
+        // This node shouldn't be visible, so store it in the parents _invisibleNodes
+        (p._invisibleNodes || (p._invisibleNodes = [])).push(n)
+      } else if (p == self.root || p.children) {
         // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
         (p.children || (p.children = [])).push(n)
         if (self.options.initialSelection === n.id) {
@@ -364,6 +368,7 @@ Tree.prototype.editable = function () {
 Tree.prototype.edit = function (d) {
   if (d.id && this.get(d.id)) {
     this._patch(d)
+    this.draw(d)
   }
 }
 
@@ -408,9 +413,11 @@ Tree.prototype.patch = function (obj) {
   if (obj instanceof Stream) {
     obj.on('data', function (d) {
       self._patch(d)
+      self.draw(d)
     })
   } else if (Array.isArray(obj)) {
     obj.forEach(this._patch.bind(this))
+    self.draw(this.root)
   }
 }
 
@@ -420,11 +427,32 @@ Tree.prototype.patch = function (obj) {
  */
 Tree.prototype._patch = function (obj) {
   var d = this.get(obj.id)
+
   if (d) {
     for (var prop in obj) {
       d[prop] = obj[prop]
     }
-    this.draw(d)
+
+    // Check is the visible property has been set
+    if (typeof obj.visible !== 'undefined' && d.parent) {
+      var invisibles = d.parent._invisibleNodes || []
+      if (obj.visible && invisibles.indexOf(d) !== -1) {
+        // Remove it from the parent's _invisibleNodes
+        invisibles.splice(invisibles.indexOf(d), 1)
+        // And add it to the parent
+        delete d.visible
+        ;(d.parent.children || d.parent._children).push(d)
+      } else if (obj.visible == false) {
+        // visible was set to false, so move the node to the parent's _invisibleNodes
+        (d.parent._invisibleNodes || (d.parent._invisibleNodes = [])).push(d)
+        // And remove it from the parent's _children or children
+        var children = d.parent.children || d.parent._children
+          , idx = children.indexOf(d)
+        if (idx !== -1) {
+          children.splice(idx, 1)
+        }
+      }
+    }
   }
 }
 
