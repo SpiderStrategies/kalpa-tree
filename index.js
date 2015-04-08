@@ -305,7 +305,7 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
 
 Tree.prototype._onToggle = function (d, i) {
   d3.event.stopPropagation()
-  if (i === 0) {
+  if (d === this.root) {
     // Never toggle root
     return
   }
