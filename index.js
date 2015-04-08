@@ -72,7 +72,7 @@ Tree.prototype.render = function () {
       if (n.visible === false) {
         // This node shouldn't be visible, so store it in the parents _invisibleNodes
         (p._invisibleNodes || (p._invisibleNodes = [])).push(n)
-      } else if (p == self.root || p.children) {
+      } else if (p == self.root || (Array.isArray(self.root) && self.root.indexOf(p) !== -1) || p.children) {
         // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
         (p.children || (p.children = [])).push(n)
         if (self.options.initialSelection === n.id) {
@@ -96,7 +96,13 @@ Tree.prototype.render = function () {
         (p._children || (p._children = [])).push(n)
       }
     } else {
-      self.root = n
+      if (self.root) {
+        // This must be a forest tree
+        self.root = Array.isArray(self.root) ? self.root.concat(n) : [self.root, n]
+        self.el.select('.tree').classed('forest-tree', true)
+      } else {
+        self.root = n
+      }
       // root, draw it.
       self.draw()
     }
@@ -116,8 +122,11 @@ Tree.prototype.draw = function (source, opt) {
   opt = opt || {}
 
   var self = this
+    , data = (Array.isArray(this.root) ? this.root : [this.root]).reduce(function (p, subTree) {
+      return p.concat(self.tree.nodes(subTree))
+    }, [])
 
-  this.node = this.node.data(this.tree.nodes(this.root), function (d) {
+  this.node = this.node.data(data, function (d) {
     return d[self.options.accessors.id]
   })
 
@@ -198,11 +207,11 @@ Tree.prototype.draw = function (source, opt) {
   var exit = this.node.exit()
   exit.selectAll('div.node-contents')
       .style(prefix + 'transform', function (d) {
-        return 'translate(' + d.parent._x + 'px,0px)'
+        return 'translate(' + (d.parent ? d.parent._x : 0)+ 'px,0px)'
       })
 
   exit.style(prefix + 'transform', function (d) {
-        return 'translate(0px,' + source._y + 'px)'
+        return 'translate(0px,' + (source ? source._y : 0)+ 'px)'
       })
       .style('opacity', 1e-6)
       .transition()

@@ -18,6 +18,13 @@
     .lh-user-select(none);
 
     // Show the expand/collapse indicators on hover
+    &.forest-tree:hover {
+      li.node {
+        .toggler { .lh-opacity(1); }
+      }
+    }
+
+    // Don't show it for the root node on normal trees
     &:hover {
       li.node:not(:first-child) {
         .toggler { .lh-opacity(1); }
