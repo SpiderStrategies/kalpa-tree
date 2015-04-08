@@ -235,6 +235,29 @@ test('patch the tree by array of changes', function (t) {
   t.end()
 })
 
+test('patch changes nodes visibility', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  tree.patch([{id: 1006, visible: false}, {id: 1008, visible: false}, {id: 1058, visible: false}])
+
+  var n1 = tree.get(1006)
+  t.equal(n1.parent._invisibleNodes.length, 2, '1006 and 1008 parent has _invisibleNodes')
+  t.equal(n1.parent._children.length, 8, '1003 _children do not contain 1006 and 1008')
+
+  var n2 = tree.get(1058)
+  t.ok(!n2.visible, 'deleted n2.visible')
+  t.deepEqual(n2.parent._invisibleNodes[0], n2, '1058 parent _invisibleNodes contains 1058')
+
+  tree.expandAll()
+
+  t.equal(n2.parent.children.indexOf(n2), -1, 'expanded n2 parent does not have 1058 as a child')
+
+  tree.patch([{id: 1058, visible: true}])
+  t.equal(n2.parent.children.indexOf(n2), 1, 'expanded n2 parent now contains 1058')
+  t.end()
+})
+
 test('patch the tree with stream of data events containing the changes', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()
