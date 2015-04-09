@@ -219,7 +219,7 @@ test('edits a node', function (t) {
 })
 
 test('patch the tree by array of changes', function (t) {
-  var tree = new Tree({stream: stream()}).render()
+  var tree = new Tree({stream: stream(), indicator: true}).render()
     , el = tree.el.node()
 
   tree.patch([{id: 1002, color: 'red', nodeType: 'perspective', label: 'Patched 1002'}])
@@ -232,6 +232,7 @@ test('patch the tree by array of changes', function (t) {
   var node = el.querySelector('.tree ul li:nth-child(2)')
   t.equal(node.querySelector('.label').innerHTML, 'Patched 1002', 'dom label changed')
   t.ok(node.querySelector('.indicator.red'), 'red indicator exists')
+  tree.el.remove()
   t.end()
 })
 
