@@ -17,6 +17,8 @@ http.createServer(function (req, res) {
     var less = spawn('./node_modules/less/bin/lessc', ['-x', 'tree.less'])
     less.stdout.pipe(res)
     less.stderr.pipe(process.stderr)
+  } else if (path === '/documents.json') {
+    return fs.createReadStream(__dirname + '/documents.json').pipe(res)
   } else if (path === '/tree-patch.json') {
     return fs.createReadStream(__dirname + '/patch.json').pipe(res)
   } else if (path === '/matt-tree.json') {
