@@ -2,6 +2,7 @@ var test = require('tape').test
   , d3 = require('d3')
   , Tree = require('../')
   , Transform = require('stream').Transform
+  , Readable = require('stream').Readable
   , stream = require('./tree-stream')
   , data = require('./tree.json')
 
@@ -66,4 +67,25 @@ test('displays a node as selected on render', function (t) {
   t.equal(tree.node.size(), 8, '3 nodes by default')
   tree.el.remove()
   t.end()
+})
+
+test('emits stream on errors on tree', function (t) {
+  var stream = new Readable({objectMode: true})
+  stream._read = function () {
+    this.emit('error', new Error('Blue Smoke'))
+  }
+
+  var tree = new Tree({
+    stream: stream
+  })
+
+  tree.on('error', function (e) {
+    t.ok(e, 'error event')
+    t.equal(e.message, 'Blue Smoke', 'error message matches')
+    tree.el.remove()
+    t.end()
+  })
+
+  tree.render()
+
 })

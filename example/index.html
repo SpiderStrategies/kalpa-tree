@@ -174,7 +174,6 @@
       tree.select(this.value)
     })
 
-
     // http.get('/documents.json', function (res) {
     http.get('/sms-tree.json', function (res) {
       tree = new Tree({
@@ -183,6 +182,10 @@
           icon: 'nodeType'
         },
         initialSelection: 1005
+      })
+
+      tree.on('error', function (e) {
+        console.log('tree error', e)
       })
 
       // Let's be naughty for demo usage
