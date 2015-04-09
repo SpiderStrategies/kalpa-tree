@@ -29,6 +29,13 @@ var Tree = function (options) {
     throw new Error('options.stream is required')
   }
 
+  /*
+   * If there's an error on the incoming stream, emit that on the tree
+   */
+  options.stream.on('error', (function (e) {
+    this.emit('error', e)
+  }).bind(this))
+
   this.options = defaults
   for (var p in options) {
     if (p === 'accessors') {
