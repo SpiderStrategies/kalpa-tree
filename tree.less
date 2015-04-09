@@ -18,9 +18,20 @@
     .lh-user-select(none);
 
     // Show the expand/collapse indicators on hover
-    &.forest-tree:hover {
-      li.node {
-        .toggler { .lh-opacity(1); }
+    &.forest-tree {
+
+      &:hover {
+        li.node {
+          .toggler { .lh-opacity(1); }
+        }
+      }
+
+      ul {
+        li.node {
+          .node-contents {
+            margin: 6px;
+          }
+        }
       }
     }
 
@@ -30,6 +41,8 @@
         .toggler { .lh-opacity(1); }
       }
     }
+
+
 
     ul {
       list-style-type: none;
