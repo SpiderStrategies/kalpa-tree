@@ -137,6 +137,15 @@
         &.selected {
           background-color: #2d3135;
 
+          &:before {
+            content: "";
+            left: 0;
+            position: absolute;
+            width: 3px;
+            height: 100%;
+            background-color: #E1E8EB;
+          }
+
           .label { color: #E1E8EB; }
           .indicator { .lh-background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 50%)); }
         }
