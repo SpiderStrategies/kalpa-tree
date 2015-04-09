@@ -6,6 +6,16 @@ var test = require('tape').test
   , stream = require('./tree-stream')
   , data = require('./tree.json')
 
+test('multiple trees have their own options', function (t) {
+  var tree1 = new Tree({stream: stream(), depth: 390}).render()
+    , tree2 = new Tree({stream: stream() }).render()
+
+  t.notDeepEqual(tree1.options, tree2.options, 'options should not be shared')
+  tree1.el.remove()
+  tree2.el.remove()
+  t.end()
+})
+
 test('render populates data from stream', function (t) {
   var tree = new Tree({stream: stream()}).render()
   t.equal(Object.keys(tree._nodeData).length, data.length, '_nodeData contains all data')
@@ -14,7 +24,7 @@ test('render populates data from stream', function (t) {
 })
 
 test('does not apply indicator class to label-mask by default', function (t) {
-  var tree = new Tree({stream: stream(), indicator: false}).render()
+  var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()
   t.equal(el.querySelectorAll('.tree ul li:first-child .label-mask').length, 1, 'we have a label mask')
   t.equal(el.querySelectorAll('.tree ul li:first-child .label-mask.indicator').length, 0, 'label mask is missing an indicator class')

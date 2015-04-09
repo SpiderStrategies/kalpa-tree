@@ -2,7 +2,13 @@ var d3 = require('d3')
   , EventEmitter = require('events').EventEmitter
   , Stream = require('stream').Stream
   , util = require('util')
-  , defaults = {
+  , styles = window.getComputedStyle(document.documentElement, '')
+  , prefix = Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/)[0]
+  , resize = require('./lib/resize')
+  , partialRight = require('./lib/partial-right')
+
+var defaults = function () {
+  return {
     toggleOnSelect: true, // By default each select will toggle the node if needed. This prevents the toggle
     depth: 20, // indentation depth
     height: 36, // height of each row
@@ -15,11 +21,7 @@ var d3 = require('d3')
       color: 'color'
     }
   }
-  , styles = window.getComputedStyle(document.documentElement, '')
-  , prefix = Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/)[0]
-  , resize = require('./lib/resize')
-  , partialRight = require('./lib/partial-right')
-
+}
 /**
  * Create a new d3 tree with the given config.
  */
@@ -38,7 +40,7 @@ var Tree = function (options) {
     this.emit('error', e)
   }).bind(this))
 
-  this.options = defaults
+  this.options = defaults()
   for (var p in options) {
     if (p === 'accessors') {
       for (var pp in options.accessors) {
