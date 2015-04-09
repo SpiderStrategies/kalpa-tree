@@ -409,7 +409,7 @@ Tree.prototype._toggleAll = function (fn) {
       fn(d)
     }
   })
-  this.draw(this.root)
+  this.draw(Array.isArray(this.root) ? this.root[0] : this.root)
 }
 
 Tree.prototype.expandAll = function () {
@@ -443,7 +443,7 @@ Tree.prototype.patch = function (obj) {
     })
   } else if (Array.isArray(obj)) {
     obj.forEach(this._patch.bind(this))
-    self.draw(this.root)
+    self.draw(Array.isArray(this.root) ? this.root[0] : this.root)
   }
 }
 
