@@ -6,6 +6,7 @@ var d3 = require('d3')
     toggleOnSelect: true, // By default each select will toggle the node if needed. This prevents the toggle
     depth: 20, // indentation depth
     height: 36, // height of each row
+    maxAnimatable: 50, // Disable animations if a node has children greater than this amount
     accessors: {
       id: 'id',
       label: 'label',
@@ -172,6 +173,11 @@ Tree.prototype.draw = function (source, opt) {
   enter.append('div')
           .attr('class', 'indicator')
 
+  // Override animate if there are too many children and it will slow down the browser
+  var srcChildren = source && (source.children || source._children)
+  if (srcChildren && srcChildren.length > this.options.maxAnimatable) {
+    opt.animate = false
+  }
   // disable animations if necessary
   this.node.classed('notransition', opt.animate === false)
 
@@ -221,9 +227,13 @@ Tree.prototype.draw = function (source, opt) {
         return 'translate(0px,' + (source ? source._y : 0)+ 'px)'
       })
       .style('opacity', 1e-6)
-      .transition()
-      .duration(300) // copied in css
-      .remove()
+  if (opt.animate === false) {
+    exit.remove()
+  } else {
+    exit.transition()
+        .duration(300) // copied in css
+        .remove()
+  }
 
   // Now resize things
   this.resize()
@@ -399,7 +409,7 @@ Tree.prototype._toggleAll = function (fn) {
       fn(d)
     }
   })
-  this.draw(this.root)
+  this.draw(Array.isArray(this.root) ? this.root[0] : this.root)
 }
 
 Tree.prototype.expandAll = function () {
@@ -433,7 +443,7 @@ Tree.prototype.patch = function (obj) {
     })
   } else if (Array.isArray(obj)) {
     obj.forEach(this._patch.bind(this))
-    self.draw(this.root)
+    self.draw(Array.isArray(this.root) ? this.root[0] : this.root)
   }
 }
 
