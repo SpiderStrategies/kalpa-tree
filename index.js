@@ -7,6 +7,7 @@ var d3 = require('d3')
     depth: 20, // indentation depth
     height: 36, // height of each row
     maxAnimatable: 50, // Disable animations if a node has children greater than this amount
+    indicator: false, // show indicator light nodes on the right
     accessors: {
       id: 'id',
       label: 'label',
@@ -169,9 +170,9 @@ Tree.prototype.draw = function (source, opt) {
   contents.append('div')
          .attr('class', 'label')
 
-  // Now the indicator light
+  // Now the label mask
   enter.append('div')
-          .attr('class', 'indicator')
+          .attr('class', (this.options.indicator ? 'label-mask indicator' : 'label-mask'))
 
   // Override animate if there are too many children and it will slow down the browser
   var srcChildren = source && (source.children || source._children)
@@ -181,10 +182,10 @@ Tree.prototype.draw = function (source, opt) {
   // disable animations if necessary
   this.node.classed('notransition', opt.animate === false)
 
-  // Update the color if it changed
+  // If the tree has indicators, we may need to update the color
   this.node.selectAll('div.indicator')
       .attr('class', function (d) {
-        return 'indicator ' + d[self.options.accessors.color]
+        return 'label-mask indicator ' + d[self.options.accessors.color]
       })
 
   // The icon maybe changed

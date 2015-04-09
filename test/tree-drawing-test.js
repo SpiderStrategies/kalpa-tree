@@ -13,6 +13,15 @@ test('render populates data from stream', function (t) {
   t.end()
 })
 
+test('does not apply indicator class to label-mask by default', function (t) {
+  var tree = new Tree({stream: stream(), indicator: false}).render()
+    , el = tree.el.node()
+  t.equal(el.querySelectorAll('.tree ul li:first-child .label-mask').length, 1, 'we have a label mask')
+  t.equal(el.querySelectorAll('.tree ul li:first-child .label-mask.indicator').length, 0, 'label mask is missing an indicator class')
+  tree.el.remove()
+  t.end()
+})
+
 test('render populates and hides visible: false nodes', function (t) {
   var map = new Transform( { objectMode: true } )
     , hiddens = [1006, 1007, 1008, 1058]
