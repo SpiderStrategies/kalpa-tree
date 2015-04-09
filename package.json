@@ -4,6 +4,7 @@
   "description": "A Scoreboard tree rendered from a stream using d3",
   "main": "index.js",
   "dependencies": {
+    "JSONStream": "^0.10.0",
     "d3": "^3.5.2",
     "lesshat": "^3.0.2"
   },
