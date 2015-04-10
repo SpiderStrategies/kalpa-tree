@@ -17,6 +17,8 @@ http.createServer(function (req, res) {
     var less = spawn('./node_modules/less/bin/lessc', ['-x', 'tree.less'])
     less.stdout.pipe(res)
     less.stderr.pipe(process.stderr)
+  } else if (path === '/lots-o-docs.json') {
+    return request('https://gist.githubusercontent.com/nathanbowser/7eda0518120d7bac6847/raw/c7de51421ef571232f2a2acb690edc2ba8261fac/gistfile1.json').pipe(res)
   } else if (path === '/documents.json') {
     return fs.createReadStream(__dirname + '/documents.json').pipe(res)
   } else if (path === '/tree-patch.json') {
