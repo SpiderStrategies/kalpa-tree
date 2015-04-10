@@ -185,10 +185,9 @@ Tree.prototype.draw = function (source, opt) {
         return 'label-mask indicator ' + d[self.options.accessors.color]
       })
 
-  // Updates
-  // This is SOOO bizarre. If you remove this line, the expand all transformations don't work
-  this.el.select('div.tree').node().parentNode.getBoundingClientRect()
-  this.node.call(this.updater)
+  process.nextTick(function () {
+    self.node.call(self.updater)
+  })
 
   // if we are manipulating a single node, we may have to adjust selected properties
   if (source) {
