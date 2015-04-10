@@ -4,7 +4,7 @@ var d3 = require('d3')
   , util = require('util')
   , styles = window.getComputedStyle(document.documentElement, '')
   , prefix = Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/)[0]
-  , resize = require('./lib/resize')
+  , update = require('./lib/update')
   , partialRight = require('./lib/partial-right')
 
 var defaults = function () {
@@ -51,7 +51,8 @@ var Tree = function (options) {
     }
   }
 
-  this.resizer = resize(prefix)
+  this.prefix = prefix
+  this.updater = update(this)
 
   this.tree = d3.layout.tree()
                        .nodeSize([0, this.options.depth])
@@ -123,12 +124,6 @@ Tree.prototype.render = function () {
   return this
 }
 
-Tree.prototype.resize = function () {
-  var box = this.el.select('div.tree').node().parentNode.getBoundingClientRect()
-  this.resizer.height(this.options.height)
-  this.node.call(this.resizer)
-}
-
 Tree.prototype.draw = function (source, opt) {
   opt = opt || {}
 
@@ -158,7 +153,7 @@ Tree.prototype.draw = function (source, opt) {
 
   // Add the toggler
   contents.append('div')
-          .attr('class', 'toggler')
+          .attr('class', 'toggler leaf')
             .on('click', this._onToggle.bind(this))
             .append('svg')
               .append('use')
@@ -190,27 +185,10 @@ Tree.prototype.draw = function (source, opt) {
         return 'label-mask indicator ' + d[self.options.accessors.color]
       })
 
-  // The icon maybe changed
-  this.node.selectAll('svg.icon')
-           .attr('class', function (d) {
-             return 'icon ' + d[self.options.accessors.color]
-           })
-           .selectAll('use')
-            .attr('xlink:href', function (d) {
-              return '#icon-' + d[self.options.accessors.icon]
-            })
-
-  // change the state of the toggle icon by adjusting its class
-  this.node.selectAll('.toggler')
-           .attr('class', function (d) {
-             return 'toggler ' + (d._children ? 'collapsed' : d.children ? 'expanded' : 'leaf')
-           })
-
-  // Perhaps the name changed
-  this.node.selectAll('div.label')
-            .text(function (d) {
-              return d[self.options.accessors.label]
-            })
+  // Updates
+  // This is SOOO bizarre. If you remove this line, the expand all transformations don't work
+  this.el.select('div.tree').node().parentNode.getBoundingClientRect()
+  this.node.call(this.updater)
 
   // if we are manipulating a single node, we may have to adjust selected properties
   if (source) {
@@ -237,9 +215,6 @@ Tree.prototype.draw = function (source, opt) {
         .duration(300) // copied in css
         .remove()
   }
-
-  // Now resize things
-  this.resize()
 
   // Now remove the notransition class
   if (opt.animate === false) {

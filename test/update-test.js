@@ -1,6 +1,6 @@
 var test = require('tape').test
   , d3 = require('d3')
-  , resize = require('../lib/resize')
+  , update = require('../lib/update')
 
 test('setup', function (t) {
   d3.select(document.body)
@@ -16,12 +16,11 @@ test('setup', function (t) {
   t.end()
 })
 
-test('resize adjusts node styles', function (t) {
-  var resizer = resize('-webkit-')
-  resizer.height(10)
+test('update adjusts node styles', function (t) {
+  var updater = update({prefix: '-webkit-', options: { height: 10 }})
   var nodes = d3.select('ul.nodes-container').selectAll('li')
 
-  nodes.call(resizer)
+  nodes.call(updater)
 
   nodes.each(function (d, i) {
     var node = d3.select(this)
@@ -32,18 +31,17 @@ test('resize adjusts node styles', function (t) {
   t.end()
 })
 
-test('resize stores private fields', function (t) {
-  var resizer = resize('-webkit-')
-  resizer.height(100)
+test('update stores private fields', function (t) {
+  var updater = update({prefix: '-webkit-', options: { height: 100 }})
   var nodes = d3.select('ul.nodes-container').selectAll('li')
-  nodes.call(resizer)
+  nodes.call(updater)
 
   nodes.each(function (d, i) {
     t.equal(d._x, d.y, '_x is equal to original y')
     t.equal(d._y, i * 100, '_y is equal to index * height')
   })
 
-  nodes.data([{y: 10}, {y: 20}, {y: 30}]).call(resizer)
+  nodes.data([{y: 10}, {y: 20}, {y: 30}]).call(updater)
 
   nodes.each(function (d, i) {
     t.equal(d._x, d.y, '_x is equal to original y')
