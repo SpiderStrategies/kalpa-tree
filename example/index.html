@@ -166,7 +166,6 @@
     ;[].forEach.call(document.querySelectorAll('.coord'), function (coord) {
       coord.addEventListener('blur', function () {
         container.style[this.id] = this.value  + 'px'
-        tree.resize()
       })
     })
 
