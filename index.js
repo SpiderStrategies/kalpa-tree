@@ -88,9 +88,9 @@ Tree.prototype.render = function () {
         // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
         (p.children || (p.children = [])).push(n)
         if (self.options.initialSelection === n.id) {
-          self.select(n.id, { silent: true })
-        } else {
-          self.draw()
+          self.select(n.id, { silent: true, animate: false })
+        } else if (!Array.isArray(self.root)) {
+          self.draw(null, {animate: false})
         }
       } else if (self.options.initialSelection === n.id) {
         // There's a initialSelection option equal to this node
@@ -102,7 +102,7 @@ Tree.prototype.render = function () {
         // Push this node onto the parents visible children
         (p.children || (p.children = [])).push(n)
         // And select it
-        self.select(n.id, { silent: true })
+        self.select(n.id, { silent: true, animate: false })
       } else {
         // push to _children so it's hidden, no need to draw
         (p._children || (p._children = [])).push(n)
@@ -115,11 +115,11 @@ Tree.prototype.render = function () {
       } else {
         self.root = n
         // root, draw it.
-        self.draw()
+        self.draw(null, {animate: false})
       }
     }
   })
-  .on('end', self.draw.bind(self))
+  .on('end', self.draw.bind(self, null, {animate: false}))
 
   return this
 }
