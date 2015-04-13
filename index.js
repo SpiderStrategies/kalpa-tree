@@ -187,6 +187,11 @@ Tree.prototype.draw = function (source, opt) {
 
   process.nextTick(function () {
     self.node.call(self.updater)
+
+    // Now remove the notransition class
+    if (opt.animate === false) {
+      self.node.classed('notransition', false)
+    }
   })
 
   // if we are manipulating a single node, we may have to adjust selected properties
@@ -213,13 +218,6 @@ Tree.prototype.draw = function (source, opt) {
     exit.transition()
         .duration(300) // copied in css
         .remove()
-  }
-
-  // Now remove the notransition class
-  if (opt.animate === false) {
-    process.nextTick(function () {
-      self.node.classed('notransition', false)
-    })
   }
 }
 

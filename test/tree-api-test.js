@@ -173,10 +173,12 @@ test('adds a node to a parent', function (t) {
     nodeType: 'metric'
   }, 1003)
 
-  t.deepEqual(d.parent, tree.get(1003), 'new node\'s parent is correct')
-  t.equal(tree._nodeData[3020], d, 'node was added to _nodeData')
-  t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node', 'new node label is correct')
-  t.end()
+  process.nextTick(function () {
+    t.deepEqual(d.parent, tree.get(1003), 'new node\'s parent is correct')
+    t.equal(tree._nodeData[3020], d, 'node was added to _nodeData')
+    t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node', 'new node label is correct')
+    t.end()
+  })
 })
 
 test('adds a node to a parent and before sibling', function (t) {
@@ -192,11 +194,13 @@ test('adds a node to a parent and before sibling', function (t) {
     nodeType: 'metric'
   }, 1003, 1) // Add as the second node
 
-  t.equal(tree.get(1003).children.indexOf(d), 1, 'new node index is correct in parent\'s children')
-  t.deepEqual(d.parent.children[2], tree.get(1005), 'sibling 1005 is after the new node')
-  t.equal(tree._nodeData[3020], d, 'node was added to _nodeData')
-  t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node sibling', 'new node label is correct')
-  t.end()
+  process.nextTick(function () {
+    t.equal(tree.get(1003).children.indexOf(d), 1, 'new node index is correct in parent\'s children')
+    t.deepEqual(d.parent.children[2], tree.get(1005), 'sibling 1005 is after the new node')
+    t.equal(tree._nodeData[3020], d, 'node was added to _nodeData')
+    t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node sibling', 'new node label is correct')
+    t.end()
+  })
 })
 
 test('edits a node', function (t) {
@@ -214,8 +218,10 @@ test('edits a node', function (t) {
   t.equal(d.color, 'green', 'color changed')
   t.equal(d.nodeType, 'root', 'nodeType remained the same')
 
-  t.equal(el.querySelector('.tree ul li:nth-child(1) .label').innerHTML, 'New label for root', 'dom label changed')
-  t.end()
+  process.nextTick(function () {
+    t.equal(el.querySelector('.tree ul li:nth-child(1) .label').innerHTML, 'New label for root', 'dom label changed')
+    t.end()
+  })
 })
 
 test('patch the tree by array of changes', function (t) {
@@ -229,11 +235,13 @@ test('patch the tree by array of changes', function (t) {
   t.equal(d.color, 'red', 'colors are equal')
   t.equal(d.nodeType, 'perspective', 'nodeType changed')
 
-  var node = el.querySelector('.tree ul li:nth-child(2)')
-  t.equal(node.querySelector('.label').innerHTML, 'Patched 1002', 'dom label changed')
-  t.ok(node.querySelector('.indicator.red'), 'red indicator exists')
-  tree.el.remove()
-  t.end()
+  process.nextTick(function () {
+    var node = el.querySelector('.tree ul li:nth-child(2)')
+    t.equal(node.querySelector('.label').innerHTML, 'Patched 1002', 'dom label changed')
+    t.ok(node.querySelector('.indicator.red'), 'red indicator exists')
+    tree.el.remove()
+    t.end()
+  })
 })
 
 test('patch changes nodes visibility', function (t) {
@@ -287,19 +295,20 @@ test('toggle a specific node', function (t) {
   t.ok(d.children, 'node should have children')
   t.ok(!d._children, 'node should not have hidden children')
   t.equal(el.querySelectorAll('.tree ul li').length, 8, 'root + children + first child expanded')
-  t.equal(el.querySelector('.tree ul li:nth-child(4) .label').innerHTML, 'O1', 'P2 first child is visible')
+  process.nextTick(function () {
+    t.equal(el.querySelector('.tree ul li:nth-child(4) .label').innerHTML, 'O1', 'P2 first child is visible')
+    // Now toggle again
+    tree.toggle(tree.get(1002))
+    t.ok(!d.children, 'node should not have children')
+    t.ok(d._children, 'node should have hidden children')
 
-  // Now toggle again
-  tree.toggle(tree.get(1002))
-  t.ok(!d.children, 'node should not have children')
-  t.ok(d._children, 'node should have hidden children')
-
-  // pause since exit has a 300 duration
-  setTimeout(function () {
-    t.equal(el.querySelectorAll('.tree ul li').length, 3, 'root + children visible')
-    tree.el.remove()
-    t.end()
-  }, 400)
+    // pause since exit has a 300 duration
+    setTimeout(function () {
+      t.equal(el.querySelectorAll('.tree ul li').length, 3, 'root + children visible')
+      tree.el.remove()
+      t.end()
+    }, 400)
+  })
 })
 
 test('click toggler listener', function (t) {
