@@ -185,16 +185,17 @@ Tree.prototype.draw = function (source, opt) {
         return 'label-mask indicator ' + d[self.options.accessors.color]
       })
 
-  process.nextTick(function () {
-    self.node.call(self.updater)
+  // force a redraw so the css transitions are sure to work
+  this.el[0][0].offsetHeight
+  // Now we can update position
+  self.node.call(self.updater)
 
-    // Now remove the notransition class
-    if (opt.animate === false) {
-      process.nextTick(function () {
-        self.node.classed('notransition', false)
-      })
-    }
-  })
+  // Now remove the notransition class
+  if (opt.animate === false) {
+    process.nextTick(function () {
+      self.node.classed('notransition', false)
+    })
+  }
 
   // if we are manipulating a single node, we may have to adjust selected properties
   if (source) {
