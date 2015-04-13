@@ -114,9 +114,9 @@ Tree.prototype.render = function () {
         self.el.select('.tree').classed('forest-tree', true)
       } else {
         self.root = n
+        // root, draw it.
+        self.draw()
       }
-      // root, draw it.
-      self.draw()
     }
   })
   .on('end', self.draw.bind(self))
