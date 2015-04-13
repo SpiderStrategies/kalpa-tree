@@ -140,7 +140,7 @@ Tree.prototype.draw = function (source, opt) {
       .attr('class', 'node')
       .on('click', partialRight(this._onSelect.bind(this), self.options))
       .style(prefix + 'transform', function (d) {
-        return 'translate(0px,' + (source ? source._y : d.y) + 'px)'
+        return 'translate(0px,' + (source ? (source._y || 0) : d.y) + 'px)'
       })
       .style('opacity', 1e-6)
 
