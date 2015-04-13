@@ -460,7 +460,7 @@ Tree.prototype._patch = function (obj) {
 /*
  * Removes a node from the tree. obj can be the node id or the node itself
  */
-Tree.prototype.remove = function (obj) {
+Tree.prototype.removeNode = function (obj) {
   var node = this.get(typeof obj === 'object' ? obj.id : obj)
 
   if (!node) {
