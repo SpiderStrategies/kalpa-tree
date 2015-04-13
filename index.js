@@ -190,7 +190,9 @@ Tree.prototype.draw = function (source, opt) {
 
     // Now remove the notransition class
     if (opt.animate === false) {
-      self.node.classed('notransition', false)
+      process.nextTick(function () {
+        self.node.classed('notransition', false)
+      })
     }
   })
 

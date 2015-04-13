@@ -114,12 +114,13 @@ test('disables animations if opts.maxAnimatable is exceeded', function (t) {
 
   process.nextTick = function (fn) {
     process.nextTick = tick // back to normal
-
     t.ok(tree.node.classed('notransition'), 'tree nodes have notransition class applied')
     fn()
-    t.ok(!tree.node.classed('notransition'), 'tree nodes notransition class removed')
-    tree.el.remove()
-    t.end()
+    process.nextTick(function () {
+      t.ok(!tree.node.classed('notransition'), 'tree nodes notransition class removed')
+      tree.el.remove()
+      t.end()
+    })
   }
   t.equal(tree.get(1003)._children.length, 10, 'has 10 hidden nodes')
   tree.select(1003)

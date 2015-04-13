@@ -47,9 +47,11 @@ test('selects a node without animations', function (t) {
 
     t.ok(tree.node.classed('notransition'), 'tree nodes have notransition class applied')
     fn()
-    t.ok(!tree.node.classed('notransition'), 'tree nodes notransition class removed')
-    tree.el.remove()
-    t.end()
+    process.nextTick(function () {
+      t.ok(!tree.node.classed('notransition'), 'tree nodes notransition class removed')
+      tree.el.remove()
+      t.end()
+    })
   }
   tree.select(1003, {animate: false})
 })
