@@ -458,9 +458,16 @@ Tree.prototype._patch = function (obj) {
 }
 
 /*
+ * Cleanup the tree object and remove it from the dom
+ */
+Tree.prototype.remove = function () {
+  this.el.remove()
+}
+
+/*
  * Removes a node from the tree. obj can be the node id or the node itself
  */
-Tree.prototype.remove = function (obj) {
+Tree.prototype.removeNode = function (obj) {
   var node = this.get(typeof obj === 'object' ? obj.id : obj)
 
   if (!node) {
