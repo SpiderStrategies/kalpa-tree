@@ -33,15 +33,19 @@ function stream () {
 }
 
 test('forest tree render populates multiple roots', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-  t.equal(Object.keys(tree._nodeData).length, nodes.length, '_nodeData contains all data')
-  t.equal(tree.root.length, 2, 'two root nodes')
-  t.equal(tree.node[0].length, 4, '4 list elements displayed')
-  tree.collapseAll()
-  setTimeout(function () {
-    t.equal(tree.node[0].length, 2, '2 list elements displayed after a collapse all')
-    tree.el.remove()
-    t.end()
-  }, 400)
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    t.equal(Object.keys(tree._nodeData).length, nodes.length, '_nodeData contains all data')
+    t.equal(tree.root.length, 2, 'two root nodes')
+    t.equal(tree.node[0].length, 4, '4 list elements displayed')
+    tree.collapseAll()
+    setTimeout(function () {
+      t.equal(tree.node[0].length, 2, '2 list elements displayed after a collapse all')
+      tree.el.remove()
+      t.end()
+    }, 400)
+  })
 
 })

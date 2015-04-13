@@ -88,9 +88,9 @@ Tree.prototype.render = function () {
         // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
         (p.children || (p.children = [])).push(n)
         if (self.options.initialSelection === n.id) {
-          self.select(n.id, { silent: true })
-        } else {
-          self.draw()
+          self.select(n.id, { silent: true, animate: false })
+        } else if (!Array.isArray(self.root)) {
+          self.draw(null, {animate: false})
         }
       } else if (self.options.initialSelection === n.id) {
         // There's a initialSelection option equal to this node
@@ -102,7 +102,7 @@ Tree.prototype.render = function () {
         // Push this node onto the parents visible children
         (p.children || (p.children = [])).push(n)
         // And select it
-        self.select(n.id, { silent: true })
+        self.select(n.id, { silent: true, animate: false })
       } else {
         // push to _children so it's hidden, no need to draw
         (p._children || (p._children = [])).push(n)
@@ -114,12 +114,12 @@ Tree.prototype.render = function () {
         self.el.select('.tree').classed('forest-tree', true)
       } else {
         self.root = n
+        // root, draw it.
+        self.draw(null, {animate: false})
       }
-      // root, draw it.
-      self.draw()
     }
   })
-  .on('end', self.draw.bind(self))
+  .on('end', self.draw.bind(self, null, {animate: false}))
 
   return this
 }
@@ -185,16 +185,17 @@ Tree.prototype.draw = function (source, opt) {
         return 'label-mask indicator ' + d[self.options.accessors.color]
       })
 
-  process.nextTick(function () {
-    self.node.call(self.updater)
+  // force a redraw so the css transitions are sure to work
+  this.el[0][0].offsetHeight
+  // Now we can update position
+  self.node.call(self.updater)
 
-    // Now remove the notransition class
-    if (opt.animate === false) {
-      process.nextTick(function () {
-        self.node.classed('notransition', false)
-      })
-    }
-  })
+  // Now remove the notransition class
+  if (opt.animate === false) {
+    process.nextTick(function () {
+      self.node.classed('notransition', false)
+    })
+  }
 
   // if we are manipulating a single node, we may have to adjust selected properties
   if (source) {
