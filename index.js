@@ -125,6 +125,7 @@ Tree.prototype.render = function () {
         }
       }
     }
+    self.emit('node', n)
   })
   .on('end', self.draw.bind(self, null, {animate: false}))
 

@@ -16,6 +16,23 @@ test('multiple trees have their own options', function (t) {
   t.end()
 })
 
+test('emits node events', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s})
+    , nodes = []
+
+  tree.on('node', function (node) {
+    nodes.push(node)
+  })
+
+  s.on('end', function () {
+    t.equal(nodes.length, data.length, 'node event emitted for each node in stream')
+    tree.el.remove()
+    t.end()
+  })
+  tree.render()
+})
+
 test('render populates data from stream', function (t) {
   var tree = new Tree({stream: stream()}).render()
   t.equal(Object.keys(tree._nodeData).length, data.length, '_nodeData contains all data')
