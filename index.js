@@ -112,10 +112,17 @@ Tree.prototype.render = function () {
         // This must be a forest tree
         self.root = Array.isArray(self.root) ? self.root.concat(n) : [self.root, n]
         self.el.select('.tree').classed('forest-tree', true)
+        if (self.options.initialSelection === n.id) {
+          self.select(n.id, { silent: true, animate: false })
+        }
       } else {
         self.root = n
         // root, draw it.
-        self.draw(null, {animate: false})
+        if (self.options.initialSelection === n.id) {
+          self.select(n.id, { silent: true, animate: false })
+        } else {
+          self.draw(null, {animate: false})
+        }
       }
     }
   })
