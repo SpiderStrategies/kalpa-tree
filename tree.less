@@ -1,8 +1,5 @@
 @import "node_modules/lesshat/build/lesshat-prefixed";
 
-@yellow: #fbcc3c;
-@green: #96cd00;
-@red: #f35132;
 @transition: 300ms ease-out;
 
 .tree-container {
@@ -100,10 +97,6 @@
             margin-left: 4px;
             width: 14px;
             height: 14px;
-
-            &.yellow { fill: @yellow; }
-            &.green { fill: @green; }
-            &.red { fill: @red; }
           }
 
           .label {
@@ -137,10 +130,6 @@
 
           &.indicator {
             .lh-background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 50%));
-
-            &.yellow:after { background-color: @yellow; }
-            &.green:after { background-color: @green; }
-            &.red:after { background-color: @red; }
           }
         }
 
