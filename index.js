@@ -390,9 +390,9 @@ Tree.prototype.edit = function (d) {
  */
 Tree.prototype._toggleAll = function (fn) {
   var self = this
-  this._nodeData.forEach(function (d) {
-    if (d != self.root) {
-      fn(d)
+  Object.keys(this._nodeData).forEach(function (key) {
+    if (self._nodeData[key] != self.root) {
+      fn(self._nodeData[key])
     }
   })
   this.draw(Array.isArray(this.root) ? this.root[0] : this.root)
