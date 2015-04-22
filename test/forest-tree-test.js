@@ -47,5 +47,31 @@ test('forest tree render populates multiple roots', function (t) {
       t.end()
     }, 400)
   })
+})
 
+test('allows addition of new root elements', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    t.equal(tree.root.length, 2, 'two root nodes')
+
+    tree.add({label: 'New root node', id: 1010})
+    t.equal(tree.root.length, 3, 'three root nodes')
+    t.equal(tree.node[0].length, 5, '5 list elements displayed')
+    t.end()
+  })
+})
+
+test('allows addition of new root elements at an index', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    tree.add({label: 'New root node', id: 1010}, null, 0)
+    t.equal(tree.root.length, 3, 'three root nodes')
+    t.equal(tree.root[0].id, 1010, 'first root node is the new node')
+    t.equal(tree.node[0][0].querySelector('.label').innerHTML, 'New root node', 'first dom node is the new node')
+    t.end()
+  })
 })
