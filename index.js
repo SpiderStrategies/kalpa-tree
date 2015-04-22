@@ -188,6 +188,7 @@ Tree.prototype.draw = function (source, opt) {
   this.node.classed('notransition', opt.animate === false)
 
   // If the tree has indicators, we may need to update the color
+  // TODO This belongs in update.js
   this.node.selectAll('div.indicator')
       .attr('class', function (d) {
         return 'label-mask indicator ' + d[self.options.accessors.color]
