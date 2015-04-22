@@ -4,12 +4,11 @@
   "description": "A Scoreboard tree rendered from a stream using d3",
   "main": "index.js",
   "dependencies": {
-    "JSONStream": "^0.10.0",
     "d3": "^3.5.2",
     "lesshat": "^3.0.2"
   },
   "devDependencies": {
-    "JSONStream": "^0.8.3",
+    "JSONStream": "^0.10.0",
     "browserify": "^3.46.0",
     "less": "^1.7.0",
     "lodash": "^2.4.1",
