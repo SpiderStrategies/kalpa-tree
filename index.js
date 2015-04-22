@@ -187,13 +187,6 @@ Tree.prototype.draw = function (source, opt) {
   // disable animations if necessary
   this.node.classed('notransition', opt.animate === false)
 
-  // If the tree has indicators, we may need to update the color
-  // TODO This belongs in update.js
-  this.node.selectAll('div.indicator')
-      .attr('class', function (d) {
-        return 'label-mask indicator ' + d[self.options.accessors.color]
-      })
-
   // force a redraw so the css transitions are sure to work
   this.el[0][0].offsetHeight
   // Now we can update position
