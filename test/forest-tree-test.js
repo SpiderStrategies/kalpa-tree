@@ -37,7 +37,8 @@ test('forest tree render populates multiple roots', function (t) {
     , tree = new Tree({stream: s}).render()
 
   s.on('end', function () {
-    t.equal(Object.keys(tree._nodeData).length, nodes.length, '_nodeData contains all data')
+    t.equal(Object.keys(tree.nodes).length, nodes.length, 'nodes contains all data')
+    t.equal(Object.keys(tree._layout).length, nodes.length, '_layout contains all data')
     t.equal(tree.root.length, 2, 'two root nodes')
     t.equal(tree.node[0].length, 4, '4 list elements displayed')
     tree.collapseAll()
