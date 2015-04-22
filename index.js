@@ -261,12 +261,7 @@ Tree.prototype.get = function (id) {
 }
 
 /*
- * Returns the currently selected d3 selection. This is the d3 object that contains
- * the currently selected node. The underlying dom node can be accessed by invoking
- * .node() on the selection.
- *
- * e.g.
- *    tree.getSelected().node()
+ * Returns the currently selected node's data
  */
 Tree.prototype.getSelected = function () {
   if (!this._selected) {
@@ -274,6 +269,20 @@ Tree.prototype.getSelected = function () {
   }
 
   return this.get(this._selected.id)
+}
+
+/*
+ * Returns the currently selected node's dom element
+ */
+Tree.prototype.getSelectedEl = function () {
+  if (!this._selected) {
+    return
+  }
+
+  var self = this
+  return this.node.filter(function (d) {
+    return d.id == self._selected.id
+  }).node()
 }
 
 Tree.prototype._onSelect = function (d, i, j, opt) {

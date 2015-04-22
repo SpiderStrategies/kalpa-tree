@@ -84,6 +84,18 @@ test('selects a node with options', function (t) {
   t.end()
 })
 
+test('getSelectedEl returns the selected node\'s dom element', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+  tree.select(1003)
+
+  var data = tree.getSelected()
+    , el = tree.getSelectedEl()
+
+  t.equal(data.label, el.querySelector('.label').innerHTML, 'selected dom node label is correct')
+  tree.el.remove()
+  t.end()
+})
+
 test('editable', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()
