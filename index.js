@@ -71,28 +71,38 @@ Tree.prototype.render = function () {
                        .append('ul')
                          .selectAll('li.node')
 
-  this._nodeData = []
+  // Internal structure holding the node's layout data
+  this._layout = []
+
+  // Public node data. The tree won't modify the objects in this structure
+  this.nodes = []
+
   this.root = null
 
   this.options.stream.on('data', function (n) {
-    var p = self._nodeData[n.parentId]
-    self._nodeData[n.id] = n
+    // Add the node in its incoming form to nodes
+    self.nodes[n.id] = n
+
+    var p = self._layout[n.parentId]
+      , _n = self._layout[n.id] = { // internal version which we'll use to modify the node's layout
+        id: n.id
+      }
 
     if (p) {
-      n.parent = p
+      _n.parent = p
 
       if (n.visible === false) {
         // This node shouldn't be visible, so store it in the parents _invisibleNodes
-        (p._invisibleNodes || (p._invisibleNodes = [])).push(n)
+        (p._invisibleNodes || (p._invisibleNodes = [])).push(_n)
       } else if (p == self.root || (Array.isArray(self.root) && self.root.indexOf(p) !== -1) || p.children) {
         // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
-        (p.children || (p.children = [])).push(n)
-        if (self.options.initialSelection === n.id) {
-          self.select(n.id, { silent: true, animate: false })
+        (p.children || (p.children = [])).push(_n)
+        if (self.options.initialSelection === _n.id) {
+          self.select(_n.id, { silent: true, animate: false })
         } else if (!Array.isArray(self.root)) {
           self.draw(null, {animate: false})
         }
-      } else if (self.options.initialSelection === n.id) {
+      } else if (self.options.initialSelection === _n.id) {
         // There's a initialSelection option equal to this node
         if (p._children) {
           // This parent has hidden children. Transfer them so they are visible
@@ -100,26 +110,27 @@ Tree.prototype.render = function () {
           p._children = null
         }
         // Push this node onto the parents visible children
-        (p.children || (p.children = [])).push(n)
+        (p.children || (p.children = [])).push(_n)
         // And select it
-        self.select(n.id, { silent: true, animate: false })
+        self.select(_n.id, { silent: true, animate: false })
       } else {
         // push to _children so it's hidden, no need to draw
-        (p._children || (p._children = [])).push(n)
+        (p._children || (p._children = [])).push(_n)
       }
     } else {
       if (self.root) {
         // This must be a forest tree
-        self.root = Array.isArray(self.root) ? self.root.concat(n) : [self.root, n]
+        self.root = Array.isArray(self.root) ? self.root.concat(_n) : [self.root, _n]
         self.el.select('.tree').classed('forest-tree', true)
-        if (self.options.initialSelection === n.id) {
-          self.select(n.id, { silent: true, animate: false })
+        if (self.options.initialSelection === _n.id) {
+          self.select(_n.id, { silent: true, animate: false })
         }
       } else {
-        self.root = n
+        self.root = _n
+
         // root, draw it.
-        if (self.options.initialSelection === n.id) {
-          self.select(n.id, { silent: true, animate: false })
+        if (self.options.initialSelection === _n.id) {
+          self.select(_n.id, { silent: true, animate: false })
         } else {
           self.draw(null, {animate: false})
         }
@@ -228,7 +239,7 @@ Tree.prototype.draw = function (source, opt) {
 
 Tree.prototype.select = function (id, opt) {
   opt = opt || this.options
-  var d = this.get(id)
+  var d = this._layout[id]
 
   if (d) {
     this._onSelect(d, null, null, opt)
@@ -246,7 +257,7 @@ Tree.prototype.get = function (id) {
     return this.root
   }
 
-  return this._nodeData[id]
+  return this.nodes[id]
 }
 
 /*
@@ -262,10 +273,7 @@ Tree.prototype.getSelected = function () {
     return
   }
 
-  var self = this
-  return this.node.filter(function (d) {
-    return d == self._selected
-  })
+  return this.get(this._selected.id)
 }
 
 Tree.prototype._onSelect = function (d, i, j, opt) {
@@ -325,22 +333,27 @@ Tree.prototype._onToggle = function (d, i) {
  * parent's children.
  */
 Tree.prototype.add = function (d, parent, idx) {
-  if (this.get(d.id)) {
+  if (this._layout[d.id]) {
     // can't add a node that we already have
     return
   }
 
+  // internal node used for computing the layout
+  var _d = { id: d.id }
+
   if (!parent && Array.isArray(this.root)) {
+    this.nodes[d.id] = d // Store the real node
+
     // Forest tree and the new node is a new root
     if (typeof idx === 'number') {
-      this.root.splice(idx, 0, d)
+      this.root.splice(idx, 0, _d)
     } else {
-      this.root.push(d)
+      this.root.push(_d)
     }
     this.draw()
-    return this.get(d.id)
+    return d
   } else if (parent) {
-    parent = this.get(typeof parent === 'object' ? parent.id : parent)
+    parent = this._layout[typeof parent === 'object' ? parent.id : parent]
   }
 
   if (!parent) {
@@ -348,21 +361,23 @@ Tree.prototype.add = function (d, parent, idx) {
   }
 
   var children = parent.children || parent._children
-  this._nodeData[d.id] = d
 
-  d.parent = parent
+  this.nodes[d.id] = d
+  this._layout[_d.id] = _d
+
+  _d.parent = parent
 
   if (typeof idx !== 'undefined') {
-    children.splice(idx, 0, d)
+    children.splice(idx, 0, _d)
   } else {
     if (!children) {
       children = parent.children = []
     }
-    children.push(d)
+    children.push(_d)
   }
 
   this.draw(parent)
-  return this.get(d.id)
+  return d
 }
 
 /*
@@ -384,9 +399,9 @@ Tree.prototype.editable = function () {
  * Edits a node
  */
 Tree.prototype.edit = function (d) {
-  if (d.id && this.get(d.id)) {
+  if (d.id && this.nodes[d.id]) {
     this._patch(d)
-    this.draw(d)
+    this.draw(this._layout[d.id])
   }
 }
 
@@ -396,9 +411,9 @@ Tree.prototype.edit = function (d) {
  */
 Tree.prototype._toggleAll = function (fn) {
   var self = this
-  Object.keys(this._nodeData).forEach(function (key) {
-    if (self._nodeData[key] != self.root) {
-      fn(self._nodeData[key])
+  Object.keys(this._layout).forEach(function (key) {
+    if (self._layout[key] != self.root) {
+      fn(self._layout[key])
     }
   })
   this.draw(Array.isArray(this.root) ? this.root[0] : this.root)
@@ -431,7 +446,7 @@ Tree.prototype.patch = function (obj) {
   if (obj instanceof Stream) {
     obj.on('data', function (d) {
       self._patch(d)
-      self.draw(d)
+      self.draw(self._layout[d.id])
     })
   } else if (Array.isArray(obj)) {
     obj.forEach(this._patch.bind(this))
@@ -444,7 +459,8 @@ Tree.prototype.patch = function (obj) {
  * as obj
  */
 Tree.prototype._patch = function (obj) {
-  var d = this.get(obj.id)
+  var d = this.nodes[obj.id]
+    , _d = this._layout[obj.id]
 
   if (d) {
     for (var prop in obj) {
@@ -452,20 +468,19 @@ Tree.prototype._patch = function (obj) {
     }
 
     // Check is the visible property has been set
-    if (typeof obj.visible !== 'undefined' && d.parent) {
-      var invisibles = d.parent._invisibleNodes || []
-      if (obj.visible && invisibles.indexOf(d) !== -1) {
+    if (typeof obj.visible !== 'undefined' && _d.parent) {
+      var invisibles = _d.parent._invisibleNodes || []
+      if (obj.visible && invisibles.indexOf(_d) !== -1) {
         // Remove it from the parent's _invisibleNodes
-        invisibles.splice(invisibles.indexOf(d), 1)
+        invisibles.splice(invisibles.indexOf(_d), 1)
         // And add it to the parent
-        delete d.visible
-        ;(d.parent.children || d.parent._children).push(d)
+        ;(_d.parent.children || _d.parent._children).push(_d)
       } else if (obj.visible == false) {
         // visible was set to false, so move the node to the parent's _invisibleNodes
-        (d.parent._invisibleNodes || (d.parent._invisibleNodes = [])).push(d)
+        (_d.parent._invisibleNodes || (_d.parent._invisibleNodes = [])).push(_d)
         // And remove it from the parent's _children or children
-        var children = d.parent.children || d.parent._children
-          , idx = children.indexOf(d)
+        var children = _d.parent.children || _d.parent._children
+          , idx = children.indexOf(_d)
         if (idx !== -1) {
           children.splice(idx, 1)
         }
@@ -485,42 +500,46 @@ Tree.prototype.remove = function () {
  * Removes a node from the tree. obj can be the node id or the node itself
  */
 Tree.prototype.removeNode = function (obj) {
-  var node = this.get(typeof obj === 'object' ? obj.id : obj)
+  var node = this.nodes[typeof obj === 'object' ? obj.id : obj]
 
   if (!node) {
     return
   }
 
-  var parent = node.parent
+  var _node = this._layout[node.id]
+    , parent = _node.parent
     , self = this
+
   if (parent) {
     // Remove the child from parent
     var children = parent.children || parent._children
-    children.splice(children.indexOf(node), 1)
+    children.splice(children.indexOf(_node), 1)
     this.draw(parent)
 
-    // Cleanup _nodeData
-    ;[node].reduce(function reduce(p, c) {
+    // Cleanup nodes
+    ;[_node].reduce(function reduce(p, c) {
       var children = c.children || c._children
       if (children) {
         return p.concat(children.reduce(reduce, []))
       }
       return p.concat(c.id)
     }, []).forEach(function (id) {
-      delete self._nodeData[id]
+      delete self.nodes[id]
+      delete self._layout[id]
     })
   }
 }
 
 Tree.prototype.toggle = function (d, opt) {
-  if (d.children) {
-    d._children = d.children
-    d.children = null
+  var _d = this._layout[d.id]
+  if (_d.children) {
+    _d._children = _d.children
+    _d.children = null
   } else {
-    d.children = d._children
-    d._children = null
+    _d.children = _d._children
+    _d._children = null
   }
-  this.draw(d, opt)
+  this.draw(_d, opt)
 }
 
 module.exports = Tree

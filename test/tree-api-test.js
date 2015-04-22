@@ -9,7 +9,7 @@ test('get', function (t) {
   var tree = new Tree({stream: stream()}).render()
 
   t.deepEqual(tree.get(), tree.root, 'get returns root by default')
-  t.deepEqual(tree.get(1002), tree.root.children[0], 'get returns a node by id')
+  t.deepEqual(tree.get(1002), tree.nodes[1002], 'get returns a node by id')
   t.ok(tree.get(1006), 'get returns nodes that are hidden')
   tree.el.remove()
   t.end()
@@ -20,16 +20,17 @@ test('selects a node', function (t) {
   tree.select(1003)
 
   var selected = tree.getSelected()
-  t.deepEqual(selected.datum(), tree.get(1003), 'getSelected gives us the selected node')
-  t.ok(tree.get(1003).selected,  'selected node is selected')
-  t.ok(tree.get(1003).children, 'selected node is expanded')
+  t.deepEqual(selected, tree.get(1003), 'getSelected gives us the selected node')
+  t.ok(tree._layout[1003].selected,  '_layout selected node is selected')
+  t.ok(tree._layout[1003].children, 'selected node is expanded')
 
   tree.collapseAll()
   setTimeout(function () {
     // wait for the tree to be collapsed, then select a deep leaf.
     tree.select(1004)
     // Make sure all ancestors of the selected node are also expanded.
-    var leaf = tree.getSelected().datum()
+    var leaf = tree._layout[1004]
+    t.equal(leaf.id, tree.getSelected().id, 'getSelected returns the correct node')
     t.ok(leaf.parent.children, '01 has children')
     t.ok(leaf.parent.parent.children, 'P1 has children')
     t.ok(leaf.parent.parent.parent.children, 'Root has children')
@@ -61,7 +62,7 @@ test('select will not toggle an already expanded node', function (t) {
 
   tree.expandAll()
   tree.select(1003)
-  t.ok(tree.get(1003).children, 'previously expanded node is still expanded after select')
+  t.ok(tree._layout[1003].children, 'previously expanded node is still expanded after select')
 
   tree.el.remove()
   t.end()
@@ -132,9 +133,12 @@ test('removes a node by id', function (t) {
 
   tree.expandAll() // start expanded
 
-  t.equal(Object.keys(tree._nodeData).length, data.length, 'starts with all nodes')
+  t.equal(Object.keys(tree.nodes).length, data.length, 'starts with all nodes')
+  t.equal(Object.keys(tree._layout).length, data.length, 'starts with all nodes in layout')
+
   tree.removeNode(1002)
-  t.equal(Object.keys(tree._nodeData).length, 11, 'nodes were removed from _nodeData')
+  t.equal(Object.keys(tree.nodes).length, 11, 'nodes were removed from nodes')
+  t.equal(Object.keys(tree._layout).length, 11, 'nodes were removed from _layout')
 
   setTimeout(function () {
     var node = el.querySelector('.tree ul li:nth-child(2)')
@@ -147,7 +151,8 @@ test('removes a node by data object', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()
   tree.removeNode(tree.get(1002))
-  t.equal(Object.keys(tree._nodeData).length, 11, 'nodes were removed from _nodeData')
+  t.equal(Object.keys(tree.nodes).length, 11, 'nodes were removed from nodes')
+  t.equal(Object.keys(tree._layout).length, 11, 'nodes were removed from _layout')
   t.end()
 })
 
@@ -176,8 +181,8 @@ test('adds a node to a parent', function (t) {
   }, 1003)
 
   process.nextTick(function () {
-    t.deepEqual(d.parent, tree.get(1003), 'new node\'s parent is correct')
-    t.equal(tree._nodeData[3020], d, 'node was added to _nodeData')
+    t.deepEqual(tree._layout[3020].parent, tree._layout[1003], 'new node\'s parent is correct')
+    t.equal(tree.nodes[3020], d, 'node was added to nodes')
     t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node', 'new node label is correct')
     t.end()
   })
@@ -197,9 +202,9 @@ test('adds a node to a parent and before sibling', function (t) {
   }, 1003, 1) // Add as the second node
 
   process.nextTick(function () {
-    t.equal(tree.get(1003).children.indexOf(d), 1, 'new node index is correct in parent\'s children')
-    t.deepEqual(d.parent.children[2], tree.get(1005), 'sibling 1005 is after the new node')
-    t.equal(tree._nodeData[3020], d, 'node was added to _nodeData')
+    t.equal(tree._layout[1003].children.indexOf(tree._layout[3020]), 1, 'new node index is correct in parent\'s children')
+    t.deepEqual(tree._layout[3020].parent.children[2], tree._layout[1005], 'sibling 1005 is after the new node')
+    t.equal(tree.nodes[3020], d, 'stored the node in nodes')
     t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node sibling', 'new node label is correct')
     t.end()
   })
@@ -252,11 +257,11 @@ test('patch changes nodes visibility', function (t) {
 
   tree.patch([{id: 1006, visible: false}, {id: 1008, visible: false}, {id: 1058, visible: false}])
 
-  var n1 = tree.get(1006)
+  var n1 = tree._layout[1006]
   t.equal(n1.parent._invisibleNodes.length, 2, '1006 and 1008 parent has _invisibleNodes')
   t.equal(n1.parent._children.length, 8, '1003 _children do not contain 1006 and 1008')
 
-  var n2 = tree.get(1058)
+  var n2 = tree._layout[1058]
   t.ok(!n2.visible, 'deleted n2.visible')
   t.deepEqual(n2.parent._invisibleNodes[0], n2, '1058 parent _invisibleNodes contains 1058')
 
@@ -294,15 +299,16 @@ test('toggle a specific node', function (t) {
 
   var d = tree.get(1002)
   tree.toggle(d) // 1002 is the first child of root
-  t.ok(d.children, 'node should have children')
-  t.ok(!d._children, 'node should not have hidden children')
+  t.ok(tree._layout[1002].children, 'node should have children')
+  t.ok(!tree._layout[1002]._children, 'node should not have hidden children')
   t.equal(el.querySelectorAll('.tree ul li').length, 8, 'root + children + first child expanded')
+  return t.end()
   process.nextTick(function () {
     t.equal(el.querySelector('.tree ul li:nth-child(4) .label').innerHTML, 'O1', 'P2 first child is visible')
     // Now toggle again
     tree.toggle(tree.get(1002))
-    t.ok(!d.children, 'node should not have children')
-    t.ok(d._children, 'node should have hidden children')
+    t.ok(!tree._layout[1002].children, 'node should not have children')
+    t.ok(tree._layout[1002]._children, 'node should have hidden children')
 
     // pause since exit has a 300 duration
     setTimeout(function () {
@@ -315,7 +321,8 @@ test('toggle a specific node', function (t) {
 
 test('click toggler listener', function (t) {
   var tree = new Tree({stream: stream()}).render()
-    , node = tree.get(1002)
+    , node = tree._layout[1002]
+
   t.ok(node._children, 'first child has hidden children')
   tree.node[0][1].querySelector('.toggler').click()
   t.ok(node.children, 'first child has children after click event')
