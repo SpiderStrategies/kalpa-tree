@@ -335,7 +335,19 @@ Tree.prototype.add = function (d, parent, idx) {
     // can't add a node that we already have
     return
   }
-  parent = this.get(typeof parent === 'object' ? parent.id : parent)
+
+  if (!parent && Array.isArray(this.root)) {
+    // Forest tree and the new node is a new root
+    if (typeof idx === 'number') {
+      this.root.splice(idx, 0, d)
+    } else {
+      this.root.push(d)
+    }
+    this.draw()
+    return this.get(d.id)
+  } else if (parent) {
+    parent = this.get(typeof parent === 'object' ? parent.id : parent)
+  }
 
   if (!parent) {
     return
