@@ -4,8 +4,10 @@ var d3 = require('d3')
   , util = require('util')
   , styles = window.getComputedStyle(document.documentElement, '')
   , prefix = Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/)[0]
+  , enter = require('./lib/enter')
+  , flyExit = require('./lib/fly-exit')
+  , slideExit = require('./lib/slide-exit')
   , update = require('./lib/update')
-  , partialRight = require('./lib/partial-right')
 
 var defaults = function () {
   return {
@@ -53,7 +55,12 @@ var Tree = function (options) {
   }
 
   this.prefix = prefix
+  this.transitionTimeout = 300 // Copied in css
+
   this.updater = update(this)
+  this.enter = enter(this)
+  this.flyExit = flyExit(this)
+  this.slideExit = slideExit(this)
 
   this.tree = d3.layout.tree()
                        .nodeSize([0, this.options.depth])
@@ -104,7 +111,7 @@ Tree.prototype.render = function () {
         if (self.options.initialSelection === _n.id) {
           self.select(_n.id, { silent: true })
         } else if (!self.options.forest) {
-          self.draw()
+          self._fly()
         }
       } else if (self.options.initialSelection === _n.id) {
         // There's a initialSelection option equal to this node
@@ -134,14 +141,14 @@ Tree.prototype.render = function () {
         if (self.options.initialSelection === _n.id) {
           self.select(_n.id, { silent: true })
         } else {
-          self.draw()
+          self._fly()
         }
       }
     }
     self.emit('node', n)
   })
   .on('end', function () {
-    self.draw()
+    self._fly()
     // force redraw so we're sure the dom is updated
     self.el[0][0].offsetHeight
     self.el.select('.tree').classed('notransition', false)
@@ -150,11 +157,12 @@ Tree.prototype.render = function () {
   return this
 }
 
-Tree.prototype.draw = function (source, opt) {
-  opt = opt || {}
-
-  var self = this
-    , data = null
+/*
+ * Rebinds the data to the selection
+ */
+Tree.prototype._rebind = function () {
+  var data = null
+    , self = this
 
   if (this.options.forest) {
     data = this.root.reduce(function (p, subTree) {
@@ -168,72 +176,43 @@ Tree.prototype.draw = function (source, opt) {
     return d[self.options.accessors.id]
   })
 
-  var enter = this.node.enter().append('li')
-      .attr('class', 'node')
-      .on('click', partialRight(this._onSelect.bind(this), self.options))
-      .style(prefix + 'transform', function (d) {
+  return this.node
+}
+
+/*
+ * Used to redraw the tree by flying nodes up to their parent if they are removed,
+ * or having them released by their parent and flying down to their position.
+ */
+Tree.prototype._fly = function (source) {
+  this._rebind()
+      .call(this.enter, function (d) {
         return 'translate(0px,' + (source ? (source._y || 0) : d.y) + 'px)'
       })
-      .style('opacity', 1e-6)
+      .call(this.updater)
+      .call(this.flyExit, source)
+}
 
-  // Add the node contents
-  var contents = enter.append('div')
-                        .attr('class', 'node-contents')
-                        .attr('style', function (d) {
-                          return prefix + 'transform:' + 'translate(' + (d.parent ? d.parent._x : 0) + 'px,0px)'
-                        })
-
-  // Add the toggler
-  contents.append('div')
-          .attr('class', 'toggler leaf')
-            .on('click', this._onToggle.bind(this))
-            .append('svg')
-              .append('use')
-                .attr('xlink:href', '#icon-collapsed')
-
-  // icon to represent the node tpye
-  contents.append('svg')
-          .attr('class', 'icon')
-            .append('use')
-
-  contents.append('div')
-         .attr('class', 'label')
-
-  // Now the label mask
-  enter.append('div')
-          .attr('class', (this.options.indicator ? 'label-mask indicator' : 'label-mask'))
-
-  // force a redraw so the css transitions are sure to work
-  this.el[0][0].offsetHeight
-  // Now we can update position
-  self.node.call(self.updater)
-
-  // if we are manipulating a single node, we may have to adjust selected properties
-  if (source) {
-    this.node.classed('selected', function (d) {
-      return d.selected
-    })
-  }
-
-  // If this node has been removed, let's remove it.
-  var exit = this.node.exit()
-  exit.selectAll('div.node-contents')
-      .style(prefix + 'transform', function (d) {
-        return 'translate(' + (d.parent ? d.parent._x : 0)+ 'px,0px)'
+/*
+ * Used to redraw the tree by sliding a node down into its place from a previous hole, or
+ * having a node disappear into a hole and the nodes below it sliding up to their new position.
+ */
+Tree.prototype._slide = function () {
+  var self = this
+  this._rebind()
+      .call(this.enter, function (d, i) {
+        return 'translate(0px,' + (i * self.options.height) + 'px)'
+      }, 'fading-node placeholder')
+      .call(function (selection) {
+        // Remove the fading-node class, now that it's in the dom
+        selection.classed('fading-node', false)
+        // Then remove the placeholder class once the transitions have run
+        d3.timer(function () {
+          selection.classed('placeholder', false)
+          return true // run once
+        }, self.transitionTimeout)
       })
-
-  exit.style(prefix + 'transform', function (d) {
-        return 'translate(0px,' + (source ? source._y : 0)+ 'px)'
-      })
-      .style('opacity', 1e-6)
-
-  if (this.el.select('.tree').classed('notransition')) {
-    exit.remove()
-  } else {
-    exit.transition()
-        .duration(300) // copied in css
-        .remove()
-  }
+      .call(this.slideExit)
+      .call(this.updater)
 }
 
 Tree.prototype.select = function (id, opt) {
@@ -335,8 +314,13 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
     }
 
   } else {
-    this.draw(d, opt)
+    this._fly(d, opt)
   }
+
+  // Adjust selected properties
+  this.node.classed('selected', function (d) {
+    return d.selected
+  })
 
   if (!opt.silent) {
     this.emit('select', this.nodes[d.id])
@@ -375,7 +359,8 @@ Tree.prototype.add = function (d, parent, idx) {
     } else {
       this.root.push(_d)
     }
-    this.draw()
+
+    this._slide()
     return d
   } else if (parent) {
     parent = this._layout[typeof parent === 'object' ? parent.id : parent]
@@ -401,7 +386,7 @@ Tree.prototype.add = function (d, parent, idx) {
     children.push(_d)
   }
 
-  this.draw(parent)
+  this._slide(parent)
   return d
 }
 
@@ -426,7 +411,7 @@ Tree.prototype.editable = function () {
 Tree.prototype.edit = function (d) {
   if (d.id && this.nodes[d.id]) {
     this._patch(d)
-    this.draw(this._layout[d.id])
+    this._slide(this._layout[d.id])
   }
 }
 
@@ -441,7 +426,7 @@ Tree.prototype._toggleAll = function (fn) {
       fn(self._layout[key])
     }
   })
-  this.draw(this.options.forest ? this.root[0] : this.root)
+  this._fly(this.options.forest ? this.root[0] : this.root)
 }
 
 Tree.prototype.expandAll = function () {
@@ -473,11 +458,11 @@ Tree.prototype.patch = function (obj) {
          self._patch(d)
        })
        .on('end', function () {
-         self.draw()
+         self._slide()
        })
   } else if (Array.isArray(obj)) {
     obj.forEach(this._patch.bind(this))
-    self.draw(this.options.forest ? this.root[0] : this.root)
+    self._slide(this.options.forest ? this.root[0] : this.root)
   }
 }
 
@@ -550,7 +535,7 @@ Tree.prototype.removeNode = function (obj) {
     delete this._layout[_node.id]
   }
 
-  this.draw(parent)
+  this._slide(parent)
 
     // Cleanup child nodes
   ;[_node].reduce(function reduce(p, c) {
@@ -574,7 +559,7 @@ Tree.prototype.toggle = function (d, opt) {
     _d.children = _d._children
     _d._children = null
   }
-  this.draw(_d, opt)
+  this._fly(_d, opt)
 }
 
 module.exports = Tree
