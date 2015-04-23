@@ -274,6 +274,41 @@ test('patch changes nodes visibility', function (t) {
   t.end()
 })
 
+test('patch visibility toggling', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+    , parent = tree._layout[1003]
+
+  tree.expandAll()
+
+  var originalIndex = parent.children.indexOf(tree._layout[1006])
+
+  // Set visible: false on 1006
+  tree.patch([{id: 1006, visible: false}])
+  t.equal(parent._invisibleNodes.length, 1, '1003 has _invisibleNodes')
+  t.equal(parent.children.length, 9, '1003 is missing 1006')
+
+  // Set visible: true on 1006
+  tree.patch([{id: 1006, visible: true}])
+
+  t.equal(parent._invisibleNodes.length, 0, '1003 does not have _invisibleNodes')
+  t.equal(parent.children.length, 10, '1003 has all its children')
+  t.equal(parent.children.indexOf(tree._layout[1006]), originalIndex, '1006 was restored to original location')
+
+  tree.patch([{id: 1006, visible: false}, {id: 1007, visible: false}, {id: 1008, visible: false}])
+  tree.patch([{id: 1008, visible: true}])
+
+  t.equal(parent.children.length, 8, '1003 has two _invisibleNodes')
+
+  var p = -Infinity
+  parent.children.forEach(function (node) {
+    t.ok(node.id > p, 'node id ' + node.id + ' is greater than prev node id ' + p)
+    p = node.id
+  })
+
+  t.end()
+})
+
 test('patch the tree with stream of data events containing the changes', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()

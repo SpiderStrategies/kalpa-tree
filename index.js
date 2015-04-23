@@ -94,6 +94,8 @@ Tree.prototype.render = function () {
       if (n.visible === false) {
         // This node shouldn't be visible, so store it in the parents _invisibleNodes
         (p._invisibleNodes || (p._invisibleNodes = [])).push(_n)
+        // Store the node's original index in case it's patched
+        _n._originalIndex = (p.children || p._children).length
       } else if (p == self.root || (Array.isArray(self.root) && self.root.indexOf(p) !== -1) || p.children) {
         // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
         (p.children || (p.children = [])).push(_n)
@@ -470,11 +472,13 @@ Tree.prototype._patch = function (obj) {
     // Check is the visible property has been set
     if (typeof obj.visible !== 'undefined' && _d.parent) {
       var invisibles = _d.parent._invisibleNodes || []
+
       if (obj.visible && invisibles.indexOf(_d) !== -1) {
         // Remove it from the parent's _invisibleNodes
         invisibles.splice(invisibles.indexOf(_d), 1)
         // And add it to the parent
-        ;(_d.parent.children || _d.parent._children).push(_d)
+        ;(_d.parent.children || _d.parent._children).splice(_d._originalIndex, 0, _d)
+        delete _d._originalIndex
       } else if (obj.visible == false) {
         // visible was set to false, so move the node to the parent's _invisibleNodes
         (_d.parent._invisibleNodes || (_d.parent._invisibleNodes = [])).push(_d)
@@ -484,6 +488,7 @@ Tree.prototype._patch = function (obj) {
         if (idx !== -1) {
           children.splice(idx, 1)
         }
+        _d._originalIndex = idx
       }
     }
   }
