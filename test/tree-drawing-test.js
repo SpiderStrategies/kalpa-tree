@@ -126,20 +126,41 @@ test('emits stream on errors on tree', function (t) {
   tree.render()
 })
 
-test('disables animations if opts.maxAnimatable is exceeded', function (t) {
-  var tree = new Tree({stream: stream(), maxAnimatable: 3}).render()
-    , tick = process.nextTick
+test('renders without transitions', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s})
 
-  process.nextTick = function (fn) {
-    process.nextTick = tick // back to normal
-    t.ok(tree.node.classed('notransition'), 'tree nodes have notransition class applied')
-    fn()
-    process.nextTick(function () {
-      t.ok(!tree.node.classed('notransition'), 'tree nodes notransition class removed')
-      tree.el.remove()
-      t.end()
-    })
-  }
-  t.equal(tree._layout[1003]._children.length, 10, 'has 10 hidden nodes')
-  tree.select(1003)
+  tree.once('node', function () {
+    // By the time the first data event fires, the tree should have the 'notransition' class
+    t.ok(tree.el.select('.tree').classed('notransition'), 'tree nodes have notransition class applied')
+  })
+
+  tree.render()
+  s.on('end', function () {
+    // Once the tree has rendered, the class should have been removed
+    t.ok(!tree.node.classed('notransition'), 'tree nodes notransition class removed')
+    tree.el.remove()
+    t.end()
+  })
+})
+
+test('disables animations if opts.maxAnimatable is exceeded', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s, maxAnimatable: 3}).render()
+
+  s.on('end', function () {
+    var toggler = tree.toggle
+    tree.toggle = function () {
+      t.ok(tree.el.select('.tree').classed('notransition'), 'tree has notransition class applied')
+      toggler.apply(tree, arguments)
+      process.nextTick(function () {
+        t.ok(!tree.el.select('.tree').classed('notransition'), 'tree notransition class was removed after toggle')
+        tree.el.remove()
+        t.end()
+      })
+    }
+    t.equal(tree._layout[1003]._children.length, 10, 'has 10 hidden nodes')
+    tree.select(1002)
+  })
+
 })

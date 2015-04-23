@@ -40,21 +40,23 @@ test('selects a node', function (t) {
 })
 
 test('selects a node without animations', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-    , tick = process.nextTick
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
 
-  process.nextTick = function (fn) {
-    process.nextTick = tick // back to normal
-
-    t.ok(tree.node.classed('notransition'), 'tree nodes have notransition class applied')
-    fn()
-    process.nextTick(function () {
-      t.ok(!tree.node.classed('notransition'), 'tree nodes notransition class removed')
-      tree.el.remove()
-      t.end()
-    })
-  }
-  tree.select(1003, {animate: false})
+  s.on('end', function () {
+    t.ok(!tree.el.select('.tree').classed('notransition'), 'tree el does not have notransition by default')
+    var toggler = tree.toggle
+    tree.toggle = function () {
+      t.ok(tree.el.select('.tree').classed('notransition'), 'tree has notransition class applied')
+      toggler.apply(tree, arguments)
+      process.nextTick(function () {
+        t.ok(!tree.el.select('.tree').classed('notransition'), 'tree notransition class was removed after toggle')
+        tree.el.remove()
+        t.end()
+      })
+    }
+    tree.select(1002, {animate: false})
+  })
 })
 
 test('select will not toggle an already expanded node', function (t) {

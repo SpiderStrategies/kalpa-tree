@@ -14,6 +14,20 @@
 
     .lh-user-select(none);
 
+    &.notransition {
+      ul {
+        li.node {
+          .lh-transition(none) !important;
+          .node-contents {
+            .lh-transition(none) !important;
+            .toggler {
+              .lh-transition(none) !important;
+            }
+          }
+        }
+      }
+    }
+
     // Show the expand/collapse indicators on hover
     &.forest-tree {
       &:hover {
@@ -52,16 +66,6 @@
         left: 0;
         overflow-x: hidden;
         .lh-transition(transform @transition, opacity @transition);
-
-        &.notransition {
-          .lh-transition(none) !important;
-          .node-contents {
-            .lh-transition(none) !important;
-            .toggler {
-              .lh-transition(none) !important;
-            }
-          }
-        }
 
         .node-contents {
           margin: 6px;

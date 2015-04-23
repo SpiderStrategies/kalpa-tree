@@ -68,7 +68,7 @@ Tree.prototype.render = function () {
               .attr('class', 'tree-container')
 
   this.node = this.el.append('div')
-                       .attr('class', 'tree')
+                       .attr('class', 'tree notransition') // set notransition initially until we have all the data
                        .classed('forest-tree', this.options.forest)
                        .append('ul')
                          .selectAll('li.node')
@@ -102,9 +102,9 @@ Tree.prototype.render = function () {
         // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
         (p.children || (p.children = [])).push(_n)
         if (self.options.initialSelection === _n.id) {
-          self.select(_n.id, { silent: true, animate: false })
+          self.select(_n.id, { silent: true })
         } else if (!self.options.forest) {
-          self.draw(null, {animate: false})
+          self.draw()
         }
       } else if (self.options.initialSelection === _n.id) {
         // There's a initialSelection option equal to this node
@@ -116,7 +116,7 @@ Tree.prototype.render = function () {
         // Push this node onto the parents visible children
         (p.children || (p.children = [])).push(_n)
         // And select it
-        self.select(_n.id, { silent: true, animate: false })
+        self.select(_n.id, { silent: true })
       } else {
         // push to _children so it's hidden, no need to draw
         (p._children || (p._children = [])).push(_n)
@@ -125,22 +125,27 @@ Tree.prototype.render = function () {
       if (self.options.forest) {
         self.root.push(_n)
         if (self.options.initialSelection === _n.id) {
-          self.select(_n.id, { silent: true, animate: false })
+          self.select(_n.id, { silent: true })
         }
       } else {
         self.root = _n
 
         // root, draw it.
         if (self.options.initialSelection === _n.id) {
-          self.select(_n.id, { silent: true, animate: false })
+          self.select(_n.id, { silent: true })
         } else {
-          self.draw(null, {animate: false})
+          self.draw()
         }
       }
     }
     self.emit('node', n)
   })
-  .on('end', self.draw.bind(self, null, {animate: false}))
+  .on('end', function () {
+    self.draw()
+    // force redraw so we're sure the dom is updated
+    self.el[0][0].offsetHeight
+    self.el.select('.tree').classed('notransition', false)
+  })
 
   return this
 }
@@ -198,25 +203,10 @@ Tree.prototype.draw = function (source, opt) {
   enter.append('div')
           .attr('class', (this.options.indicator ? 'label-mask indicator' : 'label-mask'))
 
-  // Override animate if there are too many children and it will slow down the browser
-  var srcChildren = source && (source.children || source._children)
-  if (srcChildren && srcChildren.length > this.options.maxAnimatable) {
-    opt.animate = false
-  }
-  // disable animations if necessary
-  this.node.classed('notransition', opt.animate === false)
-
   // force a redraw so the css transitions are sure to work
   this.el[0][0].offsetHeight
   // Now we can update position
   self.node.call(self.updater)
-
-  // Now remove the notransition class
-  if (opt.animate === false) {
-    process.nextTick(function () {
-      self.node.classed('notransition', false)
-    })
-  }
 
   // if we are manipulating a single node, we may have to adjust selected properties
   if (source) {
@@ -236,7 +226,8 @@ Tree.prototype.draw = function (source, opt) {
         return 'translate(0px,' + (source ? source._y : 0)+ 'px)'
       })
       .style('opacity', 1e-6)
-  if (opt.animate === false) {
+
+  if (this.el.select('.tree').classed('notransition')) {
     exit.remove()
   } else {
     exit.transition()
@@ -246,7 +237,10 @@ Tree.prototype.draw = function (source, opt) {
 }
 
 Tree.prototype.select = function (id, opt) {
-  opt = opt || this.options
+  opt = opt || {}
+  if (typeof opt.toggleOnSelect === 'undefined') {
+    opt.toggleOnSelect = this.options.toggleOnSelect
+  }
   var d = this._layout[id]
 
   if (d) {
@@ -324,7 +318,22 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
   })(d.parent)
 
   if (toggle) {
+    var children = (d.children || d._children)
+    if (children && children.length > this.options.maxAnimatable) {
+      opt.animate = false
+    }
+    if (opt.animate === false) {
+      this.el.select('.tree').classed('notransition', true)
+    }
     this.toggle(d, opt)
+
+    if (opt.animate === false) {
+      // Force redraw if we disabled animations
+      this.el[0][0].offsetHeight
+      // so we can remove the notransition class after things were painted
+      this.el.select('.tree').classed('notransition', false)
+    }
+
   } else {
     this.draw(d, opt)
   }
