@@ -534,19 +534,23 @@ Tree.prototype.removeNode = function (obj) {
     var children = parent.children || parent._children
     children.splice(children.indexOf(_node), 1)
     this.draw(parent)
-
-    // Cleanup nodes
-    ;[_node].reduce(function reduce(p, c) {
-      var children = c.children || c._children
-      if (children) {
-        return p.concat(children.reduce(reduce, []))
-      }
-      return p.concat(c.id)
-    }, []).forEach(function (id) {
-      delete self.nodes[id]
-      delete self._layout[id]
-    })
+  } else if (this.options.forest) {
+    this.root.splice(this.root.indexOf(this._layout[_node.id], 1))
+    delete this.nodes[_node.id]
+    delete this._layout[_node.id]
   }
+
+    // Cleanup child nodes
+  ;[_node].reduce(function reduce(p, c) {
+    var children = c.children || c._children
+    if (children) {
+      return p.concat(children.reduce(reduce, []))
+    }
+    return p.concat(c.id)
+  }, []).forEach(function (id) {
+    delete self.nodes[id]
+    delete self._layout[id]
+  })
 }
 
 Tree.prototype.toggle = function (d, opt) {
