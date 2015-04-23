@@ -65,7 +65,7 @@
         top: 0;
         left: 0;
         overflow-x: hidden;
-        .lh-transition(transform @transition, opacity @transition);
+        .lh-transition(transform @transition, opacity @transition, height @transition);
 
         .node-contents {
           margin: 6px;
@@ -139,6 +139,18 @@
 
         &:not(.selected) {
           .icon { fill: grey !important; }
+        }
+
+        &.placeholder {
+          background-color: #2d3135 !important;
+
+          * {
+            display: none;
+          }
+        }
+
+        &.fading-node {
+          height: 0; // either finishes or ends at 0
         }
 
         &.selected {

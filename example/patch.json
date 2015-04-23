@@ -18,5 +18,13 @@
     "id": 1008,
     "label": "M5 - Patched",
     "color": "yellow"
+  },
+  {
+    "id": 1009,
+    "visible": false
+  },
+  {
+    "id": 1010,
+    "visible": false
   }
 ]
