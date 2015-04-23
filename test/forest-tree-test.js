@@ -76,3 +76,17 @@ test('allows addition of new root elements at an index', function (t) {
     t.end()
   })
 })
+
+test('root nodes can be removed', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s, forest: true}).render()
+
+  s.on('end', function () {
+    tree.removeNode(1002)
+    t.equal(tree.root.length, 1, 'one root node')
+    t.equal(tree.root[0].id, 1001, 'only root is 1001')
+    t.equal(Object.keys(tree._layout).length, 1, 'one _layout node')
+    t.equal(Object.keys(tree.nodes).length, 1, 'one node in nodes')
+    t.end()
+  })
+})
