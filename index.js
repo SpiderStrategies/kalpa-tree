@@ -461,9 +461,11 @@ Tree.prototype.patch = function (obj) {
   var self = this
   if (obj instanceof Stream) {
     obj.on('data', function (d) {
-      self._patch(d)
-      self.draw(self._layout[d.id])
-    })
+         self._patch(d)
+       })
+       .on('end', function () {
+         self.draw()
+       })
   } else if (Array.isArray(obj)) {
     obj.forEach(this._patch.bind(this))
     self.draw(this.options.forest ? this.root[0] : this.root)
