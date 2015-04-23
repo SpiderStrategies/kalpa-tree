@@ -535,12 +535,13 @@ Tree.prototype.removeNode = function (obj) {
     // Remove the child from parent
     var children = parent.children || parent._children
     children.splice(children.indexOf(_node), 1)
-    this.draw(parent)
   } else if (this.options.forest) {
-    this.root.splice(this.root.indexOf(this._layout[_node.id], 1))
+    this.root.splice(this.root.indexOf(this._layout[_node.id]), 1)
     delete this.nodes[_node.id]
     delete this._layout[_node.id]
   }
+
+  this.draw(parent)
 
     // Cleanup child nodes
   ;[_node].reduce(function reduce(p, c) {
