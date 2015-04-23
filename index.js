@@ -339,7 +339,7 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
   }
 
   if (!opt.silent) {
-    this.emit('select', d)
+    this.emit('select', this.nodes[d.id])
   }
 }
 

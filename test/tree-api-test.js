@@ -74,8 +74,9 @@ test('selects a node with options', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , calls = 0
 
-  tree.on('select', function (d) {
-    t.ok(d._children, 'selected node is not expanded')
+  tree.on('select', function (node) {
+    t.equal(node.label, 'O1', 'select event provides real node, not layout node')
+    t.equal(node.id, 1003, 'select node event is correct')
   })
 
   tree.select(1058, {silent: true})
