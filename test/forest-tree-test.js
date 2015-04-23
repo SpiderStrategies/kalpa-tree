@@ -34,7 +34,7 @@ function stream () {
 
 test('forest tree render populates multiple roots', function (t) {
   var s = stream()
-    , tree = new Tree({stream: s}).render()
+    , tree = new Tree({stream: s, forest: true}).render()
 
   s.on('end', function () {
     t.equal(Object.keys(tree.nodes).length, nodes.length, 'nodes contains all data')
@@ -52,7 +52,7 @@ test('forest tree render populates multiple roots', function (t) {
 
 test('allows addition of new root elements', function (t) {
   var s = stream()
-    , tree = new Tree({stream: s}).render()
+    , tree = new Tree({stream: s, forest: true}).render()
 
   s.on('end', function () {
     t.equal(tree.root.length, 2, 'two root nodes')
@@ -66,7 +66,7 @@ test('allows addition of new root elements', function (t) {
 
 test('allows addition of new root elements at an index', function (t) {
   var s = stream()
-    , tree = new Tree({stream: s}).render()
+    , tree = new Tree({stream: s, forest: true}).render()
 
   s.on('end', function () {
     tree.add({label: 'New root node', id: 1010}, null, 0)

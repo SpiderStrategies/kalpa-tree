@@ -14,6 +14,7 @@ var defaults = function () {
     height: 36, // height of each row
     maxAnimatable: 50, // Disable animations if a node has children greater than this amount
     indicator: false, // show indicator light nodes on the right
+    forest: false, // Indicates whether this tree can have multiple root nodes
     accessors: {
       id: 'id',
       label: 'label',
@@ -68,6 +69,7 @@ Tree.prototype.render = function () {
 
   this.node = this.el.append('div')
                        .attr('class', 'tree')
+                       .classed('forest-tree', this.options.forest)
                        .append('ul')
                          .selectAll('li.node')
 
@@ -77,7 +79,7 @@ Tree.prototype.render = function () {
   // Public node data. The tree won't modify the objects in this structure
   this.nodes = []
 
-  this.root = null
+  this.root = this.options.forest ? [] : null
 
   this.options.stream.on('data', function (n) {
     // Add the node in its incoming form to nodes
@@ -96,12 +98,12 @@ Tree.prototype.render = function () {
         (p._invisibleNodes || (p._invisibleNodes = [])).push(_n)
         // Store the node's original index in case it's patched
         _n._originalIndex = (p.children || p._children).length
-      } else if (p == self.root || (Array.isArray(self.root) && self.root.indexOf(p) !== -1) || p.children) {
+      } else if (p == self.root || (self.options.forest && self.root.indexOf(p) !== -1) || p.children) {
         // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
         (p.children || (p.children = [])).push(_n)
         if (self.options.initialSelection === _n.id) {
           self.select(_n.id, { silent: true, animate: false })
-        } else if (!Array.isArray(self.root)) {
+        } else if (!self.options.forest) {
           self.draw(null, {animate: false})
         }
       } else if (self.options.initialSelection === _n.id) {
@@ -120,10 +122,8 @@ Tree.prototype.render = function () {
         (p._children || (p._children = [])).push(_n)
       }
     } else {
-      if (self.root) {
-        // This must be a forest tree
-        self.root = Array.isArray(self.root) ? self.root.concat(_n) : [self.root, _n]
-        self.el.select('.tree').classed('forest-tree', true)
+      if (self.options.forest) {
+        self.root.push(_n)
         if (self.options.initialSelection === _n.id) {
           self.select(_n.id, { silent: true, animate: false })
         }
@@ -149,9 +149,15 @@ Tree.prototype.draw = function (source, opt) {
   opt = opt || {}
 
   var self = this
-    , data = (Array.isArray(this.root) ? this.root : [this.root]).reduce(function (p, subTree) {
-      return p.concat(self.tree.nodes(subTree))
-    }, [])
+    , data = null
+
+  if (this.options.forest) {
+    data = this.root.reduce(function (p, subTree) {
+                      return p.concat(self.tree.nodes(subTree))
+                    }, [])
+  } else {
+    data = this.tree.nodes(this.root)
+  }
 
   this.node = this.node.data(data, function (d) {
     return d[self.options.accessors.id]
@@ -352,10 +358,9 @@ Tree.prototype.add = function (d, parent, idx) {
   // internal node used for computing the layout
   var _d = { id: d.id }
 
-  if (!parent && Array.isArray(this.root)) {
-    this.nodes[d.id] = d // Store the real node
-
+  if (!parent && this.options.forest) {
     // Forest tree and the new node is a new root
+    this.nodes[d.id] = d // Store the real node
     if (typeof idx === 'number') {
       this.root.splice(idx, 0, _d)
     } else {
@@ -427,7 +432,7 @@ Tree.prototype._toggleAll = function (fn) {
       fn(self._layout[key])
     }
   })
-  this.draw(Array.isArray(this.root) ? this.root[0] : this.root)
+  this.draw(this.options.forest ? this.root[0] : this.root)
 }
 
 Tree.prototype.expandAll = function () {
@@ -461,7 +466,7 @@ Tree.prototype.patch = function (obj) {
     })
   } else if (Array.isArray(obj)) {
     obj.forEach(this._patch.bind(this))
-    self.draw(Array.isArray(this.root) ? this.root[0] : this.root)
+    self.draw(this.options.forest ? this.root[0] : this.root)
   }
 }
 
