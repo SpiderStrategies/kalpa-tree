@@ -336,9 +336,9 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
       opt.animate = false
     }
 
-    this._transitionWrap(this.toggle, opt.animate)(d, opt)
+    this._transitionWrap(this.toggle, opt.animate)(d)
   } else {
-    this._fly(d, opt)
+    this._fly(d)
   }
 
   // Adjust selected properties
@@ -410,7 +410,7 @@ Tree.prototype.add = function (d, parent, idx) {
     children.push(_d)
   }
 
-  this._slide(parent)
+  this._slide()
   return d
 }
 
@@ -435,7 +435,7 @@ Tree.prototype.editable = function () {
 Tree.prototype.edit = function (d) {
   if (d.id && this.nodes[d.id]) {
     this._patch(d)
-    this._slide(this._layout[d.id])
+    this._slide()
   }
 }
 
@@ -499,7 +499,7 @@ Tree.prototype.patch = function (obj) {
        })
   } else if (Array.isArray(obj)) {
     obj.forEach(this._patch.bind(this))
-    self._slide(this.options.forest ? this.root[0] : this.root)
+    self._slide()
   }
 }
 
@@ -572,7 +572,7 @@ Tree.prototype.removeNode = function (obj) {
     delete this._layout[_node.id]
   }
 
-  this._slide(parent)
+  this._slide()
 
     // Cleanup child nodes
   ;[_node].reduce(function reduce(p, c) {
@@ -587,7 +587,7 @@ Tree.prototype.removeNode = function (obj) {
   })
 }
 
-Tree.prototype.toggle = function (d, opt) {
+Tree.prototype.toggle = function (d) {
   var _d = this._layout[d.id]
   if (_d.children) {
     _d._children = _d.children
@@ -596,7 +596,7 @@ Tree.prototype.toggle = function (d, opt) {
     _d.children = _d._children
     _d._children = null
   }
-  this._fly(_d, opt)
+  this._fly(_d)
 }
 
 module.exports = Tree
