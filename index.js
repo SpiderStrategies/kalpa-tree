@@ -431,7 +431,15 @@ Tree.prototype._toggleAll = function (fn) {
       fn(self._layout[key])
     }
   })
-  this._fly(this.options.forest ? this.root[0] : this.root)
+
+  this._rebind()
+      .call(this.enter, function (d) {
+        return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
+      })
+      .call(this.updater)
+      .call(this.flyExit, null, function (d) {
+        return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
+      })
 }
 
 Tree.prototype.expandAll = function () {
