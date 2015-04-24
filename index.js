@@ -432,14 +432,27 @@ Tree.prototype._toggleAll = function (fn) {
     }
   })
 
-  this._rebind()
-      .call(this.enter, function (d) {
-        return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
-      })
-      .call(this.updater)
-      .call(this.flyExit, null, function (d) {
-        return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
-      })
+  var prev = this.node.size()
+    , selection = this._rebind()
+    , notrans = selection[0].length > this.options.maxAnimatable || prev > this.options.maxAnimatable
+
+  if (notrans) {
+    this.el.select('.tree').classed('notransition', true)
+  }
+
+  selection.call(this.enter, function (d) {
+             return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
+           })
+           .call(this.updater)
+           .call(this.flyExit, null, function (d) {
+             return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
+           })
+
+  if (notrans) {
+    // Force redraw if we disabled animations
+    this.el[0][0].offsetHeight
+    this.el.select('.tree').classed('notransition', false)
+  }
 }
 
 Tree.prototype.expandAll = function () {

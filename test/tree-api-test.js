@@ -129,6 +129,31 @@ test('expand all', function (t) {
   t.end()
 })
 
+test('expand all disables animations if there are too many nodes', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s, maxAnimatable: 3})
+
+  s.on('end', function () {
+    // Wait for default end to remove notransition, which is applied on initial render
+    process.nextTick(function () {
+      t.ok(!tree.el.select('.tree').classed('notransition'), 'tree el does not have notransition')
+      var updater = tree.updater
+      tree.updater = function () {
+        t.ok(tree.el.select('.tree').classed('notransition'), 'tree has notransition class applied')
+        updater.apply(tree, arguments)
+        process.nextTick(function () {
+          t.ok(!tree.el.select('.tree').classed('notransition'), 'tree notransition class was removed after toggle')
+          tree.el.remove()
+          t.end()
+        })
+      }
+      tree.expandAll()
+    })
+
+  })
+  tree.render()
+})
+
 test('collapse all', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()
@@ -140,6 +165,31 @@ test('collapse all', function (t) {
     tree.el.remove()
     t.end()
   }, 400)
+})
+
+test('collapse all disables animations if there are too many nodes alredy expanded', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s, maxAnimatable: 5})
+
+  s.on('end', function () {
+    tree.select(1006)
+    process.nextTick(function () {
+      t.ok(tree.node.size() > 5, 'there are more nodes than our set maxAnimatable')
+      t.ok(!tree.el.select('.tree').classed('notransition'), 'tree el does not have notransition')
+      var updater = tree.updater
+      tree.updater = function () {
+        t.ok(tree.el.select('.tree').classed('notransition'), 'tree has notransition class applied')
+        updater.apply(tree, arguments)
+        process.nextTick(function () {
+          t.ok(!tree.el.select('.tree').classed('notransition'), 'tree notransition class was removed after toggle')
+          tree.el.remove()
+          t.end()
+        })
+      }
+      tree.collapseAll()
+    })
+  })
+  tree.render()
 })
 
 test('removes a node by id', function (t) {
