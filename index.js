@@ -14,7 +14,7 @@ var defaults = function () {
     toggleOnSelect: true, // By default each select will toggle the node if needed. This prevents the toggle
     depth: 20, // indentation depth
     height: 36, // height of each row (repeated in tree.less)
-    maxAnimatable: 50, // Disable animations if a node has children greater than this amount
+    maxAnimatable: 100, // Disable animations if a node has children greater than this amount
     indicator: false, // show indicator light nodes on the right
     forest: false, // Indicates whether this tree can have multiple root nodes
     accessors: {
