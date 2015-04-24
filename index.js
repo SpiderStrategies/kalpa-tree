@@ -220,7 +220,8 @@ Tree.prototype._rebind = function () {
 Tree.prototype._fly = function (source) {
   this._rebind()
       .call(this.enter, function (d) {
-        return 'translate(0px,' + (source ? (source._y || 0) : d.y) + 'px)'
+        // We always fly in from our parent if we have one. Otherwise fly in from our location
+        return 'translate(0px,' + (d.parent ? d.parent._y : d._y) + 'px)'
       })
       .call(this.updater)
       .call(this.flyExit, source)
