@@ -172,7 +172,12 @@ Tree.prototype._rebind = function () {
     data = this.tree.nodes(this.root)
   }
 
-  this.node = this.node.data(data, function (d) {
+  this.node = this.node.data(data.map(function (d, i) {
+    // Store sane copies of x,y that denote our true coords in the tree
+    d._x = d.y
+    d._y = i * self.options.height
+    return d
+  }), function (d) {
     return d[self.options.accessors.id]
   })
 

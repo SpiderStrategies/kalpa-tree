@@ -126,6 +126,21 @@ test('emits stream on errors on tree', function (t) {
   tree.render()
 })
 
+test('rebind stores private fields', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+  s.on('end', function () {
+    // Once the tree has rendered, the class should have been removed
+    tree.node.data().forEach(function (d, i) {
+      t.equal(d._x, d.y, '_x is equal to original y')
+      t.equal(d._y, i * tree.options.height, '_y is equal to index * height')
+    })
+
+    tree.el.remove()
+    t.end()
+  })
+})
+
 test('renders without transitions', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
