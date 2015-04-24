@@ -149,12 +149,20 @@ Tree.prototype.render = function () {
   })
   .on('end', function () {
     self._fly()
-    // force redraw so we're sure the dom is updated
-    self.el[0][0].offsetHeight
+    self._forceRedraw()
     self.el.select('.tree').classed('notransition', false)
   })
 
   return this
+}
+
+/*
+ * Forces a browser redraw. This is used if we're adding a node, and then
+ * applying some transition. It makes sure that node is added to them, so the
+ * browser doesn't batch operations
+ */
+Tree.prototype._forceRedraw = function () {
+  this.el[0][0].offsetHeight
 }
 
 /*
@@ -312,8 +320,7 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
     this.toggle(d, opt)
 
     if (opt.animate === false) {
-      // Force redraw if we disabled animations
-      this.el[0][0].offsetHeight
+      this._forceRedraw()
       // so we can remove the notransition class after things were painted
       this.el.select('.tree').classed('notransition', false)
     }
@@ -449,8 +456,7 @@ Tree.prototype._toggleAll = function (fn) {
            })
 
   if (notrans) {
-    // Force redraw if we disabled animations
-    this.el[0][0].offsetHeight
+    this._forceRedraw()
     this.el.select('.tree').classed('notransition', false)
   }
 }
