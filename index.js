@@ -572,7 +572,9 @@ Tree.prototype.removeNode = function (obj) {
     delete this._layout[_node.id]
   }
 
-  this._slide()
+  this._rebind()
+      .call(this.updater)
+      .call(this.slideExit, _node)
 
     // Cleanup child nodes
   ;[_node].reduce(function reduce(p, c) {
