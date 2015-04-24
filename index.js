@@ -234,7 +234,7 @@ Tree.prototype._slide = function () {
   var self = this
   this._rebind()
       .call(this.enter, function (d, i) {
-        return 'translate(0px,' + (i * self.options.height) + 'px)'
+        return 'translate(0px,' + d._y + 'px)'
       }, 'fading-node placeholder')
       .call(function (selection) {
         // Remove the fading-node class, now that it's in the dom
