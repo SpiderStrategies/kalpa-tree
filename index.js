@@ -229,12 +229,15 @@ Tree.prototype._fly = function (source) {
 /*
  * Used to redraw the tree by sliding a node down into its place from a previous hole, or
  * having a node disappear into a hole and the nodes below it sliding up to their new position.
+ *
+ * source is the node that was changed
  */
-Tree.prototype._slide = function () {
+Tree.prototype._slide = function (source) {
   var self = this
   this._rebind()
       .call(this.enter, function (d, i) {
-        return 'translate(0px,' + d._y + 'px)'
+        // if there's a source, enter at that source's position, otherwise add the node at its position
+        return 'translate(0px,' + (source ? source._y : d._y) + 'px)'
       }, 'fading-node placeholder')
       .call(function (selection) {
         // Remove the fading-node class, now that it's in the dom
@@ -245,7 +248,7 @@ Tree.prototype._slide = function () {
           return true // run once
         }, self.transitionTimeout)
       })
-      .call(this.slideExit)
+      .call(this.slideExit, source)
       .call(this.updater)
 }
 
@@ -430,12 +433,12 @@ Tree.prototype.editable = function () {
 }
 
 /*
- * Edits a node
+ * Edits a single node
  */
 Tree.prototype.edit = function (d) {
   if (d.id && this.nodes[d.id]) {
     this._patch(d)
-    this._slide()
+    this._slide(this._layout[d.id])
   }
 }
 
