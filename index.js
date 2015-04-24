@@ -166,6 +166,27 @@ Tree.prototype._forceRedraw = function () {
 }
 
 /*
+ * Makes some operation (fn) transitionless, by applying
+ * the notransition class to the tree before the operation is performed,
+ * and then removing the class after the operation has finished
+ */
+Tree.prototype._transitionWrap = function (fn, animate) {
+  var self = this
+  return function () {
+    if (animate === false) {
+      self.el.select('.tree').classed('notransition', true)
+    }
+    var result = fn.apply(self, arguments)
+    if (animate === false) {
+      self._forceRedraw()
+      // so we can remove the notransition class after things were painted
+      self.el.select('.tree').classed('notransition', false)
+    }
+    return result
+  }
+}
+
+/*
  * Rebinds the data to the selection
  */
 Tree.prototype._rebind = function () {
@@ -314,17 +335,8 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
     if (children && children.length > this.options.maxAnimatable) {
       opt.animate = false
     }
-    if (opt.animate === false) {
-      this.el.select('.tree').classed('notransition', true)
-    }
-    this.toggle(d, opt)
 
-    if (opt.animate === false) {
-      this._forceRedraw()
-      // so we can remove the notransition class after things were painted
-      this.el.select('.tree').classed('notransition', false)
-    }
-
+    this._transitionWrap(this.toggle, opt.animate)(d, opt)
   } else {
     this._fly(d, opt)
   }
@@ -443,22 +455,15 @@ Tree.prototype._toggleAll = function (fn) {
     , selection = this._rebind()
     , notrans = selection[0].length > this.options.maxAnimatable || prev > this.options.maxAnimatable
 
-  if (notrans) {
-    this.el.select('.tree').classed('notransition', true)
-  }
-
-  selection.call(this.enter, function (d) {
-             return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
-           })
-           .call(this.updater)
-           .call(this.flyExit, null, function (d) {
-             return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
-           })
-
-  if (notrans) {
-    this._forceRedraw()
-    this.el.select('.tree').classed('notransition', false)
-  }
+  this._transitionWrap(function () {
+    selection.call(this.enter, function (d) {
+               return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
+             })
+             .call(this.updater)
+             .call(this.flyExit, null, function (d) {
+               return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
+             })
+  }, !notrans)()
 }
 
 Tree.prototype.expandAll = function () {
