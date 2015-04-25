@@ -159,6 +159,25 @@ test('renders without transitions', function (t) {
   })
 })
 
+test('transitioning-node applied to entering nodes', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s})
+
+  s.on('end', function () {
+    process.nextTick(function () {
+      var node = tree._layout[1002]
+      t.ok(node._children, 'first child has hidden children')
+      tree.node[0][1].click() // click the first child
+      t.equal(tree.el.selectAll('li.node.transitioning-node').size(), 5, '5 new nodes have transitioning-node')
+      setTimeout(function () {
+        t.equal(tree.el.selectAll('li.node.transitioning-node').size(), 0, 'transitioning-node has been removed')
+        t.end()
+      }, 400)
+    })
+  })
+  tree.render()
+})
+
 test('disables animations if opts.maxAnimatable is exceeded', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, maxAnimatable: 3}).render()
