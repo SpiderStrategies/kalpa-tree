@@ -87,8 +87,38 @@ test('selects a node with options', function (t) {
   t.end()
 })
 
+test('select disables animations if selected node parent is not visible', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s})
+
+  s.on('end', function () {
+    process.nextTick(function () {
+      var updater = tree.updater
+      tree.updater = function () {
+        t.ok(tree.el.select('.tree').classed('notransition'), 'tree has notransition class applied')
+        updater.apply(tree, arguments)
+        tree.el.remove()
+        t.end()
+      }
+      tree.select(1009)
+    })
+  })
+  tree.render()
+})
+
+test('select scrolls into view', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+  document.body.appendChild(tree.el.node())
+  var height = tree.el.select('.tree').node().scrollHeight
+  tree.select(1029)
+  t.ok(height < tree.el.select('.tree').node().scrollHeight, 'new scroll height is greater than original height')
+  tree.remove()
+  t.end()
+})
+
 test('getSelectedEl returns the selected node\'s dom element', function (t) {
   var tree = new Tree({stream: stream()}).render()
+
   tree.select(1003)
 
   var data = tree.getSelected()
