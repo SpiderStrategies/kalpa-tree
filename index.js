@@ -68,6 +68,10 @@ var Tree = function (options) {
 
 util.inherits(Tree, EventEmitter)
 
+Tree.prototype._hasTransitions = function () {
+  return ('transition' in document.documentElement.style) || ('WebkitTransition' in document.documentElement.style)
+}
+
 Tree.prototype.render = function () {
   var self = this
 
@@ -261,7 +265,31 @@ Tree.prototype.select = function (id, opt) {
   var d = this._layout[id]
 
   if (d) {
+    // Disable animations if the node's parent is not visible and we're not already disabled (e.g. initial render)
+    if (d.parent && !this.el.select('.tree').classed('notransition')) {
+      var visible = this.node.filter(function (_d) {
+        return d.parent.id === _d.id
+      }).size()
+      if (!visible) {
+        opt.animate = false
+      }
+    }
+
     this._onSelect(d, null, null, opt)
+
+    // Now scroll the node into view
+    var node = this.node.filter(function (_d) {
+      return _d == d
+    }).node()
+
+    if (opt.animate === false || !this._hasTransitions()) {
+      node.scrollIntoView()
+    } else {
+      d3.timer(function () {
+        node.scrollIntoView()
+        return true
+      }, this.transitionTimeout)
+    }
   }
 }
 
