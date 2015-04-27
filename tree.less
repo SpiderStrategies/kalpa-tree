@@ -67,6 +67,10 @@
         overflow-x: hidden;
         .lh-transition(transform @transition, opacity @transition, height @transition);
 
+        &.transitioning-node {
+          pointer-events: none;
+        }
+
         .node-contents {
           margin: 6px;
           margin-left: -6px;
