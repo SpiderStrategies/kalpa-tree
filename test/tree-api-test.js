@@ -119,6 +119,15 @@ test('select scrolls into view', function (t) {
   t.end()
 })
 
+test('select does not scroll if node is within viewport', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+  tree.el.select('.tree')
+           .style('overflow', 'auto')
+           .style('height', '150px')
+
+  document.body.appendChild(tree.el.node())
+  tree.select(1058, {animate: false})
+  t.equal(tree.el.select('.tree').node().scrollTop, 0, 'scroll top is 0')
   tree.remove()
   t.end()
 })
