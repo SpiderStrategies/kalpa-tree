@@ -190,6 +190,14 @@
         console.log('tree error', e)
       })
 
+      tree.on('move', function (node, newParent, previousParent, newIndex, prevIndex) {
+        console.log(node)
+        console.log(previousParent)
+        console.log(newParent)
+        console.log(newIndex)
+        console.log(prevIndex)
+      })
+
       // Let's be naughty for demo usage
       window.tree = tree
 

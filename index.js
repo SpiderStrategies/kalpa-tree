@@ -25,6 +25,7 @@ var defaults = function () {
     }
   }
 }
+
 /**
  * Create a new d3 tree with the given config.
  */
@@ -55,8 +56,8 @@ var Tree = function (options) {
   }
 
   this.prefix = prefix
-  this.transitionTimeout = 300 // Copied in css
 
+  this.transitionTimeout = 300 // Copied in css
   this.updater = update(this)
   this.enter = enter(this)
   this.flyExit = flyExit(this)
@@ -213,7 +214,6 @@ Tree.prototype._rebind = function () {
   }), function (d) {
     return d[self.options.accessors.id]
   })
-
   return this.node
 }
 
@@ -333,6 +333,10 @@ Tree.prototype.getSelectedEl = function () {
 }
 
 Tree.prototype._onSelect = function (d, i, j, opt) {
+  if (d3.event && d3.event.defaultPrevented) {
+    return  // click events were suppressed by dnd (presumably)
+  }
+
   opt = opt || {}
 
   // determines if we should toggle the node. We don't toggle if it's the root node
