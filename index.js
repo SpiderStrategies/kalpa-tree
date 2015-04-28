@@ -282,15 +282,11 @@ Tree.prototype.select = function (id, opt) {
 
     if (d._y < n.scrollTop || d._y > n.offsetHeight + n.scrollTop) {
       // Now scroll the node into view
-      var node = this.node.filter(function (_d) {
-        return _d == d
-      }).node()
-
       if (opt.animate === false || !this._hasTransitions()) {
-        node.scrollIntoView()
+        n.scrollTop = d._y
       } else {
         d3.timer(function () {
-          node.scrollIntoView()
+          n.scrollTop = d._y
           return true
         }, this.transitionTimeout)
       }
