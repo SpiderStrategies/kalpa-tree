@@ -1,6 +1,7 @@
 var test = require('tape').test
   , Tree = require('../')
   , Readable = require('stream').Readable
+  , Dnd = require('../lib/dnd')
   , nodes = [{
       "id": 1001,
       "label": "Folder A"
@@ -96,5 +97,42 @@ test('root nodes can be removed', function (t) {
     t.equal(Object.keys(tree._layout).length, 1, 'one _layout node')
     t.equal(Object.keys(tree.nodes).length, 1, 'one node in nodes')
     t.end()
+  })
+})
+
+test('dnd allows a node to become a new root', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s, forest: true}).render()
+    , dnd = new Dnd(tree)
+
+  s.on('end', function () {
+    var node = tree.node[0][2]
+      , data = tree._layout[1003]
+    d3.event = new Event
+    d3.event.sourceEvent = new Event
+
+    t.equal(tree.root.length, 2, 'two root nodes to start')
+
+    tree.editable()
+    dnd.start.apply(node, [data, 2])
+    d3.event.y = 5
+    dnd.drag.apply(node, [data, 2])
+    t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(0px,0px)', '0px y indentation')
+
+    tree.on('move', function (n, newParent, previousParent, newIndex, previousIndex) {
+      t.equal(n.id, 1003, 'moved node id matches 1003')
+      t.ok(!newParent, 'no new parent')
+      t.equal(previousParent.id, 1002, 'preview parent is 1002')
+      t.equal(newIndex, 0, 'new index 0')
+      t.equal(previousIndex, 0, 'prev index 0')
+
+      t.equal(tree.root.length, 3, 'three root nodes')
+      t.deepEqual(tree.root[0], data, 'new first root is the node moved')
+
+      tree.remove()
+      t.end()
+    })
+    dnd.end.apply(node, [data, 2])
+
   })
 })
