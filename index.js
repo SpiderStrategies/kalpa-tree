@@ -277,18 +277,23 @@ Tree.prototype.select = function (id, opt) {
 
     this._onSelect(d, null, null, opt)
 
-    // Now scroll the node into view
-    var node = this.node.filter(function (_d) {
-      return _d == d
-    }).node()
+    // check if we need to scroll this element into view
+    var n = this.el.select('.tree').node()
 
-    if (opt.animate === false || !this._hasTransitions()) {
-      node.scrollIntoView()
-    } else {
-      d3.timer(function () {
+    if (d._y < n.scrollTop || d._y > n.offsetHeight + n.scrollTop) {
+      // Now scroll the node into view
+      var node = this.node.filter(function (_d) {
+        return _d == d
+      }).node()
+
+      if (opt.animate === false || !this._hasTransitions()) {
         node.scrollIntoView()
-        return true
-      }, this.transitionTimeout)
+      } else {
+        d3.timer(function () {
+          node.scrollIntoView()
+          return true
+        }, this.transitionTimeout)
+      }
     }
   }
 }

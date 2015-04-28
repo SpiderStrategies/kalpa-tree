@@ -108,10 +108,26 @@ test('select disables animations if selected node parent is not visible', functi
 
 test('select scrolls into view', function (t) {
   var tree = new Tree({stream: stream()}).render()
+  tree.el.select('.tree')
+           .style('overflow', 'auto')
+           .style('height', '36px')
   document.body.appendChild(tree.el.node())
-  var height = tree.el.select('.tree').node().scrollHeight
-  tree.select(1029)
-  t.ok(height < tree.el.select('.tree').node().scrollHeight, 'new scroll height is greater than original height')
+  t.equal(tree.el.select('.tree').node().scrollTop, 0, 'scroll top is 0')
+  tree.select(1029, {animate: false})
+  t.ok(tree.el.select('.tree').node().scrollTop > 0, 'scroll top is larger than 0')
+  tree.remove()
+  t.end()
+})
+
+test('select does not scroll if node is within viewport', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+  tree.el.select('.tree')
+           .style('overflow', 'auto')
+           .style('height', '150px')
+
+  document.body.appendChild(tree.el.node())
+  tree.select(1058, {animate: false})
+  t.equal(tree.el.select('.tree').node().scrollTop, 0, 'scroll top is 0')
   tree.remove()
   t.end()
 })
