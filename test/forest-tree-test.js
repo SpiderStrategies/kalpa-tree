@@ -41,6 +41,14 @@ test('forest tree render populates multiple roots', function (t) {
     t.equal(Object.keys(tree._layout).length, nodes.length, '_layout contains all data')
     t.equal(tree.root.length, 2, 'two root nodes')
     t.equal(tree.node[0].length, 4, '4 list elements displayed')
+
+    var rootClz = false
+    tree.node.each(function () {
+      if (d3.select(this).classed('root')) {
+        rootClz = true
+      }
+    })
+    t.ok(!rootClz, 'no nodes have root class')
     tree.collapseAll()
     setTimeout(function () {
       t.equal(tree.node[0].length, 2, '2 list elements displayed after a collapse all')

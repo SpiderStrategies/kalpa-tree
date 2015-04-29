@@ -90,6 +90,18 @@ test('displays root and its children by default', function (t) {
   t.end()
 })
 
+test('root node has a class of root', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+  t.ok(d3.select(tree.node[0][0]).classed('root'), 'root node has root class')
+  tree.node.each(function (d, i) {
+    if (i !== 0) {
+      t.ok(!d3.select(this).classed('root'), 'non root nodes do not have root class')
+    }
+  })
+  tree.el.remove()
+  t.end()
+})
+
 test('displays a node as selected on render', function (t) {
   var tree = new Tree({
     stream: stream(),
