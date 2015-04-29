@@ -257,6 +257,14 @@ Tree.prototype._slide = function (source) {
       .call(this.updater)
 }
 
+/*
+ * Selects a node in the tree. The node will be marked as selected and shown in the tree.
+ *
+ * opt supports:
+ *    - silent: Don't fire the select event
+ *    - toggleOnSelect: Don't toggle the node if it has children, just select it
+ *    - animate: Disable animations
+ */
 Tree.prototype.select = function (id, opt) {
   opt = opt || {}
   if (typeof opt.toggleOnSelect === 'undefined') {
@@ -650,6 +658,10 @@ Tree.prototype.search = function (term) {
                        .classed('search-result', true)
 }
 
+/*
+ * Used to toggle the node's children. If they are visible this will hide them, and
+ * if they are hidden, this will show them.
+ */
 Tree.prototype.toggle = function (d) {
   var _d = this._layout[d.id]
   if (_d.children) {
