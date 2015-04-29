@@ -626,6 +626,30 @@ Tree.prototype.removeNode = function (obj) {
   })
 }
 
+Tree.prototype.search = function (term) {
+  var re = new RegExp(term, 'ig')
+    , self = this
+    , data = Object.keys(this.nodes).filter(function (k) {
+               re.lastIndex = 0
+               return re.test(self.nodes[k][self.options.accessors.label])
+             }).map(function (key, i) {
+               var _d = self._layout[key]
+               _d._x = 0
+               _d._y = i * self.options.height
+               return _d
+             })
+
+  this.node = this.node.data(data, function (d) {
+                         return d[self.options.accessors.id]
+                       })
+                       .call(this.enter)
+                       .call(this.updater)
+                       .call(function (selection) {
+                         selection.exit().remove() // No animations on exit
+                       })
+                       .classed('search-result', true)
+}
+
 Tree.prototype.toggle = function (d) {
   var _d = this._layout[d.id]
   if (_d.children) {

@@ -484,3 +484,35 @@ test('click toggler disabled on root', function (t) {
   t.ok(tree.get().children, 'root has exposed children after we tried to toggle')
   t.end()
 })
+
+test('search', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  t.equal(tree.node.size(), 3, '3 initial nodes')
+  s.on('end', function () {
+    tree.search('M')
+    t.equal(tree.node.size(), 25, '25 nodes visible')
+    var clazzed = true
+    tree.node.each(function (n) {
+      if (!d3.select(this).classed('search-result')) {
+        clazzed = false
+      }
+    })
+    t.ok(clazzed, 'all nodes have search-result class')
+    t.equal()
+    t.equal(tree.nodes[d3.select(tree.node[0][0]).datum().id].label, 'M1', 'M1 is the first result')
+    tree.select(d3.select(tree.node[0][3]).datum().id)
+    t.equal(tree.node.size(), 18, '18 nodes visible')
+    clazzed = false
+    tree.node.each(function (n) {
+      if (d3.select(this).classed('search-result')) {
+        clazzed = true
+      }
+    })
+    t.ok(!clazzed, 'no nodes have search-result class')
+    tree.remove()
+    t.end()
+  })
+})
