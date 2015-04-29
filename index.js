@@ -167,7 +167,7 @@ Tree.prototype.render = function () {
  * browser doesn't batch operations
  */
 Tree.prototype._forceRedraw = function () {
-  this.el[0][0].offsetHeight
+  return this.el[0][0].offsetHeight
 }
 
 /*
@@ -240,7 +240,7 @@ Tree.prototype._fly = function (source) {
 Tree.prototype._slide = function (source) {
   var self = this
   this._rebind()
-      .call(this.enter, function (d, i) {
+      .call(this.enter, function (d) {
         // if there's a source, enter at that source's position, otherwise add the node at its position
         return 'translate(0px,' + (source ? source._y : d._y) + 'px)'
       }, 'fading-node placeholder')
@@ -388,7 +388,7 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
   }
 }
 
-Tree.prototype._onToggle = function (d, i) {
+Tree.prototype._onToggle = function (d) {
   d3.event.stopPropagation()
   if (d === this.root) {
     // Never toggle root
@@ -563,7 +563,7 @@ Tree.prototype._patch = function (obj) {
         // And add it to the parent
         ;(_d.parent.children || _d.parent._children).splice(_d._originalIndex, 0, _d)
         delete _d._originalIndex
-      } else if (obj.visible == false) {
+      } else if (obj.visible === false) {
         // visible was set to false, so move the node to the parent's _invisibleNodes
         (_d.parent._invisibleNodes || (_d.parent._invisibleNodes = [])).push(_d)
         // And remove it from the parent's _children or children
