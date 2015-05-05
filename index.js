@@ -109,7 +109,7 @@ Tree.prototype.render = function () {
         // This node shouldn't be visible, so store it in the parents _invisibleNodes
         (p._invisibleNodes || (p._invisibleNodes = [])).push(_n)
         // Store the node's original index in case it's patched
-        _n._originalIndex = (p.children || p._children).length
+        _n._originalIndex = (p.children || p._children || []).length
       } else if (p == self.root || (self.options.forest && self.root.indexOf(p) !== -1) || p.children) {
         // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
         (p.children || (p.children = [])).push(_n)
