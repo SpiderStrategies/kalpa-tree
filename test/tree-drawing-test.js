@@ -51,7 +51,7 @@ test('does not apply indicator class to label-mask by default', function (t) {
 
 test('render populates and hides visible: false nodes', function (t) {
   var map = new Transform( { objectMode: true } )
-    , hiddens = [1006, 1007, 1008, 1058]
+    , hiddens = [1002, 1070, 1081]
 
   map._transform = function(obj, encoding, done) {
     if (hiddens.indexOf(obj.id) !== -1) {
@@ -69,15 +69,14 @@ test('render populates and hides visible: false nodes', function (t) {
     tree.expandAll()
     t.equal(Object.keys(tree.nodes).length, data.length, 'nodes contains all data')
     t.equal(Object.keys(tree._layout).length, data.length, '_layout contains all data')
-    t.equal(el.querySelectorAll('.tree ul li').length, 28, 'visible: false nodes are not displayed')
+    t.equal(el.querySelectorAll('.tree ul li').length, 5, 'visible: false nodes are not displayed')
 
-    var n1 = tree._layout[1003]
-    t.equal(n1._invisibleNodes.length, 3, '1003 has 3 invisible nodes')
-    t.equal(n1.children.length, 7, '1003 children do not display invisible nodes')
+    var n1 = tree._layout[1001]
+    t.equal(n1._invisibleNodes.length, 1, 'root has 1 invisible nodes')
+    t.equal(n1.children.length, 1, 'root children do not display invisible nodes')
 
-    var n2 = tree._layout[1058]
-    t.ok(!n2.visible, 'deleted n2.visible')
-    t.deepEqual(n2.parent._invisibleNodes[0], n2, '1058 parent _invisibleNodes contains 1058')
+    var n2 = tree._layout[1070]
+    t.deepEqual(n2.parent._invisibleNodes[0], n2, '1070 parent _invisibleNodes contains 1070')
     tree.el.remove()
     t.end()
   })
