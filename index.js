@@ -266,6 +266,25 @@ Tree.prototype.parent = function (obj) {
 }
 
 /*
+ * Returns a node's children. This includes all visible and invisible children
+ */
+Tree.prototype.children = function (obj) {
+  var node = this._layout[typeof obj === 'object' ? obj.id : obj]
+    , self = this
+    , children = (node.children || node._children || []).map(function (n) {
+      return self.nodes[n.id]
+    })
+
+  if (node._invisibleNodes) {
+    node._invisibleNodes.forEach(function (n) {
+      children.splice(n._originalIndex, 0, self.nodes[n.id])
+    })
+  }
+
+  return children
+}
+
+/*
  * Selects a node in the tree. The node will be marked as selected and shown in the tree.
  *
  * opt supports:
