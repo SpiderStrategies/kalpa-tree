@@ -423,6 +423,7 @@ Tree.prototype.add = function (d, parent, idx) {
   if (!parent && this.options.forest) {
     // Forest tree and the new node is a new root
     this.nodes[d.id] = d // Store the real node
+    this._layout[_d.id] = _d
     if (typeof idx === 'number') {
       this.root.splice(idx, 0, _d)
     } else {
