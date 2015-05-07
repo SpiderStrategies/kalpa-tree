@@ -62,13 +62,15 @@ test('forest tree render populates multiple roots', function (t) {
 test('allows addition of new root elements', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
-
   s.on('end', function () {
     t.equal(tree.root.length, 2, 'two root nodes')
 
+    var totalNodes = Object.keys(tree.nodes).length
     tree.add({label: 'New root node', id: 1010})
     t.equal(tree.root.length, 3, 'three root nodes')
     t.equal(tree.node[0].length, 5, '5 list elements displayed')
+    t.equal(Object.keys(tree.nodes).length, totalNodes + 1, 'one more node added to all nodes')
+    t.equal(Object.keys(tree.nodes).length, Object.keys(tree._layout).length, '.nodes length equal _layout length ')
     t.end()
   })
 })
