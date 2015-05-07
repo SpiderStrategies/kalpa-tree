@@ -15,6 +15,30 @@ test('get', function (t) {
   t.end()
 })
 
+test('parent', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+  t.deepEqual(tree.parent(1002), tree.get(1001), 'returns a nodes parent by id')
+  t.deepEqual(tree.parent(tree.get(1002)), tree.get(1001), 'returns a nodes parent by object')
+  t.ok(!tree.parent(1001), 'returns null for root')
+  tree.el.remove()
+  t.end()
+})
+
+test('children', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+  t.equal(tree.children(1001).length, 2, 'root has two children')
+  t.equal(tree.children(1007).length, 0, 'a leaf has no children')
+  t.equal(tree.children(1058).length, 5, 'a collapsed node has children')
+
+  var children = tree.children(1003)
+  t.equal(children.length, 10, '1003 has ten children')
+
+  tree.patch([{id: 1006, visible: false}, {id: 1007, visible: false}])
+  t.deepEqual(children.length, tree.children(1003).length, '1003 has the same number of children')
+  tree.el.remove()
+  t.end()
+})
+
 test('selects a node', function (t) {
   var tree = new Tree({stream: stream()}).render()
   tree.select(1003)
