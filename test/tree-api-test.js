@@ -15,6 +15,15 @@ test('get', function (t) {
   t.end()
 })
 
+test('parent', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+  t.deepEqual(tree.parent(1002), tree.get(1001), 'returns a nodes parent by id')
+  t.deepEqual(tree.parent(tree.get(1002)), tree.get(1001), 'returns a nodes parent by object')
+  t.ok(!tree.parent(1001), 'returns null for root')
+  tree.el.remove()
+  t.end()
+})
+
 test('selects a node', function (t) {
   var tree = new Tree({stream: stream()}).render()
   tree.select(1003)

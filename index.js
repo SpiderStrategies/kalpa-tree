@@ -258,6 +258,14 @@ Tree.prototype._slide = function (source) {
 }
 
 /*
+ * Returns the parent node.
+ */
+Tree.prototype.parent = function (obj) {
+  var parent = this._layout[typeof obj === 'object' ? obj.id : obj].parent
+  return parent && this.nodes[parent.id]
+}
+
+/*
  * Selects a node in the tree. The node will be marked as selected and shown in the tree.
  *
  * opt supports:
