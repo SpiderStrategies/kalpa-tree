@@ -30,6 +30,8 @@ var defaults = function () {
  * Create a new d3 tree with the given config.
  */
 var Tree = function (options) {
+  var self = this
+
   if (!options) {
     throw new Error('options are required')
   }
@@ -65,6 +67,14 @@ var Tree = function (options) {
 
   this.tree = d3.layout.tree()
                        .nodeSize([0, this.options.depth])
+                       .children(function (d) {
+                         if (d.collapsed) {
+                           return null
+                         }
+                         return d._allChildren && d._allChildren.filter(function (node) {
+                                                                  return self._layout[node.id].visible !== false
+                                                                })
+                       })
 }
 
 util.inherits(Tree, EventEmitter)
@@ -99,56 +109,33 @@ Tree.prototype.render = function () {
 
     var p = self._layout[n.parentId]
       , _n = self._layout[n.id] = { // internal version which we'll use to modify the node's layout
-        id: n.id
+        id: n.id,
+        collapsed: true // by default incoming nodes are collapsed
       }
+
+    if (n.visible === false) {
+      _n.visible = false
+    }
 
     if (p) {
       _n.parent = p
-
-      if (n.visible === false) {
-        // This node shouldn't be visible, so store it in the parents _invisibleNodes
-        (p._invisibleNodes || (p._invisibleNodes = [])).push(_n)
-        // Store the node's original index in case it's patched
-        _n._originalIndex = (p.children || p._children || []).length
-      } else if (p == self.root || (self.options.forest && self.root.indexOf(p) !== -1) || p.children) {
-        // if the parent is the root, or the parent has visible children, then push onto its children so this node is visible
-        (p.children || (p.children = [])).push(_n)
-        if (self.options.initialSelection === _n.id) {
-          self.select(_n.id, { silent: true })
-        } else if (!self.options.forest) {
-          self._fly()
-        }
-      } else if (self.options.initialSelection === _n.id) {
-        // There's a initialSelection option equal to this node
-        if (p._children) {
-          // This parent has hidden children. Transfer them so they are visible
-          p.children = p._children
-          p._children = null
-        }
-        // Push this node onto the parents visible children
-        (p.children || (p.children = [])).push(_n)
-        // And select it
-        self.select(_n.id, { silent: true })
-      } else {
-        // push to _children so it's hidden, no need to draw
-        (p._children || (p._children = [])).push(_n)
-      }
+      // Simple array that we use to keep track of children
+      ;(p._allChildren || (p._allChildren = [])).push(_n)
     } else {
+      // Some type of root nodes. We treat those as expanded nodes
+      _n.collapsed = false
       if (self.options.forest) {
         self.root.push(_n)
-        if (self.options.initialSelection === _n.id) {
-          self.select(_n.id, { silent: true })
-        }
       } else {
         self.root = _n
-
-        // root, draw it.
-        if (self.options.initialSelection === _n.id) {
-          self.select(_n.id, { silent: true })
-        } else {
-          self._fly()
-        }
       }
+    }
+
+    if (self.options.initialSelection === _n.id) {
+      self.select(_n.id, { silent: true })
+    } else if (!_n.collapsed) {
+      // we may need to draw the tree to show the incoming node
+      self._fly()
     }
     self.emit('node', n)
   })
@@ -271,17 +258,10 @@ Tree.prototype.parent = function (obj) {
 Tree.prototype.children = function (obj) {
   var node = this._layout[typeof obj === 'object' ? obj.id : obj]
     , self = this
-    , children = (node.children || node._children || []).map(function (n) {
-      return self.nodes[n.id]
-    })
 
-  if (node._invisibleNodes) {
-    node._invisibleNodes.forEach(function (n) {
-      children.splice(n._originalIndex, 0, self.nodes[n.id])
-    })
-  }
-
-  return children
+  return (node._allChildren || []).map(function (n) {
+    return self.nodes[n.id]
+  })
 }
 
 /*
@@ -377,7 +357,7 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
 
   // determines if we should toggle the node. We don't toggle if it's the root node
   // or the node is already expanded, but not selected.
-  var toggle = opt.toggleOnSelect && !(d.children && !d.selected) && d !== this.root
+  var toggle = opt.toggleOnSelect && !(!d.collapsed && !d.selected) && d !== this.root
 
   // tree_.selected stores a previously selected node
   if (this._selected) {
@@ -393,18 +373,14 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
     if (!node) {
       return
     }
-    if (node._children) {
-      node.children = node._children
-      node._children = null
-    }
+    delete node.collapsed
     if (node && node.parent) {
       e(node.parent)
     }
   })(d.parent)
 
   if (toggle) {
-    var children = (d.children || d._children)
-    if (children && children.length > this.options.maxAnimatable) {
+    if (d._allChildren && d._allChildren.length > this.options.maxAnimatable) {
       opt.animate = false
     }
 
@@ -467,20 +443,18 @@ Tree.prototype.add = function (d, parent, idx) {
     return
   }
 
-  var children = parent.children || parent._children
-
   this.nodes[d.id] = d
   this._layout[_d.id] = _d
 
   _d.parent = parent
 
   if (typeof idx !== 'undefined') {
-    children.splice(idx, 0, _d)
+    parent._allChildren.splice(idx, 0, _d)
   } else {
-    if (!children) {
-      children = parent.children = []
+    if (!parent._allChildren) {
+      parent._allChildren = []
     }
-    children.push(_d)
+    parent._allChildren.push(_d)
   }
 
   this._slide()
@@ -541,19 +515,13 @@ Tree.prototype._toggleAll = function (fn) {
 
 Tree.prototype.expandAll = function () {
   this._toggleAll(function (d) {
-    if (d._children) {
-      d.children = d._children
-      d._children = null
-    }
+    delete d.collapsed
   })
 }
 
 Tree.prototype.collapseAll = function () {
   this._toggleAll(function (d) {
-    if (d.children) {
-      d._children = d.children
-      d.children = null
-    }
+    d.collapsed = true
   })
 }
 
@@ -590,25 +558,11 @@ Tree.prototype._patch = function (obj) {
     }
 
     // Check is the visible property has been set
-    if (typeof obj.visible !== 'undefined' && _d.parent) {
-      var invisibles = _d.parent._invisibleNodes || []
-
-      if (obj.visible && invisibles.indexOf(_d) !== -1) {
-        // Remove it from the parent's _invisibleNodes
-        invisibles.splice(invisibles.indexOf(_d), 1)
-        // And add it to the parent
-        ;(_d.parent.children || _d.parent._children).splice(_d._originalIndex, 0, _d)
-        delete _d._originalIndex
-      } else if (obj.visible === false) {
-        // visible was set to false, so move the node to the parent's _invisibleNodes
-        (_d.parent._invisibleNodes || (_d.parent._invisibleNodes = [])).push(_d)
-        // And remove it from the parent's _children or children
-        var children = _d.parent.children || _d.parent._children
-          , idx = children.indexOf(_d)
-        if (idx !== -1) {
-          children.splice(idx, 1)
-        }
-        _d._originalIndex = idx
+    if (typeof obj.visible !== 'undefined') {
+      if (obj.visible === false) {
+        _d.visible = false
+      } else {
+        delete _d.visible
       }
     }
   }
@@ -637,8 +591,7 @@ Tree.prototype.removeNode = function (obj) {
 
   if (parent) {
     // Remove the child from parent
-    var children = parent.children || parent._children
-    children.splice(children.indexOf(_node), 1)
+    parent._allChildren.splice(parent._allChildren.indexOf(_node), 1)
   } else if (this.options.forest) {
     this.root.splice(this.root.indexOf(this._layout[_node.id]), 1)
     delete this.nodes[_node.id]
@@ -651,9 +604,8 @@ Tree.prototype.removeNode = function (obj) {
 
     // Cleanup child nodes
   ;[_node].reduce(function reduce(p, c) {
-    var children = c.children || c._children
-    if (children) {
-      return p.concat(children.reduce(reduce, []))
+    if (c._allChildren) {
+      return p.concat(c._allChildren.reduce(reduce, []))
     }
     return p.concat(c.id)
   }, []).forEach(function (id) {
@@ -692,13 +644,7 @@ Tree.prototype.search = function (term) {
  */
 Tree.prototype.toggle = function (d) {
   var _d = this._layout[d.id]
-  if (_d.children) {
-    _d._children = _d.children
-    _d.children = null
-  } else {
-    _d.children = _d._children
-    _d._children = null
-  }
+  _d.collapsed = !_d.collapsed
   this._fly(_d)
 }
 

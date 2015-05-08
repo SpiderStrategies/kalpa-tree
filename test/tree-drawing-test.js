@@ -27,7 +27,7 @@ test('emits node events', function (t) {
 
   s.on('end', function () {
     t.equal(nodes.length, data.length, 'node event emitted for each node in stream')
-    tree.el.remove()
+    tree.remove()
     t.end()
   })
   tree.render()
@@ -36,7 +36,7 @@ test('emits node events', function (t) {
 test('render populates data from stream', function (t) {
   var tree = new Tree({stream: stream()}).render()
   t.equal(Object.keys(tree.nodes).length, data.length, 'nodes contains all data')
-  tree.el.remove()
+  tree.remove()
   t.end()
 })
 
@@ -45,7 +45,7 @@ test('does not apply indicator class to label-mask by default', function (t) {
     , el = tree.el.node()
   t.equal(el.querySelectorAll('.tree ul li:first-child .label-mask').length, 1, 'we have a label mask')
   t.equal(el.querySelectorAll('.tree ul li:first-child .label-mask.indicator').length, 0, 'label mask is missing an indicator class')
-  tree.el.remove()
+  tree.remove()
   t.end()
 })
 
@@ -72,21 +72,29 @@ test('render populates and hides visible: false nodes', function (t) {
     t.equal(el.querySelectorAll('.tree ul li').length, 5, 'visible: false nodes are not displayed')
 
     var n1 = tree._layout[1001]
-    t.equal(n1._invisibleNodes.length, 1, 'root has 1 invisible nodes')
+    t.equal(n1._allChildren.length, 2, 'root has 2 total children')
     t.equal(n1.children.length, 1, 'root children do not display invisible nodes')
 
     var n2 = tree._layout[1070]
-    t.deepEqual(n2.parent._invisibleNodes[0], n2, '1070 parent _invisibleNodes contains 1070')
-    tree.el.remove()
+    t.equal(n2.parent._allChildren.indexOf(n2), 1, '1070 parent _invisibleNodes contains 1070')
+    t.equal(n2.parent.children.indexOf(n2), -1, '1070 parents children does contain 1070')
+    tree.remove()
     t.end()
   })
 })
 
 test('displays root and its children by default', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-  t.equal(tree.node.size(), 3, '3 nodes by default')
-  tree.el.remove()
-  t.end()
+  var s = stream()
+    , tree = new Tree({stream: s})
+
+  s.on('end', function () {
+    process.nextTick(function () {
+      t.equal(tree.node.size(), 3, '3 nodes by default')
+      tree.remove()
+      t.end()
+    })
+  })
+  tree.render()
 })
 
 test('root node has a class of root', function (t) {
@@ -97,13 +105,14 @@ test('root node has a class of root', function (t) {
       t.ok(!d3.select(this).classed('root'), 'non root nodes do not have root class')
     }
   })
-  tree.el.remove()
+  tree.remove()
   t.end()
 })
 
 test('displays a node as selected on render', function (t) {
-  var tree = new Tree({
-    stream: stream(),
+  var s = stream()
+    , tree = new Tree({
+    stream: s,
     initialSelection: 1003
   })
 
@@ -111,10 +120,14 @@ test('displays a node as selected on render', function (t) {
     t.fail('should not fire select on initial selection')
   })
 
+  s.on('end', function () {
+    process.nextTick(function () {
+      t.equal(tree.node.size(), 18, '3 nodes by default')
+      tree.remove()
+      t.end()
+    })
+  })
   tree.render()
-  t.equal(tree.node.size(), 8, '3 nodes by default')
-  tree.el.remove()
-  t.end()
 })
 
 test('emits stream on errors on tree', function (t) {
@@ -130,7 +143,7 @@ test('emits stream on errors on tree', function (t) {
   tree.on('error', function (e) {
     t.ok(e, 'error event')
     t.equal(e.message, 'Blue Smoke', 'error message matches')
-    tree.el.remove()
+    tree.remove()
     t.end()
   })
 
@@ -147,7 +160,7 @@ test('rebind stores private fields', function (t) {
       t.equal(d._y, i * tree.options.height, '_y is equal to index * height')
     })
 
-    tree.el.remove()
+    tree.remove()
     t.end()
   })
 })
@@ -165,7 +178,7 @@ test('renders without transitions', function (t) {
   s.on('end', function () {
     // Once the tree has rendered, the class should have been removed
     t.ok(!tree.node.classed('notransition'), 'tree nodes notransition class removed')
-    tree.el.remove()
+    tree.remove()
     t.end()
   })
 })
@@ -177,7 +190,7 @@ test('transitioning-node applied to entering nodes', function (t) {
   s.on('end', function () {
     process.nextTick(function () {
       var node = tree._layout[1002]
-      t.ok(node._children, 'first child has hidden children')
+      t.ok(!node.children, 'first child has hidden children')
       tree.node[0][1].click() // click the first child
       t.equal(tree.el.selectAll('li.node.transitioning-node').size(), 5, '5 new nodes have transitioning-node')
       setTimeout(function () {
@@ -200,12 +213,11 @@ test('disables animations if opts.maxAnimatable is exceeded', function (t) {
       toggler.apply(tree, arguments)
       process.nextTick(function () {
         t.ok(!tree.el.select('.tree').classed('notransition'), 'tree notransition class was removed after toggle')
-        tree.el.remove()
+        tree.remove()
         t.end()
       })
     }
-    t.equal(tree._layout[1003]._children.length, 10, 'has 10 hidden nodes')
+    t.ok(!tree._layout[1003].children, 10, '1003 hidden nodes')
     tree.select(1002)
   })
-
 })
