@@ -34,7 +34,7 @@ test('children', function (t) {
   t.equal(children.length, 10, '1003 has ten children')
 
   tree.patch([{id: 1006, visible: false}, {id: 1007, visible: false}])
-  t.deepEqual(children.length, tree.children(1003).length, '1003 has the same number of children')
+  t.deepEqual(children, tree.children(1003), '1003 has the same number of children')
   tree.el.remove()
   t.end()
 })
@@ -186,17 +186,21 @@ test('editable', function (t) {
 })
 
 test('expand all', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-    , el = tree.el.node()
+  var s = stream()
+    , tree = new Tree({stream: s})
 
-  t.equal(el.querySelectorAll('.tree ul li').length, 3, 'tree has 3 nodes initially')
-  tree.expandAll()
-  tree.node.each(function (d) {
-    t.ok(!d._children, 'node should have no hidden children')
+  s.on('end', function () {
+    var el = tree.el.node()
+    process.nextTick(function () {
+      t.equal(el.querySelectorAll('.tree ul li').length, 3, 'tree has 3 nodes initially')
+      tree.expandAll()
+      t.equal(el.querySelectorAll('.tree ul li').length, data.length, 'all nodes should be visible')
+      tree.el.remove()
+      t.end()
+    }, 1000)
+
   })
-  t.equal(el.querySelectorAll('.tree ul li').length, data.length, 'all nodes should be visible')
-  tree.el.remove()
-  t.end()
+  tree.render()
 })
 
 test('expand all disables animations if there are too many nodes', function (t) {
@@ -263,43 +267,59 @@ test('collapse all disables animations if there are too many nodes alredy expand
 })
 
 test('removes a node by id', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-    , el = tree.el.node()
+  var s = stream()
+    , tree = new Tree({stream: s})
 
-  tree.expandAll() // start expanded
+  s.on('end', function () {
+    var el = tree.el.node()
 
-  t.equal(Object.keys(tree.nodes).length, data.length, 'starts with all nodes')
-  t.equal(Object.keys(tree._layout).length, data.length, 'starts with all nodes in layout')
+    tree.expandAll() // start expanded
 
-  tree.removeNode(1002)
-  t.equal(Object.keys(tree.nodes).length, 11, 'nodes were removed from nodes')
-  t.equal(Object.keys(tree._layout).length, 11, 'nodes were removed from _layout')
+    t.equal(Object.keys(tree.nodes).length, data.length, 'starts with all nodes')
+    t.equal(Object.keys(tree._layout).length, data.length, 'starts with all nodes in layout')
 
-  setTimeout(function () {
-    var node = el.querySelector('.tree ul li:nth-child(2)')
-    t.equal(el.querySelectorAll('.tree ul li').length, 7, 'removed nodes no longer in the dom')
-    t.end()
-  }, 400)
+    tree.removeNode(1002)
+    t.equal(Object.keys(tree.nodes).length, 11, 'nodes were removed from nodes')
+    t.equal(Object.keys(tree._layout).length, 11, 'nodes were removed from _layout')
+
+    setTimeout(function () {
+      var node = el.querySelector('.tree ul li:nth-child(2)')
+      t.equal(el.querySelectorAll('.tree ul li').length, 7, 'removed nodes no longer in the dom')
+      t.end()
+    }, 400)
+  })
+  tree.render()
 })
 
 test('removes a node by data object', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-    , el = tree.el.node()
-  tree.removeNode(tree.get(1002))
-  t.equal(Object.keys(tree.nodes).length, 11, 'nodes were removed from nodes')
-  t.equal(Object.keys(tree._layout).length, 11, 'nodes were removed from _layout')
-  t.end()
+  var s = stream()
+    , tree = new Tree({stream: s})
+
+  s.on('end', function () {
+    process.nextTick(function () {
+      var el = tree.el.node()
+      tree.removeNode(tree.get(1002))
+      t.equal(Object.keys(tree.nodes).length, 11, 'nodes were removed from nodes')
+      t.equal(Object.keys(tree._layout).length, 11, 'nodes were removed from _layout')
+      tree.remove()
+      t.end()
+    })
+  })
+  tree.render()
 })
 
 test('prevents add for a node w/ that id', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-    , el = tree.el.node()
+  var s = stream()
+    , tree = new Tree({stream: s})
 
-  var d = tree.add({
-    id: 1001
+  s.on('end', function () {
+    var d = tree.add({
+      id: 1001
+    })
+    t.ok(!d, 'd is undefined')
+    t.end()
   })
-  t.ok(!d, 'd is undefined')
-  t.end()
+  tree.render()
 })
 
 test('adds a node to a parent', function (t) {
@@ -381,67 +401,75 @@ test('patch the tree by array of changes', function (t) {
     var node = el.querySelector('.tree ul li:nth-child(2)')
     t.equal(node.querySelector('.label').innerHTML, 'Patched 1002', 'dom label changed')
     t.ok(node.querySelector('.indicator.red'), 'red indicator exists')
-    tree.el.remove()
+    tree.remove()
     t.end()
   })
 })
 
 test('patch changes nodes visibility', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-    , el = tree.el.node()
+  var s = stream()
+    , tree = new Tree({stream: s})
 
-  tree.patch([{id: 1006, visible: false}, {id: 1008, visible: false}, {id: 1058, visible: false}])
+  s.on('end', function () {
+    process.nextTick(function () {
+      var el = tree.el.node()
+      tree.expandAll()
 
-  var n1 = tree._layout[1006]
-  t.equal(n1.parent._invisibleNodes.length, 2, '1006 and 1008 parent has _invisibleNodes')
-  t.equal(n1.parent._children.length, 8, '1003 _children do not contain 1006 and 1008')
+      tree.patch([{id: 1006, visible: false}, {id: 1008, visible: false}, {id: 1058, visible: false}])
 
-  var n2 = tree._layout[1058]
-  t.ok(!n2.visible, 'deleted n2.visible')
-  t.deepEqual(n2.parent._invisibleNodes[0], n2, '1058 parent _invisibleNodes contains 1058')
+      var n1 = tree._layout[1006]
+      t.equal(n1.parent.children.length, n1.parent._allChildren.length - 2, 'parent has two invisible nodes')
 
-  tree.expandAll()
+      var n2 = tree._layout[1058]
+      t.equal(n2.parent.children.length, n2.parent._allChildren.length - 1, '1058 parent is missing 1058')
+      t.equal(n2.parent.children.indexOf(n2), -1, 'expanded n2 parent does not have 1058 as a child')
 
-  t.equal(n2.parent.children.indexOf(n2), -1, 'expanded n2 parent does not have 1058 as a child')
+      tree.patch([{id: 1058, visible: true}])
+      t.equal(n2.parent.children.indexOf(n2), 1, 'expanded n2 parent now contains 1058')
+      t.end()
+    })
+  })
 
-  tree.patch([{id: 1058, visible: true}])
-  t.equal(n2.parent.children.indexOf(n2), 1, 'expanded n2 parent now contains 1058')
-  t.end()
+  tree.render()
 })
 
 test('patch visibility toggling', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-    , el = tree.el.node()
-    , parent = tree._layout[1003]
+  var s = stream()
+    , tree = new Tree({stream: s})
 
-  tree.expandAll()
+  s.on('end', function () {
+    var el = tree.el.node()
+      , parent = tree._layout[1003]
 
-  var originalIndex = parent.children.indexOf(tree._layout[1006])
+    tree.expandAll()
 
-  // Set visible: false on 1006
-  tree.patch([{id: 1006, visible: false}])
-  t.equal(parent._invisibleNodes.length, 1, '1003 has _invisibleNodes')
-  t.equal(parent.children.length, 9, '1003 is missing 1006')
+    var originalIndex = parent.children.indexOf(tree._layout[1006])
 
-  // Set visible: true on 1006
-  tree.patch([{id: 1006, visible: true}])
+    // Set visible: false on 1006
+    tree.patch([{id: 1006, visible: false}])
+    t.equal(parent.children.length, parent._allChildren.length - 1, '1003 has an invisible node')
+    t.equal(parent.children.length, 9, '1003 is missing 1006')
 
-  t.equal(parent._invisibleNodes.length, 0, '1003 does not have _invisibleNodes')
-  t.equal(parent.children.length, 10, '1003 has all its children')
-  t.equal(parent.children.indexOf(tree._layout[1006]), originalIndex, '1006 was restored to original location')
+    // Set visible: true on 1006
+    tree.patch([{id: 1006, visible: true}])
 
-  tree.patch([{id: 1006, visible: false}, {id: 1007, visible: false}, {id: 1008, visible: false}])
-  tree.patch([{id: 1008, visible: true}])
+    t.equal(parent.children.length, parent._allChildren.length, '1003 does not have invisible nodes')
+    t.equal(parent.children.indexOf(tree._layout[1006]), originalIndex, '1006 was restored to original location')
 
-  t.equal(parent.children.length, 8, '1003 has two _invisibleNodes')
+    tree.patch([{id: 1006, visible: false}, {id: 1007, visible: false}, {id: 1008, visible: false}])
+    tree.patch([{id: 1008, visible: true}])
 
-  var p = -Infinity
-  parent.children.forEach(function (node) {
-    t.ok(node.id > p, 'node id ' + node.id + ' is greater than prev node id ' + p)
-    p = node.id
+    t.equal(parent.children.length, 8, '1003 has two invisible nodes')
+
+    var p = -Infinity
+    parent.children.forEach(function (node) {
+      t.ok(node.id > p, 'node id ' + node.id + ' is greater than prev node id ' + p)
+      p = node.id
+    })
+
+    t.end()
   })
-
-  t.end()
+  tree.render()
 })
 
 test('patch the tree with stream of data events containing the changes', function (t) {
@@ -460,6 +488,7 @@ test('patch the tree with stream of data events containing the changes', functio
   tree.patch(patchStream)
   t.equal(tree.get(1002).label, 'Patched 1002', '1002 labels are equal')
   t.equal(tree.get(1003).label, 'Patched 1003', '1003 labels are equal')
+  tree.remove()
   t.end()
 })
 
@@ -490,23 +519,37 @@ test('toggle a specific node', function (t) {
 })
 
 test('click toggler listener', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-    , node = tree._layout[1002]
+  var s = stream()
+    , tree = new Tree({stream: s}, {})
 
-  t.ok(node._children, 'first child has hidden children')
-  tree.node[0][1].querySelector('.toggler').click()
-  t.ok(node.children, 'first child has children after click event')
-  t.end()
+  s.on('end', function () {
+    process.nextTick(function () {
+      var node = tree._layout[1002]
+      t.ok(!node.children, 'first child has hidden children')
+      tree.node[0][1].querySelector('.toggler').click()
+      t.ok(node.children, 'first child has children after click event')
+      tree.remove()
+      t.end()
+    })
+  })
+  tree.render()
 })
 
 test('click toggler disabled on root', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-    , el = tree.el.node()
+  var s = stream()
+    , tree = new Tree({stream: s})
 
-  t.ok(tree.get().children, 'root starts with exposed children')
-  tree.node[0][0].querySelector('.toggler').click()
-  t.ok(tree.get().children, 'root has exposed children after we tried to toggle')
-  t.end()
+  s.on('end', function () {
+    process.nextTick(function () {
+      var el = tree.el.node()
+      t.ok(tree.get().children, 'root starts with exposed children')
+      tree.node[0][0].querySelector('.toggler').click()
+      t.ok(tree.get().children, 'root has exposed children after we tried to toggle')
+      t.end()
+    })
+  })
+
+  tree.render()
 })
 
 test('search', function (t) {
@@ -514,8 +557,8 @@ test('search', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  t.equal(tree.node.size(), 3, '3 initial nodes')
   s.on('end', function () {
+    t.equal(tree.node.size(), 3, '3 initial nodes')
     tree.search('M')
     t.equal(tree.node.size(), 25, '25 nodes visible')
     var clazzed = true
