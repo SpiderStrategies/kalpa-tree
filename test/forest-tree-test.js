@@ -102,6 +102,19 @@ test('root nodes can be removed', function (t) {
   })
 })
 
+test('root nodes return their siblings', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s, forest: true}).render()
+
+  s.on('end', function () {
+    t.deepEqual(tree.nextSibling(1001), tree.get(1002), 'root has the next sibling')
+    t.deepEqual(tree.previousSibling(1002), tree.get(1001), 'root has the previous sibling')
+    t.ok(!tree.previousSibling(1001), 'first root has no previous sibling')
+    t.ok(!tree.nextSibling(1002), 'last root has no next sibling')
+    t.end()
+  })
+})
+
 test('dnd allows a node to become a new root', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()

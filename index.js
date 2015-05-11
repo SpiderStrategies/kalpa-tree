@@ -264,6 +264,52 @@ Tree.prototype.children = function (obj) {
   })
 }
 
+
+/*
+ * Returns a node's siblings
+ */
+Tree.prototype._siblings = function (obj) {
+  var node = this._layout[typeof obj === 'object' ? obj.id : obj]
+    , children = node.parent ? node.parent._allChildren : this.options.forest ? this.root : []
+
+  return children
+}
+
+/*
+ * Returns an object with containing a node's siblings along with
+ * its index within those siblings
+ */
+Tree.prototype._indexOf = function (obj) {
+  var node = this._layout[typeof obj === 'object' ? obj.id : obj]
+    , siblings = this._siblings(obj)
+
+  return siblings.indexOf(node)
+}
+
+/*
+ * Returns a node's next sibling
+ */
+Tree.prototype.nextSibling = function (obj) {
+  var idx = this._indexOf(obj)
+
+  if (idx !== -1) {
+    var n = this._siblings(obj)[idx + 1]
+    return this.nodes[n && n.id]
+  }
+}
+
+/*
+ * Returns a node's previous sibling
+ */
+Tree.prototype.previousSibling = function (obj) {
+  var idx = this._indexOf(obj)
+
+  if (idx !== -1) {
+    var p = this._siblings(obj)[idx - 1]
+    return this.nodes[p && p.id]
+  }
+}
+
 /*
  * Selects a node in the tree. The node will be marked as selected and shown in the tree.
  *

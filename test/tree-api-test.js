@@ -39,6 +39,25 @@ test('children', function (t) {
   t.end()
 })
 
+test('siblings', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s, forest: true}).render()
+
+  s.on('end', function () {
+    t.ok(!tree.previousSibling(1001), 'root has no previous sibling')
+    t.ok(!tree.nextSibling(1001), 'root has no next sibling')
+
+    t.deepEqual(tree.nextSibling(1007), tree.get(1008), 'correct next sibling')
+    t.deepEqual(tree.previousSibling(1008), tree.get(1007), 'correct previous sibling')
+
+    tree.patch([{id: 1006, visible: false}, {id: 1007, visible: false}])
+    t.deepEqual(tree.nextSibling(1005), tree.get(1006), 'next sibling includes invisible nodes')
+    t.deepEqual(tree.previousSibling(1008), tree.get(1007), 'previous sibling includes invisible nodes')
+    tree.remove()
+    t.end()
+  })
+})
+
 test('selects a node', function (t) {
   var tree = new Tree({stream: stream()}).render()
   tree.select(1003)
