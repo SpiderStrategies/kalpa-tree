@@ -62,8 +62,8 @@ test('selects a node', function (t) {
   var tree = new Tree({stream: stream()}).render()
   tree.select(1003)
 
-  var selected = tree.getSelected()
-  t.deepEqual(selected, tree.get(1003), 'getSelected gives us the selected node')
+  var selected = tree.selected()
+  t.deepEqual(selected, tree.get(1003), 'selected gives us the selected node')
   t.ok(tree._layout[1003].selected,  '_layout selected node is selected')
   t.ok(tree._layout[1003].children, 'selected node is expanded')
 
@@ -73,7 +73,7 @@ test('selects a node', function (t) {
     tree.select(1004)
     // Make sure all ancestors of the selected node are also expanded.
     var leaf = tree._layout[1004]
-    t.equal(leaf.id, tree.getSelected().id, 'getSelected returns the correct node')
+    t.equal(leaf.id, tree.selected().id, 'selected returns the correct node')
     t.ok(leaf.parent.children, '01 has children')
     t.ok(leaf.parent.parent.children, 'P1 has children')
     t.ok(leaf.parent.parent.parent.children, 'Root has children')
@@ -180,8 +180,8 @@ test('getSelectedEl returns the selected node\'s dom element', function (t) {
 
   tree.select(1003)
 
-  var data = tree.getSelected()
-    , el = tree.getSelectedEl()
+  var data = tree.selected()
+    , el = tree.selectedEl()
 
   t.equal(data.label, el.querySelector('.label').innerHTML, 'selected dom node label is correct')
   tree.el.remove()
