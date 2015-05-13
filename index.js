@@ -372,7 +372,7 @@ Tree.prototype.get = function (id) {
 /*
  * Returns the currently selected node's data
  */
-Tree.prototype.getSelected = function () {
+Tree.prototype.selected = function () {
   if (!this._selected) {
     return
   }
@@ -383,7 +383,7 @@ Tree.prototype.getSelected = function () {
 /*
  * Returns the currently selected node's dom element
  */
-Tree.prototype.getSelectedEl = function () {
+Tree.prototype.selectedEl = function () {
   if (!this._selected) {
     return
   }
