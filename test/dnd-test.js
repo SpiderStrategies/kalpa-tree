@@ -138,13 +138,53 @@ test('drag changes data', function (t) {
   })
 })
 
+test('escape keypress cancels dnd', function (t) {
+  before(function (tree, dnd) {
+    var node = tree.node[0][3]
+      , data = tree._layout[1004]
+      , originalParent = data.parent.id
+      , originalIndex = data.parent._allChildren.indexOf(data)
+
+    tree.editable()
+    dnd.start.apply(node, [data, 3])
+    d3.event.y = 290
+    dnd.drag.apply(node, [data, 3])
+
+    d3.event.keyCode = 27
+    dnd._escape()
+
+    tree.on('move', function () {
+      t.fail('move should not have been called')
+    })
+
+    t.equal(data.parent.id, originalParent, 'original parent equal new parent')
+    t.equal(data.parent._allChildren.indexOf(data), originalIndex, 'original index equal new index')
+
+    t.end()
+  })
+})
+
 test('end cleans up', function (t) {
+  function keypress () {
+    var keyEvent = document.createEvent('KeyboardEvent')
+    keyEvent.initKeyboardEvent('keydown', true, false, null, 27, false, 27, false, 27, 27)
+    window.dispatchEvent(keyEvent)
+  }
+
   before(function (tree, dnd) {
     tree.editable()
+    var escapeCalls = 0
+    dnd._escape = function () {
+      escapeCalls++
+    }
     dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
     d3.event.y = tree._layout[1004]._y + 20// new y location
+    keypress()
     dnd.drag.apply(tree.node[0][3], [tree._layout[1004], 3])
     dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
+    keypress()
+
+    t.equal(escapeCalls, 1, 'end removes keydown listener')
     t.equal(tree.el.select('.traveling-node').size(), 0, 'traveling node is out of the dom')
     t.ok(!dnd.traveler, 'traveler is null')
     tree.remove()
