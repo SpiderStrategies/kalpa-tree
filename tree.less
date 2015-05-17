@@ -203,8 +203,6 @@
         }
 
         &.placeholder {
-          background-color: #2d3135 !important;
-
           * {
             display: none;
           }
@@ -241,6 +239,9 @@
     &.editable {
       &.dragging {
         li.node {
+          &.selected.placeholder {
+            background-color: inherit;
+          }
           .toggler {
             .lh-opacity(0) !important; // Never show the toggler when the user is dragging
           }
