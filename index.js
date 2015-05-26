@@ -336,6 +336,15 @@ Tree.prototype.move = function (node, to) {
   this._slide()
 }
 
+Tree.prototype._descendants = function (node) {
+  return [node].reduce(function reduce (p, c) {
+    if (c._allChildren) {
+      return p.concat(c._allChildren.reduce(reduce, [c]))
+    }
+    return p.concat(c)
+  }, [])
+}
+
 /*
  * Selects a node in the tree. The node will be marked as selected and shown in the tree.
  *
@@ -684,16 +693,11 @@ Tree.prototype.removeNode = function (obj) {
   delete this.nodes[_node.id]
   delete this._layout[_node.id]
 
-  // Cleanup child nodes
+  // cleanup nodes from `.nodes` and `._layout`
   var self = this
-  ;[_node].reduce(function reduce(p, c) {
-    if (c._allChildren) {
-      return p.concat(c._allChildren.reduce(reduce, []))
-    }
-    return p.concat(c.id)
-  }, []).forEach(function (id) {
-    delete self.nodes[id]
-    delete self._layout[id]
+  this._descendants(_node).forEach(function (node) {
+    delete self.nodes[node.id]
+    delete self._layout[node.id]
   })
 
   // Redraw

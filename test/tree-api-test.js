@@ -314,8 +314,8 @@ test('removes a node by id', function (t) {
     t.equal(Object.keys(tree._layout).length, data.length, 'starts with all nodes in layout')
 
     tree.removeNode(1002)
-    t.equal(Object.keys(tree.nodes).length, 10, 'nodes were removed from nodes')
-    t.equal(Object.keys(tree._layout).length, 10, 'nodes were removed from _layout')
+    t.equal(Object.keys(tree.nodes).length, 7, 'nodes were removed from nodes')
+    t.equal(Object.keys(tree._layout).length, 7, 'nodes were removed from _layout')
 
     setTimeout(function () {
       var node = el.querySelector('.tree ul li:nth-child(2)')
@@ -334,8 +334,8 @@ test('removes a node by data object', function (t) {
     process.nextTick(function () {
       var el = tree.el.node()
       tree.removeNode(tree.get(1002))
-      t.equal(Object.keys(tree.nodes).length, 10, 'nodes were removed from nodes')
-      t.equal(Object.keys(tree._layout).length, 10, 'nodes were removed from _layout')
+      t.equal(Object.keys(tree.nodes).length, 7, 'nodes were removed from nodes')
+      t.equal(Object.keys(tree._layout).length, 7, 'nodes were removed from _layout')
       tree.remove()
       t.end()
     })
