@@ -531,8 +531,6 @@ Tree.prototype.add = function (d, parent, idx) {
   this.nodes[d.id] = d
   this._layout[_d.id] = _d
 
-  _d.parent = parent
-
   if (typeof idx !== 'undefined') {
     parent._allChildren.splice(idx, 0, _d)
   } else {
