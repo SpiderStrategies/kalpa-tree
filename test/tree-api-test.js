@@ -58,6 +58,22 @@ test('siblings', function (t) {
   })
 })
 
+test('moves a node', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+     , el = tree.el.node()
+     , orgParent = tree._layout[1003].parent
+     , orgChildrenLength = orgParent._allChildren.length
+
+  tree.move(1003, 1025)
+
+  process.nextTick(function () {
+    t.equal(orgParent._allChildren.length, orgChildrenLength - 1, 'orginal parent is missing a child')
+    t.deepEqual(tree._layout[1003].parent, tree._layout[1025], 'moved node has new parent')
+    t.deepEqual(tree._layout[1025]._allChildren[tree._layout[1025]._allChildren.length -1], tree._layout[1003], '1003 was pushed to end of 1025')
+    t.end()
+  })
+})
+
 test('selects a node', function (t) {
   var tree = new Tree({stream: stream()}).render()
   tree.select(1003)

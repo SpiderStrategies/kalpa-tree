@@ -311,6 +311,32 @@ Tree.prototype.previousSibling = function (obj) {
 }
 
 /*
+ * Moves a node within the tree
+ * If to is missing and the tree is a forest, the node will be moved
+ * to a new root node of the forest tree
+ */
+Tree.prototype.move = function (node, to) {
+  var _node = this._layout[typeof node === 'object' ? node.id : node]
+
+  if (!node) {
+    return
+  }
+
+  var _to = this._layout[typeof to === 'object' ? to.id : to]
+
+  if (_to) {
+    this._removeFromParent(_node)
+    delete _to.collapsed
+    ;(_to._allChildren || (_to._allChildren = [])).push(_node)
+    this._expandAncestors(_to)
+  } else if (this.options.forest) {
+    this._removeFromParent(_node)
+    this.root.push(_node)
+  }
+  this._slide()
+}
+
+/*
  * Selects a node in the tree. The node will be marked as selected and shown in the tree.
  *
  * opt supports:
@@ -394,6 +420,19 @@ Tree.prototype.selectedEl = function () {
   }).node()
 }
 
+Tree.prototype._expandAncestors = function (d) {
+  // Make sure all ancestors are visible
+  ;(function e (node) {
+    if (!node) {
+      return
+    }
+    delete node.collapsed
+    if (node && node.parent) {
+      e(node.parent)
+    }
+  })(d.parent)
+}
+
 Tree.prototype._onSelect = function (d, i, j, opt) {
   if (d3.event && d3.event.defaultPrevented) {
     return  // click events were suppressed by dnd (presumably)
@@ -414,16 +453,7 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
   d.selected = true
   this._selected = d
 
-  // Make sure all ancestors are visible
-  ;(function e (node) {
-    if (!node) {
-      return
-    }
-    delete node.collapsed
-    if (node && node.parent) {
-      e(node.parent)
-    }
-  })(d.parent)
+  this._expandAncestors(d)
 
   if (toggle) {
     if (d._allChildren && d._allChildren.length > this.options.maxAnimatable) {
