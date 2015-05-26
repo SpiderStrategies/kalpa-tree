@@ -74,6 +74,24 @@ test('moves a node', function (t) {
   })
 })
 
+test('copies a node', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+     , el = tree.el.node()
+     , orgParent = tree._layout[1003].parent
+     , orgChildrenLength = orgParent._allChildren.length
+
+  tree.copy(1003, 1025, function (d) {
+    d.id = d.id + 10000
+    return d
+  })
+
+  process.nextTick(function () {
+    t.equal(orgParent._allChildren.length, orgChildrenLength, 'orginal parent has its children')
+    t.deepEqual(tree._layout[11003].parent, tree._layout[1025], 'moved node has new parent')
+    t.end()
+  })
+})
+
 test('selects a node', function (t) {
   var tree = new Tree({stream: stream()}).render()
   tree.select(1003)

@@ -8,6 +8,7 @@ var d3 = require('d3')
   , flyExit = require('./lib/fly-exit')
   , slideExit = require('./lib/slide-exit')
   , update = require('./lib/update')
+  , identity = function (v) { return v }
 
 var defaults = function () {
   return {
@@ -343,6 +344,63 @@ Tree.prototype._descendants = function (node) {
     }
     return p.concat(c)
   }, [])
+}
+
+/*
+ * Copies a node to some new parent. `transformer` can be used to transform
+ * each node that will be copied.
+ */
+Tree.prototype.copy = function (node, to, transformer) {
+  var _node = this._layout[typeof node === 'object' ? node.id : node]
+
+  if (!_node) {
+    return
+  }
+
+  // We need a clone of the node and the layout
+  var self = this
+    , _to = this._layout[typeof to === 'object' ? to.id : to]
+
+  this._descendants(_node)
+      .map(function (node) {
+        var result = {
+          transformed: (transformer || identity)(util._extend({}, self.nodes[node.id])),
+          originalId: node.id,
+          prevParent: self._layout[node.id].parent
+        }
+        return result
+      })
+      .forEach(function (node, i, all) {
+        var d = {
+          id: node.transformed.id
+        }
+        self._layout[node.transformed.id] = d
+        self.nodes[node.transformed.id] = node.transformed
+
+        if (i === 0) {
+          // Top node in the subtree (node that is being copied)
+          if (_to) {
+            ;(_to._allChildren || (_to._allChildren = [])).push(d)
+            self._expandAncestors(_to)
+            _to.collapsed = false
+          } else if (self.options.forest) {
+            self.root.push(d)
+          }
+        } else {
+          // Find the new parent id
+          var p = null
+
+          for (var j = i; j >= 0; j--) {
+            if (all[j].originalId === node.prevParent.id) {
+              p = self._layout[all[j].transformed.id]
+              break
+            }
+          }
+          d.parent = p
+          ;(p._allChildren || (p._allChildren = [])).push(d)
+        }
+      })
+  this._slide()
 }
 
 /*
