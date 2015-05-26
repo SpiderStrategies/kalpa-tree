@@ -621,6 +621,21 @@ Tree.prototype.remove = function () {
   this.el.remove()
 }
 
+Tree.prototype._removeFromParent = function (node) {
+  var parent = node.parent
+  if (parent) {
+    // Remove the child from parent
+    var i = parent._allChildren.indexOf(node)
+    if (i !== -1) {
+      parent._allChildren.splice(i, 1)
+    }
+  } else if (this.options.forest) {
+    this.root.splice(this.root.indexOf(node.id), 1)
+  }
+
+  return this
+}
+
 /*
  * Removes a node from the tree. obj can be the node id or the node itself
  */
@@ -632,23 +647,15 @@ Tree.prototype.removeNode = function (obj) {
   }
 
   var _node = this._layout[node.id]
-    , parent = _node.parent
-    , self = this
 
-  if (parent) {
-    // Remove the child from parent
-    parent._allChildren.splice(parent._allChildren.indexOf(_node), 1)
-  } else if (this.options.forest) {
-    this.root.splice(this.root.indexOf(this._layout[_node.id]), 1)
-    delete this.nodes[_node.id]
-    delete this._layout[_node.id]
-  }
+  this._removeFromParent(_node)
 
-  this._rebind()
-      .call(this.updater)
-      .call(this.slideExit, _node)
+  // Now clean up
+  delete this.nodes[_node.id]
+  delete this._layout[_node.id]
 
-    // Cleanup child nodes
+  // Cleanup child nodes
+  var self = this
   ;[_node].reduce(function reduce(p, c) {
     if (c._allChildren) {
       return p.concat(c._allChildren.reduce(reduce, []))
@@ -658,6 +665,11 @@ Tree.prototype.removeNode = function (obj) {
     delete self.nodes[id]
     delete self._layout[id]
   })
+
+  // Redraw
+  this._rebind()
+      .call(this.updater)
+      .call(this.slideExit, _node)
 }
 
 Tree.prototype.search = function (term) {
