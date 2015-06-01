@@ -58,6 +58,40 @@ test('siblings', function (t) {
   })
 })
 
+test('moves a node', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+     , el = tree.el.node()
+     , orgParent = tree._layout[1003].parent
+     , orgChildrenLength = orgParent._allChildren.length
+
+  tree.move(1003, 1025)
+
+  process.nextTick(function () {
+    t.equal(orgParent._allChildren.length, orgChildrenLength - 1, 'orginal parent is missing a child')
+    t.deepEqual(tree._layout[1003].parent, tree._layout[1025], 'moved node has new parent')
+    t.deepEqual(tree._layout[1025]._allChildren[tree._layout[1025]._allChildren.length -1], tree._layout[1003], '1003 was pushed to end of 1025')
+    t.end()
+  })
+})
+
+test('copies a node', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+     , el = tree.el.node()
+     , orgParent = tree._layout[1003].parent
+     , orgChildrenLength = orgParent._allChildren.length
+
+  tree.copy(1003, 1025, function (d) {
+    d.id = d.id + 10000
+    return d
+  })
+
+  process.nextTick(function () {
+    t.equal(orgParent._allChildren.length, orgChildrenLength, 'orginal parent has its children')
+    t.deepEqual(tree._layout[11003].parent, tree._layout[1025], 'moved node has new parent')
+    t.end()
+  })
+})
+
 test('selects a node', function (t) {
   var tree = new Tree({stream: stream()}).render()
   tree.select(1003)
@@ -298,8 +332,8 @@ test('removes a node by id', function (t) {
     t.equal(Object.keys(tree._layout).length, data.length, 'starts with all nodes in layout')
 
     tree.removeNode(1002)
-    t.equal(Object.keys(tree.nodes).length, 11, 'nodes were removed from nodes')
-    t.equal(Object.keys(tree._layout).length, 11, 'nodes were removed from _layout')
+    t.equal(Object.keys(tree.nodes).length, 7, 'nodes were removed from nodes')
+    t.equal(Object.keys(tree._layout).length, 7, 'nodes were removed from _layout')
 
     setTimeout(function () {
       var node = el.querySelector('.tree ul li:nth-child(2)')
@@ -318,8 +352,8 @@ test('removes a node by data object', function (t) {
     process.nextTick(function () {
       var el = tree.el.node()
       tree.removeNode(tree.get(1002))
-      t.equal(Object.keys(tree.nodes).length, 11, 'nodes were removed from nodes')
-      t.equal(Object.keys(tree._layout).length, 11, 'nodes were removed from _layout')
+      t.equal(Object.keys(tree.nodes).length, 7, 'nodes were removed from nodes')
+      t.equal(Object.keys(tree._layout).length, 7, 'nodes were removed from _layout')
       tree.remove()
       t.end()
     })

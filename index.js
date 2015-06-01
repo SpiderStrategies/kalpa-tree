@@ -8,6 +8,7 @@ var d3 = require('d3')
   , flyExit = require('./lib/fly-exit')
   , slideExit = require('./lib/slide-exit')
   , update = require('./lib/update')
+  , identity = function (v) { return v }
 
 var defaults = function () {
   return {
@@ -311,6 +312,98 @@ Tree.prototype.previousSibling = function (obj) {
 }
 
 /*
+ * Moves a node within the tree
+ * If to is missing and the tree is a forest, the node will be moved
+ * to a new root node of the forest tree
+ */
+Tree.prototype.move = function (node, to) {
+  var _node = this._layout[typeof node === 'object' ? node.id : node]
+
+  if (!node) {
+    return
+  }
+
+  var _to = this._layout[typeof to === 'object' ? to.id : to]
+
+  if (_to) {
+    this._removeFromParent(_node)
+    delete _to.collapsed
+    ;(_to._allChildren || (_to._allChildren = [])).push(_node)
+    this._expandAncestors(_to)
+  } else if (this.options.forest) {
+    this._removeFromParent(_node)
+    this.root.push(_node)
+  }
+  this._slide()
+}
+
+Tree.prototype._descendants = function (node) {
+  return [node].reduce(function reduce (p, c) {
+    if (c._allChildren) {
+      return p.concat(c._allChildren.reduce(reduce, [c]))
+    }
+    return p.concat(c)
+  }, [])
+}
+
+/*
+ * Copies a node to some new parent. `transformer` can be used to transform
+ * each node that will be copied.
+ */
+Tree.prototype.copy = function (node, to, transformer) {
+  var _node = this._layout[typeof node === 'object' ? node.id : node]
+
+  if (!_node) {
+    return
+  }
+
+  // We need a clone of the node and the layout
+  var self = this
+    , _to = this._layout[typeof to === 'object' ? to.id : to]
+
+  this._descendants(_node)
+      .map(function (node) {
+        var result = {
+          transformed: (transformer || identity)(util._extend({}, self.nodes[node.id])),
+          originalId: node.id,
+          prevParent: self._layout[node.id].parent
+        }
+        return result
+      })
+      .forEach(function (node, i, all) {
+        var d = {
+          id: node.transformed.id
+        }
+        self._layout[node.transformed.id] = d
+        self.nodes[node.transformed.id] = node.transformed
+
+        if (i === 0) {
+          // Top node in the subtree (node that is being copied)
+          if (_to) {
+            ;(_to._allChildren || (_to._allChildren = [])).push(d)
+            self._expandAncestors(_to)
+            _to.collapsed = false
+          } else if (self.options.forest) {
+            self.root.push(d)
+          }
+        } else {
+          // Find the new parent id
+          var p = null
+
+          for (var j = i; j >= 0; j--) {
+            if (all[j].originalId === node.prevParent.id) {
+              p = self._layout[all[j].transformed.id]
+              break
+            }
+          }
+          d.parent = p
+          ;(p._allChildren || (p._allChildren = [])).push(d)
+        }
+      })
+  this._slide()
+}
+
+/*
  * Selects a node in the tree. The node will be marked as selected and shown in the tree.
  *
  * opt supports:
@@ -394,6 +487,19 @@ Tree.prototype.selectedEl = function () {
   }).node()
 }
 
+Tree.prototype._expandAncestors = function (d) {
+  // Make sure all ancestors are visible
+  ;(function e (node) {
+    if (!node) {
+      return
+    }
+    delete node.collapsed
+    if (node && node.parent) {
+      e(node.parent)
+    }
+  })(d.parent)
+}
+
 Tree.prototype._onSelect = function (d, i, j, opt) {
   if (d3.event && d3.event.defaultPrevented) {
     return  // click events were suppressed by dnd (presumably)
@@ -414,16 +520,7 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
   d.selected = true
   this._selected = d
 
-  // Make sure all ancestors are visible
-  ;(function e (node) {
-    if (!node) {
-      return
-    }
-    delete node.collapsed
-    if (node && node.parent) {
-      e(node.parent)
-    }
-  })(d.parent)
+  this._expandAncestors(d)
 
   if (toggle) {
     if (d._allChildren && d._allChildren.length > this.options.maxAnimatable) {
@@ -491,8 +588,6 @@ Tree.prototype.add = function (d, parent, idx) {
 
   this.nodes[d.id] = d
   this._layout[_d.id] = _d
-
-  _d.parent = parent
 
   if (typeof idx !== 'undefined') {
     parent._allChildren.splice(idx, 0, _d)
@@ -621,6 +716,21 @@ Tree.prototype.remove = function () {
   this.el.remove()
 }
 
+Tree.prototype._removeFromParent = function (node) {
+  var parent = node.parent
+  if (parent) {
+    // Remove the child from parent
+    var i = parent._allChildren.indexOf(node)
+    if (i !== -1) {
+      parent._allChildren.splice(i, 1)
+    }
+  } else if (this.options.forest) {
+    this.root.splice(this.root.indexOf(node.id), 1)
+  }
+
+  return this
+}
+
 /*
  * Removes a node from the tree. obj can be the node id or the node itself
  */
@@ -632,32 +742,24 @@ Tree.prototype.removeNode = function (obj) {
   }
 
   var _node = this._layout[node.id]
-    , parent = _node.parent
-    , self = this
 
-  if (parent) {
-    // Remove the child from parent
-    parent._allChildren.splice(parent._allChildren.indexOf(_node), 1)
-  } else if (this.options.forest) {
-    this.root.splice(this.root.indexOf(this._layout[_node.id]), 1)
-    delete this.nodes[_node.id]
-    delete this._layout[_node.id]
-  }
+  this._removeFromParent(_node)
 
+  // Now clean up
+  delete this.nodes[_node.id]
+  delete this._layout[_node.id]
+
+  // cleanup nodes from `.nodes` and `._layout`
+  var self = this
+  this._descendants(_node).forEach(function (node) {
+    delete self.nodes[node.id]
+    delete self._layout[node.id]
+  })
+
+  // Redraw
   this._rebind()
       .call(this.updater)
       .call(this.slideExit, _node)
-
-    // Cleanup child nodes
-  ;[_node].reduce(function reduce(p, c) {
-    if (c._allChildren) {
-      return p.concat(c._allChildren.reduce(reduce, []))
-    }
-    return p.concat(c.id)
-  }, []).forEach(function (id) {
-    delete self.nodes[id]
-    delete self._layout[id]
-  })
 }
 
 Tree.prototype.search = function (term) {
