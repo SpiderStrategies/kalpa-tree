@@ -725,7 +725,7 @@ Tree.prototype._removeFromParent = function (node) {
       parent._allChildren.splice(i, 1)
     }
   } else if (this.options.forest) {
-    this.root.splice(this.root.indexOf(node.id), 1)
+    this.root.splice(this.root.indexOf(node), 1)
   }
 
   return this
