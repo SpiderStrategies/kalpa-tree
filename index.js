@@ -349,12 +349,20 @@ Tree.prototype._descendants = function (node) {
 /*
  * Copies a node to some new parent. `transformer` can be used to transform
  * each node that will be copied.
+ *
+ * If to is missing and the tree is a forest, the node will be copied
+ * to a new root node of the forest tree.
  */
 Tree.prototype.copy = function (node, to, transformer) {
   var _node = this._layout[typeof node === 'object' ? node.id : node]
 
   if (!_node) {
     return
+  }
+
+  if (!transformer) {
+    transformer = to
+    to = undefined
   }
 
   // We need a clone of the node and the layout
