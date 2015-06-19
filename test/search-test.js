@@ -46,3 +46,26 @@ test('search allows different characters', function (t) {
     t.end()
   })
 })
+
+test('search for null clears search', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  s.on('end', function () {
+    t.equal(tree.node.size(), 3, '3 initial nodes')
+    tree.search('M')
+    t.equal(tree.node.size(), 25, '25 nodes visible')
+    tree.search(null)
+    var clazzed = false
+    tree.node.each(function (n) {
+      if (d3.select(this).classed('search-result')) {
+        clazzed = true
+      }
+    })
+    t.ok(!clazzed, 'no nodes have search-result class')
+    t.equal(tree.node.size(), 3, '3 nodes visible')
+    tree.remove()
+    t.end()
+  })
+})
