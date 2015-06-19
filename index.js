@@ -1,5 +1,6 @@
 var d3 = require('d3')
   , EventEmitter = require('events').EventEmitter
+  , regexEscape = require('escape-string-regexp')
   , Stream = require('stream').Stream
   , util = require('util')
   , styles = window.getComputedStyle(document.documentElement, '')
@@ -771,7 +772,7 @@ Tree.prototype.removeNode = function (obj) {
 }
 
 Tree.prototype.search = function (term) {
-  var re = new RegExp(term, 'ig')
+  var re = new RegExp(regexEscape(term), 'ig')
     , self = this
     , data = Object.keys(this.nodes).filter(function (k) {
                re.lastIndex = 0
