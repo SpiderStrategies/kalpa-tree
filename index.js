@@ -772,6 +772,9 @@ Tree.prototype.removeNode = function (obj) {
 }
 
 Tree.prototype.search = function (term) {
+  if (term == null) {
+    return this.select((this._selected && this._selected.id) || (this.options.forest ? this.root[0].id : this.root.id))
+  }
   var re = new RegExp(regexEscape(term), 'ig')
     , self = this
     , data = Object.keys(this.nodes).filter(function (k) {
