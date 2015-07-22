@@ -1,8 +1,8 @@
-@import "node_modules/lesshat/build/lesshat-prefixed";
+@import "bourbon";
 
-@transition: 300ms ease-out;
+$transition: 300ms ease-out;
 
-.base-node() {
+@mixin base-node() {
   list-style: none;
   position: absolute;
   width: 100%;
@@ -13,7 +13,7 @@
 
   .node-contents {
     margin: 6px;
-    .lh-transition(transform @transition, opacity @transition);
+    @include transition(transform $transition, opacity $transition);
     margin-left: -6px;
     text-align: left;
     white-space: nowrap;
@@ -44,10 +44,10 @@
   height: 100%;
 
   .traveling-node {
-    .base-node;
+    @include base-node;
 
     background-color: #D9E2E8;
-    width: calc(~"100% + 15px");
+    width: calc(#{"100% + 15px"});
     cursor: pointer;
 
     &.forest-traveler {
@@ -85,16 +85,16 @@
     width: 100%;
     height: 100%;
 
-    .lh-user-select(none);
+    @include user-select(none);
 
     &.notransition {
       ul {
         li.node {
-          .lh-transition(none) !important;
+           @include transition(none !important);
           .node-contents {
-            .lh-transition(none) !important;
+            @include transition(none !important);
             .toggler {
-              .lh-transition(none) !important;
+              @include transition(none !important);
             }
           }
         }
@@ -115,7 +115,7 @@
     &:hover {
       // Don't show it for the root node on normal trees
       li.node:not(.root):not(.search-result) {
-        .toggler { .lh-opacity(1); }
+        .toggler { opacity: 1; }
       }
     }
 
@@ -123,11 +123,11 @@
       list-style-type: none;
       padding: 0px;
       margin: 0px;
-      .lh-translateX(0); // Specify 0 transform, otherwise we get overflow on nodes
+      @include transform(translateX(0)); // Specify 0 transform, otherwise we get overflow on nodes
 
       li.node {
-        .base-node;
-        .lh-transition(transform @transition, opacity @transition, height @transition);
+        @include base-node;
+        @include transition(transform $transition, opacity $transition, height $transition);
 
         &.transitioning-node {
           pointer-events: none;
@@ -140,10 +140,10 @@
             vertical-align: middle;
             width: 14px;
             height: 14px;
-            .lh-opacity(0);
-            .lh-transform(rotate(0deg));
-            .lh-transform-origin(7px 7px);
-            .lh-transition(all @transition);
+            opacity: 0;
+            @include transform(rotate(0deg));
+            @include transform-origin(7px 7px);
+            @include transition(all $transition);
 
             svg {
               position: absolute;
@@ -152,7 +152,7 @@
               fill: #818b8f;
             }
 
-            &.expanded { .lh-transform(rotate(90deg)); }
+            &.expanded { @include transform(rotate(90deg)); }
             &.leaf { visibility: hidden !important; }
           }
 
@@ -181,7 +181,7 @@
           height: 100%;
           top: 0;
           right: 0;
-          .lh-background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 90%));
+          @include background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 90%));
 
           &:after {
             content: "";
@@ -194,7 +194,7 @@
           }
 
           &.indicator {
-            .lh-background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 50%));
+            @include background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 50%));
           }
         }
 
@@ -226,10 +226,10 @@
 
           .label { color: #E1E8EB; }
           .label-mask {
-            .lh-background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 90%));
+            @include background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 90%));
 
             &.indicator {
-              .lh-background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 50%));
+              @include background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 50%));
             }
           }
         }
@@ -243,7 +243,7 @@
             background-color: inherit;
           }
           .toggler {
-            .lh-opacity(0) !important; // Never show the toggler when the user is dragging
+             opacity: 0 !important; // Never show the toggler when the user is dragging
           }
         }
       }
