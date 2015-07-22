@@ -4,14 +4,15 @@
   "description": "A Scoreboard tree rendered from a stream using d3",
   "main": "index.js",
   "dependencies": {
+    "bourbon": "^4.2.3",
     "d3": "^3.5.2",
     "escape-string-regexp": "^1.0.3",
-    "lesshat": "^3.0.2"
+    "node-bourbon": "^4.2.3",
+    "node-sass": "^3.2.0"
   },
   "devDependencies": {
     "JSONStream": "^0.10.0",
     "browserify": "^3.46.0",
-    "less": "^1.7.0",
     "lodash": "^2.4.1",
     "request": "^2.36.0",
     "tape": "^3.5.0",
@@ -20,9 +21,11 @@
   },
   "scripts": {
     "bundle": "browserify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
-    "watch": "watchify -r ./index.js:tree -r http -r JSONStream -o example/bundle.js -d",
+    "css": "mkdir dist  &> /dev/null && node-sass --include-path node_modules/bourbon/app/assets/stylesheets tree.scss > dist/tree.css",
+    "postinstall": "npm run css",
     "start": "node example/server.js",
-    "test": "testling && killall phantomjs &> /dev/null"
+    "test": "testling && killall phantomjs &> /dev/null",
+    "watch": "watchify -r ./index.js:tree -r http -r JSONStream -o example/bundle.js -d"
   },
   "repository": {
     "type": "git",

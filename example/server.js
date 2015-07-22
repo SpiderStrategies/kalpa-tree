@@ -3,6 +3,7 @@ var http = require('http')
   , url = require('url')
   , d3 = require('d3')
   , tree = require('./tree')
+  , sass = require('node-sass')
   , request = require('request')
   , spawn = require('child_process').spawn
 
@@ -13,10 +14,13 @@ http.createServer(function (req, res) {
   if (path == '/index.html' || path == '/') {
     return fs.createReadStream(__dirname + '/index.html').pipe(res)
   } else if (path == '/tree.css') {
-    res.writeHead(200, { 'Content-Type': 'text/css' })
-    var less = spawn('./node_modules/less/bin/lessc', ['-x', 'tree.less'])
-    less.stdout.pipe(res)
-    less.stderr.pipe(process.stderr)
+    sass.render({
+        file: './tree.scss',
+        includePaths: ['./node_modules/bourbon/app/assets/stylesheets/' ]
+      }, function (err, result) {
+      res.writeHead(200, { 'Content-Type': 'text/css' })
+        res.end(result.css)
+      })
   } else if (path === '/lots-o-docs.json') {
     return request('https://gist.githubusercontent.com/nathanbowser/7eda0518120d7bac6847/raw/c7de51421ef571232f2a2acb690edc2ba8261fac/gistfile1.json').pipe(res)
   } else if (path === '/documents.json') {
