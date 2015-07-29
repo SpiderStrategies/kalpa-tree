@@ -421,6 +421,10 @@ Tree.prototype.copy = function (node, to, transformer) {
  *    - animate: Disable animations
  */
 Tree.prototype.select = function (id, opt) {
+  // handle no-op selection quickly without messing with the dom
+  if (this._selected && this._selected.id == id) {
+    return
+  }
   opt = opt || {}
   if (typeof opt.toggleOnSelect === 'undefined') {
     opt.toggleOnSelect = this.options.toggleOnSelect
