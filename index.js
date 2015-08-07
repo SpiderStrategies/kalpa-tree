@@ -419,10 +419,11 @@ Tree.prototype.copy = function (node, to, transformer) {
  *    - silent: Don't fire the select event
  *    - toggleOnSelect: Don't toggle the node if it has children, just select it
  *    - animate: Disable animations
+ *    - force: Forces a select. Can be used to bypass the no-op selection if the node is already selected. This forces a redraw.
  */
 Tree.prototype.select = function (id, opt) {
   // handle no-op selection quickly without messing with the dom
-  if (this._selected && this._selected.id == id) {
+  if ((this._selected && this._selected.id == id) && opt.force != true) {
     return
   }
   opt = opt || {}
@@ -777,7 +778,7 @@ Tree.prototype.removeNode = function (obj) {
 
 Tree.prototype.search = function (term) {
   if (term == null) {
-    return this.select((this._selected && this._selected.id) || (this.options.forest ? this.root[0].id : this.root.id))
+    return this.select((this._selected && this._selected.id) || (this.options.forest ? this.root[0].id : this.root.id), {force: true})
   }
   var re = new RegExp(regexEscape(term), 'ig')
     , self = this
