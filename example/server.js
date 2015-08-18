@@ -28,7 +28,7 @@ http.createServer(function (req, res) {
   } else if (path === '/tree-patch.json') {
     return fs.createReadStream(__dirname + '/patch.json').pipe(res)
   } else if (path === '/matt-tree.json') {
-    request('https://gist.githubusercontent.com/nathanbowser/71f670f77defb15887da/raw/279ef40200750dbd4eac953814c7dabe5e6e1b8b/gistfile1.json').pipe(res)
+    request('https://gist.githubusercontent.com/mattsgarlata/7c3229e5bff6b72c4d2c/raw/7960e5c3cdf9b0234e7b2b5145632bb3d32b1e4a/tree.json').pipe(res)
   } else if (path == '/bundle.js') {
     res.writeHead(200, {'Content-Type': 'application/javascript'})
     return fs.createReadStream(__dirname + '/bundle.js').pipe(res)
