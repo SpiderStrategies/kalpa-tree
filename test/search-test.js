@@ -2,6 +2,7 @@ var test = require('tape').test
   , d3 = require('d3')
   , Tree = require('../')
   , stream = require('./tree-stream')
+  , Transform = require('stream').Transform
 
 test('search', function (t) {
   var s = stream()
@@ -43,6 +44,31 @@ test('search allows different characters', function (t) {
   s.on('end', function () {
     tree.search('as\\')
     t.equal(tree.node.size(), 0, '0 nodes visible')
+    t.end()
+  })
+})
+
+test('search ignores `visible: false` nodes', function (t) {
+  var map = new Transform( { objectMode: true } )
+    , hiddens = [1002, 1003, 1081]
+
+  map._transform = function(obj, encoding, done) {
+    if (hiddens.indexOf(obj.id) !== -1) {
+      obj.visible = false
+    }
+    this.push(obj)
+    done()
+  }
+
+  var s = stream().pipe(map)
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  s.on('end', function () {
+    t.equal(tree.node.size(), 2, '2 initial nodes')
+    tree.search('O1')
+    t.equal(tree.node.size(), 0, '0 nodes visible')
+    tree.remove()
     t.end()
   })
 })

@@ -780,11 +780,12 @@ Tree.prototype.search = function (term) {
   if (term == null) {
     return this.select((this._selected && this._selected.id) || (this.options.forest ? this.root[0].id : this.root.id), {force: true})
   }
+
   var re = new RegExp(regexEscape(term), 'ig')
     , self = this
     , data = Object.keys(this.nodes).filter(function (k) {
                re.lastIndex = 0
-               return re.test(self.nodes[k][self.options.accessors.label])
+               return re.test(self.nodes[k][self.options.accessors.label]) && self.nodes[k].visible !== false
              }).map(function (key, i) {
                var _d = self._layout[key]
                _d._x = 0
