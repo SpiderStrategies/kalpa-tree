@@ -541,7 +541,7 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
 
   this._expandAncestors(d)
 
-  var animate = d._allChildren && d._allChildren.length < this.options.maxAnimatable
+  var animate = this.node.size() < this.options.maxAnimatable
 
   if (toggle) {
     this._transitionWrap(this.toggle, animate)(d)
@@ -656,33 +656,40 @@ Tree.prototype._toggleAll = function (fn) {
     }
   })
 
-  var prev = this.node.size()
-    , selection = this._rebind()
-    , trans = !(selection[0].length > this.options.maxAnimatable || prev > this.options.maxAnimatable)
-
   this._transitionWrap(function () {
-    selection.call(this.enter, function (d) {
-               return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
-             })
-             .call(this.updater)
-             .call(this.flyExit, null, function (d) {
-               return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
-             })
-  }, trans)()
+    this._rebind()
+        .call(this.enter, function (d) {
+          return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
+        })
+        .call(this.updater)
+        .call(this.flyExit, null, function (d) {
+          return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
+        })
+  }, this._layout.length < this.options.maxAnimatable)()
 }
 
 Tree.prototype.expandAll = function () {
   console.profile()
+  var start = new Date()
   this._toggleAll(function (d) {
     delete d.collapsed
   })
-  console.profileEnd()
+  setTimeout(function() {
+    console.profileEnd()
+    console.log('expand all took ' + (new Date() - start) + ' ms')
+  }, 1)
 }
 
 Tree.prototype.collapseAll = function () {
+  console.profile()
+  var start = new Date()
   this._toggleAll(function (d) {
     d.collapsed = true
   })
+  setTimeout(function() {
+    console.profileEnd()
+    console.log('collapse all took ' + (new Date() - start) + ' ms')
+  }, 1)
 }
 
 /*
@@ -820,7 +827,7 @@ Tree.prototype.search = function (term) {
 Tree.prototype.toggle = function (d) {
   var _d = this._layout[d.id]
   _d.collapsed = !_d.collapsed
-  this._transitionWrap(this._fly, _d._allChildren && _d._allChildren.length < this.options.maxAnimatable)(_d)
+  this._transitionWrap(this._fly, this.node.size() < this.options.maxAnimatable)(_d)
 }
 
 module.exports = Tree
