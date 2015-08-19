@@ -170,14 +170,14 @@ test('renders without transitions', function (t) {
     , tree = new Tree({stream: s})
 
   tree.once('node', function () {
-    // By the time the first data event fires, the tree should have the 'notransition' class
-    t.ok(tree.el.select('.tree').classed('notransition'), 'tree nodes have notransition class applied')
+    // By the time the first data event fires, the tree should not have the 'transitions' class
+    t.ok(!tree.el.select('.tree').classed('transitions'), 'tree nodes do not have the transitions class applied')
   })
 
   tree.render()
   s.on('end', function () {
     // Once the tree has rendered, the class should have been removed
-    t.ok(!tree.node.classed('notransition'), 'tree nodes notransition class removed')
+    t.ok(!tree.node.classed('transitions'), 'tree nodes transitions class removed')
     tree.remove()
     t.end()
   })
@@ -209,10 +209,10 @@ test('disables animations if opts.maxAnimatable is exceeded', function (t) {
   s.on('end', function () {
     var toggler = tree.toggle
     tree.toggle = function () {
-      t.ok(tree.el.select('.tree').classed('notransition'), 'tree has notransition class applied')
+      t.ok(!tree.el.select('.tree').classed('transitions'), 'tree does not have transitions class applied')
       toggler.apply(tree, arguments)
       process.nextTick(function () {
-        t.ok(!tree.el.select('.tree').classed('notransition'), 'tree notransition class was removed after toggle')
+        t.ok(!tree.el.select('.tree').classed('transitions'), 'tree does not have transitions class after toggle')
         tree.remove()
         t.end()
       })

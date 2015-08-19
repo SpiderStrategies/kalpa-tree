@@ -13,7 +13,6 @@ $transition: 300ms ease-out;
 
   .node-contents {
     margin: 6px;
-    @include transition(transform $transition, opacity $transition);
     margin-left: -6px;
     text-align: left;
     white-space: nowrap;
@@ -87,14 +86,14 @@ $transition: 300ms ease-out;
 
     @include user-select(none);
 
-    &.notransition {
+    &.transitions {
       ul {
         li.node {
-           @include transition(none !important);
+           @include transition(transform $transition, opacity $transition, height $transition);
           .node-contents {
-            @include transition(none !important);
+            @include transition(transform $transition, opacity $transition);
             .toggler {
-              @include transition(none !important);
+              @include transition(all $transition);
             }
           }
         }
@@ -127,7 +126,6 @@ $transition: 300ms ease-out;
 
       li.node {
         @include base-node;
-        @include transition(transform $transition, opacity $transition, height $transition);
 
         &.transitioning-node {
           pointer-events: none;
@@ -143,7 +141,6 @@ $transition: 300ms ease-out;
             opacity: 0;
             @include transform(rotate(0deg));
             @include transform-origin(7px 7px);
-            @include transition(all $transition);
 
             svg {
               position: absolute;
