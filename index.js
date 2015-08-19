@@ -92,7 +92,7 @@ Tree.prototype.render = function () {
               .attr('class', 'tree-container')
 
   this.node = this.el.append('div')
-                       .attr('class', 'tree notransition') // set notransition initially until we have all the data
+                       .attr('class', 'tree')
                        .classed('forest-tree', this.options.forest)
                        .append('ul')
                          .selectAll('li.node')
@@ -143,8 +143,6 @@ Tree.prototype.render = function () {
   })
   .on('end', function () {
     self._fly()
-    self._forceRedraw()
-    self.el.select('.tree').classed('notransition', false)
   })
 
   return this
@@ -152,7 +150,7 @@ Tree.prototype.render = function () {
 
 /*
  * Forces a browser redraw. This is used if we're adding a node, and then
- * applying some transition. It makes sure that node is added to them, so the
+ * applying some transition. It makes sure that node is added to dom, so the
  * browser doesn't batch operations
  */
 Tree.prototype._forceRedraw = function () {
@@ -160,21 +158,28 @@ Tree.prototype._forceRedraw = function () {
 }
 
 /*
- * Makes some operation (fn) transitionless, by applying
- * the notransition class to the tree before the operation is performed,
+ * Makes some operation (fn) have transitions, by applying
+ * the transitions class to the tree before the operation is performed,
  * and then removing the class after the operation has finished
  */
 Tree.prototype._transitionWrap = function (fn, animate) {
   var self = this
   return function () {
-    if (animate === false) {
-      self.el.select('.tree').classed('notransition', true)
+    if (animate) {
+      self.el.select('.tree').classed('transitions', true)
     }
     var result = fn.apply(self, arguments)
-    if (animate === false) {
-      self._forceRedraw()
-      // so we can remove the notransition class after things were painted
-      self.el.select('.tree').classed('notransition', false)
+    if (animate) {
+      d3.selectAll('.node')
+        .on('webkitTransitionEnd', function () {
+          self.el.select('.tree').classed('transitions', false)
+        })
+        .on('oTransitionEnd', function () {
+          self.el.select('.tree').classed('transitions', false)
+        })
+        .on('transitionend', function () {
+          self.el.select('.tree').classed('transitions', false)
+        })
     }
     return result
   }
@@ -335,7 +340,7 @@ Tree.prototype.move = function (node, to) {
     this._removeFromParent(_node)
     this.root.push(_node)
   }
-  this._slide()
+  this._transitionWrap(this._slide, true)()
 }
 
 Tree.prototype._descendants = function (node) {
@@ -409,7 +414,7 @@ Tree.prototype.copy = function (node, to, transformer) {
           ;(p._allChildren || (p._allChildren = [])).push(d)
         }
       })
-  this._slide()
+  this._transitionWrap(this._slide, true)()
 }
 
 /*
@@ -433,8 +438,8 @@ Tree.prototype.select = function (id, opt) {
   var d = this._layout[id]
 
   if (d) {
-    // Disable animations if the node's parent is not visible and we're not already disabled (e.g. initial render)
-    if (d.parent && !this.el.select('.tree').classed('notransition')) {
+    // Disable animations if the node's parent is not visible
+    if (d.parent) {
       var visible = this.node.filter(function (_d) {
         return d.parent.id === _d.id
       }).size()
@@ -536,14 +541,12 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
 
   this._expandAncestors(d)
 
-  if (toggle) {
-    if (d._allChildren && d._allChildren.length > this.options.maxAnimatable) {
-      opt.animate = false
-    }
+  var animate = this.node.size() < this.options.maxAnimatable
 
-    this._transitionWrap(this.toggle, opt.animate)(d)
+  if (toggle) {
+    this._transitionWrap(this.toggle, animate)(d)
   } else {
-    this._fly(d)
+    this._transitionWrap(this._fly, animate)(d)
   }
 
   // Adjust selected properties
@@ -590,7 +593,7 @@ Tree.prototype.add = function (d, parent, idx) {
       this.root.push(_d)
     }
 
-    this._slide()
+    this._transitionWrap(this._slide, true)()
     return d
   } else if (parent) {
     parent = this._layout[typeof parent === 'object' ? parent.id : parent]
@@ -612,7 +615,7 @@ Tree.prototype.add = function (d, parent, idx) {
     parent._allChildren.push(_d)
   }
 
-  this._slide()
+  this._transitionWrap(this._slide, true)()
   return d
 }
 
@@ -637,7 +640,7 @@ Tree.prototype.editable = function () {
 Tree.prototype.edit = function (d) {
   if (d.id && this.nodes[d.id]) {
     this._patch(d)
-    this._slide(this._layout[d.id])
+    this._transitionWrap(this._slide, true)(this._layout[d.id])
   }
 }
 
@@ -653,31 +656,40 @@ Tree.prototype._toggleAll = function (fn) {
     }
   })
 
-  var prev = this.node.size()
-    , selection = this._rebind()
-    , notrans = selection[0].length > this.options.maxAnimatable || prev > this.options.maxAnimatable
-
   this._transitionWrap(function () {
-    selection.call(this.enter, function (d) {
-               return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
-             })
-             .call(this.updater)
-             .call(this.flyExit, null, function (d) {
-               return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
-             })
-  }, !notrans)()
+    this._rebind()
+        .call(this.enter, function (d) {
+          return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
+        })
+        .call(this.updater)
+        .call(this.flyExit, null, function (d) {
+          return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
+        })
+  }, this._layout.length < this.options.maxAnimatable)()
 }
 
 Tree.prototype.expandAll = function () {
+  console.profile()
+  var start = new Date()
   this._toggleAll(function (d) {
     delete d.collapsed
   })
+  setTimeout(function() {
+    console.profileEnd()
+    console.log('expand all took ' + (new Date() - start) + ' ms')
+  }, 1)
 }
 
 Tree.prototype.collapseAll = function () {
+  console.profile()
+  var start = new Date()
   this._toggleAll(function (d) {
     d.collapsed = true
   })
+  setTimeout(function() {
+    console.profileEnd()
+    console.log('collapse all took ' + (new Date() - start) + ' ms')
+  }, 1)
 }
 
 /*
@@ -691,11 +703,11 @@ Tree.prototype.patch = function (obj) {
          self._patch(d)
        })
        .on('end', function () {
-         self._slide()
+         self._transitionWrap(self._slide, true)()
        })
   } else if (Array.isArray(obj)) {
     obj.forEach(this._patch.bind(this))
-    self._slide()
+    self._transitionWrap(self._slide, true)()
   }
 }
 
@@ -771,9 +783,11 @@ Tree.prototype.removeNode = function (obj) {
   })
 
   // Redraw
-  this._rebind()
-      .call(this.updater)
-      .call(this.slideExit, _node)
+  this._transitionWrap((function () {
+    this._rebind()
+        .call(this.updater)
+        .call(this.slideExit, _node)
+  }).bind(this), true)()
 }
 
 Tree.prototype.search = function (term) {
@@ -793,15 +807,17 @@ Tree.prototype.search = function (term) {
                return _d
              })
 
-  this.node = this.node.data(data, function (d) {
-                         return d[self.options.accessors.id]
-                       })
-                       .call(this.enter)
-                       .call(this.updater)
-                       .call(function (selection) {
-                         selection.exit().remove() // No animations on exit
-                       })
-                       .classed('search-result', true)
+  this._transitionWrap((function () {
+      this.node = this.node.data(data, function (d) {
+                             return d[self.options.accessors.id]
+                           })
+                           .call(this.enter)
+                           .call(this.updater)
+                           .call(function (selection) {
+                             selection.exit().remove() // No animations on exit
+                           })
+                           .classed('search-result', true)
+  }).bind(this), true)()
 }
 
 /*
@@ -811,7 +827,7 @@ Tree.prototype.search = function (term) {
 Tree.prototype.toggle = function (d) {
   var _d = this._layout[d.id]
   _d.collapsed = !_d.collapsed
-  this._fly(_d)
+  this._transitionWrap(this._fly, this.node.size() < this.options.maxAnimatable)(_d)
 }
 
 module.exports = Tree
