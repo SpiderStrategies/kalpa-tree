@@ -162,15 +162,27 @@ Tree.prototype._forceRedraw = function () {
  * the transitions class to the tree before the operation is performed,
  * and then removing the class after the operation has finished
  */
-Tree.prototype._transitionWrap = function (fn) {
+Tree.prototype._transitionWrap = function (fn, animate) {
   var self = this
-  return function () {
-    self.el.select('.tree').classed('transitions', true)
+  return function (d) {
+    animate = typeof animate !== 'undefined' ? animate : self.node.size() < self.options.maxAnimatable
+
+    if (d && d._allChildren && d._allChildren.length > self.options.maxAnimatable) {
+      animate = false
+    }
+
+    if (animate) {
+      self.el.select('.tree').classed('transitions', true)
+    }
+
     var result = fn.apply(self, arguments)
-    d3.selectAll('.node')
-      .on('transitionend', function () {
-        self.el.select('.tree').classed('transitions', false)
-      })
+    if (animate) {
+      d3.selectAll('.node')
+        .on('transitionend', function () {
+          self.el.select('.tree').classed('transitions', false)
+        })
+    }
+
     return result
   }
 }
@@ -532,7 +544,7 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
   this._expandAncestors(d)
 
   if (toggle) {
-    this.toggle(d)
+    this.toggle(d, opt)
   } else {
     // We're not showing or hiding nodes, it will just be an update
     this._fly(d)
@@ -823,17 +835,11 @@ Tree.prototype.search = function (term) {
  * Used to toggle the node's children. If they are visible this will hide them, and
  * if they are hidden, this will show them.
  */
-Tree.prototype.toggle = function (d) {
+Tree.prototype.toggle = function (d, opt) {
   var _d = this._layout[d.id]
+  opt = opt || {}
   _d.collapsed = !_d.collapsed
-  var animate = this.node.size() < this.options.maxAnimatable
-                 && d._allChildren && d._allChildren.length < this.options.maxAnimatable
-  if (animate) {
-    this._transitionWrap(this._fly)(_d)
-  } else {
-    this._fly(d)
-  }
-
+  this._transitionWrap(this._fly, opt.animate)(_d)
 }
 
 module.exports = Tree
