@@ -116,18 +116,38 @@ test('selects a node', function (t) {
   }, 400)
 })
 
+test('select a node adds transitions by default', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    t.ok(!tree.el.select('.tree').classed('transitions'), 'tree el does not have transitions by default')
+    var toggler = tree.toggle
+    tree.toggle = function () {
+      toggler.apply(tree, arguments)
+      t.ok(tree.el.select('.tree').classed('transitions'), 'tree has transitions class applied')
+      process.nextTick(function () {
+        t.ok(!tree.el.select('.tree').classed('transition'), 'tree transitions class not there after toggle')
+        tree.el.remove()
+        t.end()
+      })
+    }
+    tree.select(1002)
+  })
+})
+
 test('selects a node without animations', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
   s.on('end', function () {
-    t.ok(!tree.el.select('.tree').classed('notransition'), 'tree el does not have notransition by default')
+    t.ok(!tree.el.select('.tree').classed('transitions'), 'tree el does not have transitions by default')
     var toggler = tree.toggle
     tree.toggle = function () {
-      t.ok(tree.el.select('.tree').classed('notransition'), 'tree has notransition class applied')
+      t.ok(!tree.el.select('.tree').classed('transitions'), 'tree does not have transitions class applied')
       toggler.apply(tree, arguments)
       process.nextTick(function () {
-        t.ok(!tree.el.select('.tree').classed('notransition'), 'tree notransition class was removed after toggle')
+        t.ok(!tree.el.select('.tree').classed('transition'), 'tree transitions class not there after toggle')
         tree.el.remove()
         t.end()
       })
@@ -172,7 +192,7 @@ test('select disables animations if selected node parent is not visible', functi
     process.nextTick(function () {
       var updater = tree.updater
       tree.updater = function () {
-        t.ok(tree.el.select('.tree').classed('notransition'), 'tree has notransition class applied')
+        t.ok(!tree.el.select('.tree').classed('transitions'), 'tree has does not have transitions class applied')
         updater.apply(tree, arguments)
         tree.el.remove()
         t.end()
@@ -261,15 +281,15 @@ test('expand all disables animations if there are too many nodes', function (t) 
     , tree = new Tree({stream: s, maxAnimatable: 3})
 
   s.on('end', function () {
-    // Wait for default end to remove notransition, which is applied on initial render
+    // Wait for default end to remove transitions, which is applied on initial render
     process.nextTick(function () {
-      t.ok(!tree.el.select('.tree').classed('notransition'), 'tree el does not have notransition')
+      t.ok(!tree.el.select('.tree').classed('transitions'), 'tree el does not have transitions')
       var updater = tree.updater
       tree.updater = function () {
-        t.ok(tree.el.select('.tree').classed('notransition'), 'tree has notransition class applied')
+        t.ok(!tree.el.select('.tree').classed('transitions'), 'tree has does not have transitions class applied')
         updater.apply(tree, arguments)
         process.nextTick(function () {
-          t.ok(!tree.el.select('.tree').classed('notransition'), 'tree notransition class was removed after toggle')
+          t.ok(!tree.el.select('.tree').classed('transitions'), 'tree transitions class not applied after toggle')
           tree.el.remove()
           t.end()
         })
@@ -302,13 +322,13 @@ test('collapse all disables animations if there are too many nodes alredy expand
     tree.select(1006)
     process.nextTick(function () {
       t.ok(tree.node.size() > 5, 'there are more nodes than our set maxAnimatable')
-      t.ok(!tree.el.select('.tree').classed('notransition'), 'tree el does not have notransition')
+      t.ok(!tree.el.select('.tree').classed('transitions'), 'tree el does not have transitions')
       var updater = tree.updater
       tree.updater = function () {
-        t.ok(tree.el.select('.tree').classed('notransition'), 'tree has notransition class applied')
+        t.ok(!tree.el.select('.tree').classed('transitions'), 'tree does not have transitions class applied')
         updater.apply(tree, arguments)
         process.nextTick(function () {
-          t.ok(!tree.el.select('.tree').classed('notransition'), 'tree notransition class was removed after toggle')
+          t.ok(!tree.el.select('.tree').classed('transitions'), 'tree transitions class not applied after toggle')
           tree.el.remove()
           t.end()
         })
