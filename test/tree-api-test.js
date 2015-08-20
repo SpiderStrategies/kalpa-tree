@@ -192,7 +192,7 @@ test('select disables animations if selected node parent is not visible', functi
     process.nextTick(function () {
       var updater = tree.updater
       tree.updater = function () {
-        t.ok(!tree.el.select('.tree').classed('transitions'), 'tree has does not have transitions class applied')
+        t.ok(!tree.el.select('.tree').classed('transitions'), 'tree does not have transitions class applied')
         updater.apply(tree, arguments)
         tree.el.remove()
         t.end()
@@ -286,7 +286,7 @@ test('expand all disables animations if there are too many nodes', function (t) 
       t.ok(!tree.el.select('.tree').classed('transitions'), 'tree el does not have transitions')
       var updater = tree.updater
       tree.updater = function () {
-        t.ok(!tree.el.select('.tree').classed('transitions'), 'tree has does not have transitions class applied')
+        t.ok(!tree.el.select('.tree').classed('transitions'), 'tree does not have transitions class applied')
         updater.apply(tree, arguments)
         process.nextTick(function () {
           t.ok(!tree.el.select('.tree').classed('transitions'), 'tree transitions class not applied after toggle')
