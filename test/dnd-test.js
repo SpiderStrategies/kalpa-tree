@@ -93,25 +93,28 @@ test('drag moves traveler', function (t) {
     var node = tree.node[0][3]
       , data = tree._layout[1004]
     tree.editable()
-    dnd.start.apply(node, [data, 3])
-    t.ok(dnd.timeout, 'timeout was set')
-    d3.event.y = data._y
-    dnd.drag.apply(node, [data, 3])
-    t.equal(tree.el.select('.traveling-node').datum()._y, data._y - tree.options.height / 2, 'traveler _y starts centered on the the src')
-    d3.event.y = data._y + 200// new y location
-    dnd.drag.apply(node, [data, 3])
-    t.ok(tree.el.select('.traveling-node').datum()._y > data._y, 'traveler _y moved down')
-    t.equal(tree.el.select('.traveling-node').datum().i, 8, 'moved down nodes')
-    t.equal(tree.el.select('.traveling-node').attr('style'), tree.prefix + 'transform: translate(0px, 290px); opacity: 1;', 'transform changed')
-    t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(60px,0px)', '60px y indentation')
-    d3.event.y = 290 // move the node up a little
-    dnd.drag.apply(node, [data, 3])
+    process.nextTick(function () {
+      dnd.start.apply(node, [data, 3])
+      t.ok(dnd.timeout, 'timeout was set')
+      d3.event.y = data._y
+      dnd.drag.apply(node, [data, 3])
+      t.equal(tree.el.select('.traveling-node').datum()._y, data._y - tree.options.height / 2, 'traveler _y starts centered on the the src')
+      d3.event.y = data._y + 200// new y location
+      dnd.drag.apply(node, [data, 3])
+      process.nextTick(function () {})
+      t.ok(tree.el.select('.traveling-node').datum()._y > data._y, 'traveler _y moved down')
+      t.equal(tree.el.select('.traveling-node').datum().i, 8, 'moved down nodes')
+      t.equal(tree.el.select('.traveling-node').attr('style'), tree.prefix + 'transform: translate(0px, 290px); opacity: 1;', 'transform changed')
+      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(60px,0px)', '60px y indentation')
+      d3.event.y = 290 // move the node up a little
+      dnd.drag.apply(node, [data, 3])
 
-    // now it should be embedded
-    t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(80px,0px)', '80px y indentation')
-    dnd.end.apply(node, [data, 3])
-    tree.remove()
-    t.end()
+      // now it should be embedded
+      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(80px,0px)', '80px y indentation')
+      dnd.end.apply(node, [data, 3])
+      tree.remove()
+      t.end()
+    })
   })
 })
 

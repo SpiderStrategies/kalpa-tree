@@ -191,33 +191,34 @@ test('dnd allows a node to become a new root', function (t) {
     , dnd = new Dnd(tree)
 
   s.on('end', function () {
-    var node = tree.node[0][2]
-      , data = tree._layout[1003]
-    d3.event = new Event
-    d3.event.sourceEvent = new Event
+    process.nextTick(function () {
+      var node = tree.node[0][2]
+        , data = tree._layout[1003]
+      d3.event = new Event
+      d3.event.sourceEvent = new Event
 
-    t.equal(tree.root.length, 2, 'two root nodes to start')
+      t.equal(tree.root.length, 2, 'two root nodes to start')
 
-    tree.editable()
-    dnd.start.apply(node, [data, 2])
-    d3.event.y = 5
-    dnd.drag.apply(node, [data, 2])
-    t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(0px,0px)', '0px y indentation')
+      tree.editable()
+      dnd.start.apply(node, [data, 2])
+      d3.event.y = 5
+      dnd.drag.apply(node, [data, 2])
+      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(0px,0px)', '0px y indentation')
 
-    tree.on('move', function (n, newParent, previousParent, newIndex, previousIndex) {
-      t.equal(n.id, 1003, 'moved node id matches 1003')
-      t.ok(!newParent, 'no new parent')
-      t.equal(previousParent.id, 1002, 'preview parent is 1002')
-      t.equal(newIndex, 0, 'new index 0')
-      t.equal(previousIndex, 0, 'prev index 0')
+      tree.on('move', function (n, newParent, previousParent, newIndex, previousIndex) {
+        t.equal(n.id, 1003, 'moved node id matches 1003')
+        t.ok(!newParent, 'no new parent')
+        t.equal(previousParent.id, 1002, 'preview parent is 1002')
+        t.equal(newIndex, 0, 'new index 0')
+        t.equal(previousIndex, 0, 'prev index 0')
 
-      t.equal(tree.root.length, 3, 'three root nodes')
-      t.deepEqual(tree.root[0], data, 'new first root is the node moved')
+        t.equal(tree.root.length, 3, 'three root nodes')
+        t.deepEqual(tree.root[0], data, 'new first root is the node moved')
 
-      tree.remove()
-      t.end()
+        tree.remove()
+        t.end()
+      })
+      dnd.end.apply(node, [data, 2])
     })
-    dnd.end.apply(node, [data, 2])
-
   })
 })

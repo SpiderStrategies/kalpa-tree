@@ -102,7 +102,7 @@ test('selects a node', function (t) {
   t.ok(tree._layout[1003].children, 'selected node is expanded')
 
   tree.collapseAll()
-  setTimeout(function () {
+  process.nextTick(function () {
     // wait for the tree to be collapsed, then select a deep leaf.
     tree.select(1004)
     // Make sure all ancestors of the selected node are also expanded.
@@ -113,7 +113,7 @@ test('selects a node', function (t) {
     t.ok(leaf.parent.parent.parent.children, 'Root has children')
     tree.el.remove()
     t.end()
-  }, 400)
+  })
 })
 
 test('select a node adds transitions by default', function (t) {
@@ -236,10 +236,11 @@ test('getSelectedEl returns the selected node\'s dom element', function (t) {
 
   var data = tree.selected()
     , el = tree.selectedEl()
-
-  t.equal(data.label, el.querySelector('.label').innerHTML, 'selected dom node label is correct')
-  tree.el.remove()
-  t.end()
+  process.nextTick(function () {
+    t.equal(data.label, el.querySelector('.label').innerHTML, 'selected dom node label is correct')
+    tree.el.remove()
+    t.end()
+  })
 })
 
 test('editable', function (t) {
@@ -574,21 +575,7 @@ test('toggle a specific node', function (t) {
   t.ok(tree._layout[1002].children, 'node should have children')
   t.ok(!tree._layout[1002]._children, 'node should not have hidden children')
   t.equal(el.querySelectorAll('.tree ul li').length, 8, 'root + children + first child expanded')
-  return t.end()
-  process.nextTick(function () {
-    t.equal(el.querySelector('.tree ul li:nth-child(4) .label').innerHTML, 'O1', 'P2 first child is visible')
-    // Now toggle again
-    tree.toggle(tree.get(1002))
-    t.ok(!tree._layout[1002].children, 'node should not have children')
-    t.ok(tree._layout[1002]._children, 'node should have hidden children')
-
-    // pause since exit has a 300 duration
-    setTimeout(function () {
-      t.equal(el.querySelectorAll('.tree ul li').length, 3, 'root + children visible')
-      tree.el.remove()
-      t.end()
-    }, 400)
-  })
+ t.end()
 })
 
 test('click toggler listener', function (t) {
@@ -596,14 +583,14 @@ test('click toggler listener', function (t) {
     , tree = new Tree({stream: s}, {})
 
   s.on('end', function () {
-    process.nextTick(function () {
+    setTimeout(function () {
       var node = tree._layout[1002]
       t.ok(!node.children, 'first child has hidden children')
       tree.node[0][1].querySelector('.toggler').click()
       t.ok(node.children, 'first child has children after click event')
       tree.remove()
       t.end()
-    })
+    }, 10)
   })
   tree.render()
 })
