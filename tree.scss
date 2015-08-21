@@ -211,6 +211,7 @@ $transition: 300ms ease-out;
 
         &.selected {
           background-color: #2d3135;
+          z-index: 1;
 
           &:before {
             content: "";
