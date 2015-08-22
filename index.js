@@ -676,8 +676,6 @@ Tree.prototype.expandAll = function () {
         .call(this.updater)
         .call(this.enter, function (d) {
           return 'translate(0px,' + d._y + 'px)'
-        }, function (d) {
-          return prefix + 'transform:' + 'translate(' + d._x + 'px,0px)'
         })
   }
 
