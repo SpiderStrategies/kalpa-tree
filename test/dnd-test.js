@@ -15,9 +15,9 @@ function before (next) {
 
 test('drag does not work if start is not called', function (t) {
   before(function (tree, dnd) {
-    t.ok(!tree.el.select('.tree').classed('dragging'), 'tree not marked as dragging')
+    t.ok(!dnd._dragging, 'tree not marked as dragging')
     dnd.drag()
-    t.ok(!tree.el.select('.tree').classed('dragging'), 'tree still not marked as dragging')
+    t.ok(!dnd._dragging, 'tree still not marked as dragging')
     tree.remove()
     t.end()
   })
@@ -25,12 +25,12 @@ test('drag does not work if start is not called', function (t) {
 
 test('dnd dependent on edit mode', function (t) {
   before(function (tree, dnd) {
-    t.ok(!tree.el.select('.tree').classed('dragging'), 'tree not marked as dragging')
+    t.ok(!dnd._dragging, 'tree not marked as dragging')
     dnd.start()
-    t.ok(!tree.el.select('.tree').classed('dragging'), 'tree still not marked as dragging')
+    t.ok(!dnd._dragging, 'tree still not marked as dragging')
     tree.editable()
     dnd.start({y: 0}) // set y to zero to prevent dragging
-    t.ok(tree.el.select('.tree').classed('dragging'), 'tree marked as dragging')
+    t.ok(dnd._dragging, 'tree marked as dragging')
     tree.remove()
     t.end()
   })
@@ -80,6 +80,7 @@ test('creates a traveler on first drag ', function (t) {
     t.ok(dnd.timeout, 'timeout was set')
     d3.event.y = tree._layout[1004]._y + 20// new y location
     dnd.drag.apply(tree.node[0][3], [tree._layout[1004], 3])
+    t.ok(tree.el.select('.tree').classed('dragging', true), 'tree has dragging class')
     t.ok(!dnd.timeout, 'timeout was cleared')
     t.ok(tree.el.select('.traveling-node').size(), 1, 'traveling node exists as a sibling')
     dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
@@ -184,7 +185,9 @@ test('end cleans up', function (t) {
     d3.event.y = tree._layout[1004]._y + 20// new y location
     keypress()
     dnd.drag.apply(tree.node[0][3], [tree._layout[1004], 3])
+    t.ok(tree.el.select('.tree').classed('dragging', true), 'tree has dragging class')
     dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
+    t.ok(tree.el.select('.tree').classed('dragging', true), 'tree not longer has dragging class')
     keypress()
 
     t.equal(escapeCalls, 1, 'end removes keydown listener')
