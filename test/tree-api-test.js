@@ -396,6 +396,24 @@ test('prevents add for a node w/ that id', function (t) {
   tree.render()
 })
 
+test('adds a node to a parent without children', function (t) {
+  var tree = new Tree({stream: stream()}).render()
+    , el = tree.el.node()
+
+  var d = tree.add({
+    id: 1001010101,
+    label: 'Newest node',
+    color: 'green',
+    nodeType: 'metric'
+  }, 1070)
+
+  process.nextTick(function () {
+    t.deepEqual(tree._layout[1001010101].parent, tree._layout[1070], 'new node\'s parent is correct')
+    t.equal(tree.nodes[1001010101], d, 'node was added to nodes')
+    t.end()
+  })
+})
+
 test('adds a node to a parent', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()
