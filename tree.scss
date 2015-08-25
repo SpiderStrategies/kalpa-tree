@@ -57,6 +57,7 @@ $transition: 300ms ease-out;
 
     .node-contents {
       margin-left: 6px;
+      @include transition(transform $transition, opacity $transition);
 
       .label {
         color: #2d3135;
