@@ -198,8 +198,10 @@ Tree.prototype._rebind = function () {
     data = this.root.reduce(function (p, subTree) {
                       return p.concat(self.tree.nodes(subTree))
                     }, [])
-  } else {
+  } else if (this.root) {
     data = this.tree.nodes(this.root)
+  } else {
+    data = []
   }
 
   this.node = this.node.data(data.map(function (d, i) {
@@ -598,9 +600,10 @@ Tree.prototype.add = function (d, parent, idx) {
     return d
   } else if (parent) {
     parent = this._layout[typeof parent === 'object' ? parent.id : parent]
-  }
-
-  if (!parent) {
+  } else if (!parent && !this.root) {
+    this.root = _d
+  } else {
+    // No parent, and not a new root node
     return
   }
 
@@ -610,7 +613,7 @@ Tree.prototype.add = function (d, parent, idx) {
 
   if (typeof idx !== 'undefined') {
     parent._allChildren.splice(idx, 0, _d)
-  } else {
+  } else if (parent) {
     if (!parent._allChildren) {
       parent._allChildren = []
     }
@@ -785,12 +788,18 @@ Tree.prototype.removeNode = function (obj) {
   delete this.nodes[_node.id]
   delete this._layout[_node.id]
 
+  if (node.id === this.root.id) {
+    delete this.root
+  }
+
   // cleanup nodes from `.nodes` and `._layout`
   var self = this
   this._descendants(_node).forEach(function (node) {
     delete self.nodes[node.id]
     delete self._layout[node.id]
   })
+
+  _node._allChildren = []
 
   // Redraw
   this._transitionWrap(function () {

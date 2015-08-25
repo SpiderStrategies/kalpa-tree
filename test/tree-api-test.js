@@ -382,6 +382,55 @@ test('removes a node by data object', function (t) {
   tree.render()
 })
 
+test('removes root', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s})
+
+  s.on('end', function () {
+    process.nextTick(function () {
+      var el = tree.el.node()
+      tree.removeNode(1001)
+      t.ok(!tree.root, 'root was removed')
+      t.equal(Object.keys(tree.nodes).length, 0, 'no nodes in tree.nodes')
+      t.equal(Object.keys(tree._layout).length, 0, 'no nodes in _layout')
+      setTimeout(function () {
+        t.equal(el.querySelectorAll('li').length, 0, 'no li nodes in tree')
+        tree.remove()
+        t.end()
+      }, 400)
+    })
+  })
+  tree.render()
+})
+
+test('adds a new root', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s})
+
+  s.on('end', function () {
+    process.nextTick(function () {
+      tree.removeNode(1001)
+      setTimeout(function () {
+        t.ok(!tree.root, 'root was removed')
+
+        tree.add({
+          id: 1001010101,
+          label: 'Newest root',
+          color: 'green',
+          nodeType: 'root'
+        })
+        t.equal(Object.keys(tree.nodes).length, 1, 'one node in tree.nodes')
+        t.equal(Object.keys(tree._layout).length, 1, 'one node in _layout')
+        t.equal(tree.el.node().querySelectorAll('li').length, 1, 'one li node in tree')
+        t.ok(tree.root, 'tree has a root')
+        tree.remove()
+        t.end()
+      }, 400)
+    })
+  })
+  tree.render()
+})
+
 test('prevents add for a node w/ that id', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
