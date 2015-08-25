@@ -13,6 +13,31 @@ function before (next) {
   next(tree, dnd)
 }
 
+test('fires dnd events', function (t) {
+  before(function (tree, dnd) {
+    tree.editable()
+    var calls = 0
+    tree.on('dndstart', function () {
+      calls++
+    })
+    tree.on('dndcancel', function () {
+      calls++
+    })
+    tree.on('dndstop', function () {
+      calls++
+    })
+    dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
+    d3.event.y = tree._layout[1004]._y + 20// new y location
+    dnd.drag.apply(tree.node[0][3], [tree._layout[1004], 3])
+    d3.event.keyCode = 27
+    dnd._escape()
+    tree.remove()
+
+    t.equal(calls, 3, 'all 3 events fired')
+    t.end()
+  })
+})
+
 test('drag does not work if start is not called', function (t) {
   before(function (tree, dnd) {
     t.ok(!dnd._dragging, 'tree not marked as dragging')
