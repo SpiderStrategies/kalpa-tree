@@ -604,6 +604,7 @@ Tree.prototype.add = function (d, parent, idx) {
     return
   }
 
+  _d.parent = parent
   this.nodes[d.id] = d
   this._layout[_d.id] = _d
 
