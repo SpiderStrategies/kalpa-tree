@@ -199,7 +199,7 @@ Tree.prototype._rebind = function () {
                       return p.concat(self.tree.nodes(subTree))
                     }, [])
   } else {
-    data = this.tree.nodes(this.root)
+    data = this.tree.nodes(this.root || {})
   }
 
   this.node = this.node.data(data.map(function (d, i) {
@@ -785,12 +785,18 @@ Tree.prototype.removeNode = function (obj) {
   delete this.nodes[_node.id]
   delete this._layout[_node.id]
 
+  if (node.id === this.root.id) {
+    delete this.root
+  }
+
   // cleanup nodes from `.nodes` and `._layout`
   var self = this
   this._descendants(_node).forEach(function (node) {
     delete self.nodes[node.id]
     delete self._layout[node.id]
   })
+
+  _node._allChildren = []
 
   // Redraw
   this._transitionWrap(function () {
