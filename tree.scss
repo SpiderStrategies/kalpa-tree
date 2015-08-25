@@ -213,7 +213,7 @@ $transition: 300ms ease-out;
           background-color: #2d3135;
           z-index: 1;
 
-          &:before {
+          &:not(.placeholder):before {
             content: "";
             left: 0;
             position: absolute;
