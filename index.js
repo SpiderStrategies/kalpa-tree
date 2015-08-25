@@ -198,8 +198,10 @@ Tree.prototype._rebind = function () {
     data = this.root.reduce(function (p, subTree) {
                       return p.concat(self.tree.nodes(subTree))
                     }, [])
+  } else if (this.root) {
+    data = this.tree.nodes(this.root)
   } else {
-    data = this.tree.nodes(this.root || {})
+    data = []
   }
 
   this.node = this.node.data(data.map(function (d, i) {
@@ -598,9 +600,10 @@ Tree.prototype.add = function (d, parent, idx) {
     return d
   } else if (parent) {
     parent = this._layout[typeof parent === 'object' ? parent.id : parent]
-  }
-
-  if (!parent) {
+  } else if (!parent && !this.root) {
+    this.root = _d
+  } else {
+    // No parent, and not a new root node
     return
   }
 
@@ -610,7 +613,7 @@ Tree.prototype.add = function (d, parent, idx) {
 
   if (typeof idx !== 'undefined') {
     parent._allChildren.splice(idx, 0, _d)
-  } else {
+  } else if (parent) {
     if (!parent._allChildren) {
       parent._allChildren = []
     }
