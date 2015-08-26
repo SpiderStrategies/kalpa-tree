@@ -669,8 +669,25 @@ Tree.prototype.expandAll = function () {
 
   if (Object.keys(this._layout).length < this.options.maxAnimatable) {
     this._transitionWrap(function () {
+      // Nodes will come in from their first visible ancestor. Grab a list of visible nodes
+      var visible = this.node[0].reduce(function (p, c) {
+                                  var _c = d3.select(c).datum()
+                                  p[_c.id] = _c._y
+                                  return p
+                                }, {})
+
       this._rebind().call(this.enter, function (d) {
-                      return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
+                      var y = (function p (node) {
+                        if (!node) {
+                          return 0
+                        }
+                        if (visible[node.id]) {
+                          return visible[node.id]
+                        }
+                        return p(node.parent)
+                      })(d.parent)
+
+                      return 'translate(0px,' + y + 'px)'
                     })
                     .call(this.updater)
     })()
