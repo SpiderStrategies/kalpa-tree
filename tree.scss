@@ -46,7 +46,7 @@ $transition: 300ms ease-out;
     @include base-node;
 
     background-color: #D9E2E8;
-    width: calc(#{"100% + 15px"});
+    width: calc(#{"100% + 13px"});
     cursor: pointer;
 
     &.forest-traveler {
@@ -56,7 +56,7 @@ $transition: 300ms ease-out;
     }
 
     .node-contents {
-      margin-left: 6px;
+      margin-left: 8px;
       @include transition(transform $transition, opacity $transition);
 
       .label {
