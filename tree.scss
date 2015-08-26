@@ -12,8 +12,7 @@ $transition: 300ms ease-out;
   overflow-x: hidden;
 
   .node-contents {
-    margin: 6px;
-    margin-left: -6px;
+    padding: 9px 6px; // not margin so that the mouse icon doesn't flicker on edges
     text-align: left;
     white-space: nowrap;
 
@@ -47,16 +46,10 @@ $transition: 300ms ease-out;
 
     background-color: #D9E2E8;
     width: calc(#{"100% + 13px"});
-    cursor: pointer;
-
-    &.forest-traveler {
-      .node-contents {
-        margin-left: 20px;
-      }
-    }
+    cursor: move;
 
     .node-contents {
-      margin-left: 8px;
+      padding-left: 20px;
       @include transition(transform $transition, opacity $transition);
 
       .label {
@@ -102,16 +95,6 @@ $transition: 300ms ease-out;
     }
 
     // Show the expand/collapse indicators on hover
-    &.forest-tree {
-      ul {
-        li.node {
-          .node-contents {
-            margin: 6px;
-          }
-        }
-      }
-    }
-
     &:hover {
       // Don't show it for the root node on normal trees
       li.node:not(.root):not(.search-result) {
@@ -127,13 +110,13 @@ $transition: 300ms ease-out;
 
       li.node {
         @include base-node;
+        cursor: pointer;
 
         &.transitioning-node {
           pointer-events: none;
         }
 
         .node-contents {
-
           .toggler {
             display: inline-block;
             vertical-align: middle;
@@ -152,23 +135,6 @@ $transition: 300ms ease-out;
 
             &.expanded { @include transform(rotate(90deg)); }
             &.leaf { visibility: hidden !important; }
-          }
-
-          svg.icon {
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: 4px;
-            width: 14px;
-            height: 14px;
-          }
-
-          .label {
-            display: inline-block;
-            vertical-align: middle;
-            margin-left: 8px;
-            color: #ADB8BC;
-            font-size: 13px;
-            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.23);
           }
         }
 
@@ -248,7 +214,7 @@ $transition: 300ms ease-out;
       }
 
       li.node {
-        cursor: pointer;
+        cursor: move;
 
         &:hover {
           &:after {
