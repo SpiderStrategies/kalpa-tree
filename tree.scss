@@ -12,7 +12,6 @@ $transition: 300ms ease-out;
   overflow-x: hidden;
 
   .node-contents {
-    padding: 9px 6px; // not margin so that the mouse icon doesn't flicker on edges
     font-size: 13px;
     line-height: 1; // automatically the same as font size
     text-align: left;
@@ -32,6 +31,7 @@ $transition: 300ms ease-out;
       margin-left: 8px;
       color: #ADB8BC;
       text-shadow: 0 1px 0 rgba(0, 0, 0, 0.23);
+      line-height: 36px;
     }
   }
 }
@@ -190,6 +190,9 @@ $transition: 300ms ease-out;
             background-color: #E1E8EB;
           }
 
+          svg.icon {
+            fill: #e1e8eb;
+          }
           .label { color: #E1E8EB; }
           .label-mask {
             @include background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 90%));
