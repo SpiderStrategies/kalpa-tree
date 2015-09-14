@@ -4,7 +4,7 @@
   "description": "A Scoreboard tree rendered from a stream using d3",
   "main": "index.js",
   "dependencies": {
-    "bourbon": "^4.2.3",
+    "bourbon": "^4.2.4",
     "d3": "^3.5.2",
     "escape-string-regexp": "^1.0.3",
     "node-sass": "^3.2.0"
