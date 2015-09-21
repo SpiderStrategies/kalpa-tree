@@ -115,6 +115,23 @@ test('root nodes return their siblings', function (t) {
   })
 })
 
+test('copies with explicit null to', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s, forest: true}).render()
+
+  t.equal(tree.root.length, 2, 'two root nodes')
+  tree.copy(1003, null, function (n) {
+    n.id *= 100
+    return n
+  })
+
+  process.nextTick(function () {
+    t.equal(tree.root.length, 3, 'three root nodes')
+    t.deepEqual(tree.root[2], tree._layout[100300], 'last root node is 100300')
+    t.end()
+  })
+})
+
 test('copies a node to a new root', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()

@@ -377,7 +377,7 @@ Tree.prototype.copy = function (node, to, transformer) {
 
   // We need a clone of the node and the layout
   var self = this
-    , _to = this._layout[typeof to === 'object' ? to.id : to]
+    , _to = this._layout[to && typeof to === 'object' ? to.id : to]
 
   this._descendants(_node)
       .map(function (node) {
