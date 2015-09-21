@@ -712,7 +712,16 @@ Tree.prototype.collapseAll = function () {
       this._rebind()
           .call(this.updater)
           .call(this.flyExit, null, function (d) {
-            return 'translate(0px,' + (d.parent ? d.parent._y : 0) + 'px)'
+            // Determine our top ancestor
+            var p = d.parent
+              , c = null
+
+            while (p.parent) {
+              c = p
+              p = p.parent
+            }
+            // Move this node to the ancestors location
+            return 'translate(0px,' + c._y + 'px)'
           })
     })()
   } else {
@@ -844,15 +853,15 @@ Tree.prototype.search = function (term) {
              })
 
   this._transitionWrap(function () {
-      this.node = this.node.data(data, function (d) {
-                             return d[self.options.accessors.id]
-                           })
-                           .call(this.enter)
-                           .call(this.updater)
-                           .call(function (selection) {
-                             selection.exit().remove() // No animations on exit
-                           })
-                           .classed('search-result', true)
+    this.node = this.node.data(data, function (d) {
+                           return d[self.options.accessors.id]
+                         })
+                         .call(this.enter)
+                         .call(this.updater)
+                         .call(function (selection) {
+                           selection.exit().remove() // No animations on exit
+                         })
+                         .classed('search-result', true)
   })()
 }
 
