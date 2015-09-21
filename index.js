@@ -844,15 +844,15 @@ Tree.prototype.search = function (term) {
              })
 
   this._transitionWrap(function () {
-      this.node = this.node.data(data, function (d) {
-                             return d[self.options.accessors.id]
-                           })
-                           .call(this.enter)
-                           .call(this.updater)
-                           .call(function (selection) {
-                             selection.exit().remove() // No animations on exit
-                           })
-                           .classed('search-result', true)
+    this.node = this.node.data(data, function (d) {
+                           return d[self.options.accessors.id]
+                         })
+                         .call(this.enter)
+                         .call(this.updater)
+                         .call(function (selection) {
+                           selection.exit().remove() // No animations on exit
+                         })
+                         .classed('search-result', true)
   })()
 }
 
