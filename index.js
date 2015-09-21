@@ -125,16 +125,16 @@ Tree.prototype.render = function () {
       ;(p._allChildren || (p._allChildren = [])).push(_n)
     } else {
       // Some type of root nodes. We treat those as expanded nodes
-      _n.collapsed = false
       if (self.options.forest) {
         self.root.push(_n)
       } else {
+        _n.collapsed = false
         self.root = _n
       }
     }
 
     if (self.options.initialSelection === _n.id) {
-      self.select(_n.id, { silent: true })
+      self.select(_n.id, { silent: true, animate: false })
     } else if (!_n.collapsed) {
       // we may need to draw the tree to show the incoming node
       self._fly()
