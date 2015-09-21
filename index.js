@@ -125,10 +125,10 @@ Tree.prototype.render = function () {
       ;(p._allChildren || (p._allChildren = [])).push(_n)
     } else {
       // Some type of root nodes. We treat those as expanded nodes
-      _n.collapsed = false
       if (self.options.forest) {
         self.root.push(_n)
       } else {
+        _n.collapsed = false
         self.root = _n
       }
     }

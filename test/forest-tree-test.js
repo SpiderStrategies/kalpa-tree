@@ -41,7 +41,7 @@ test('forest tree render populates multiple roots', function (t) {
     t.equal(Object.keys(tree.nodes).length, nodes.length, 'nodes contains all data')
     t.equal(Object.keys(tree._layout).length, nodes.length, '_layout contains all data')
     t.equal(tree.root.length, 2, 'two root nodes')
-    t.equal(tree.node[0].length, 4, '4 list elements displayed')
+    t.equal(tree.node[0].length, 2, '2 list elements displayed')
 
     var rootClz = false
     tree.node.each(function () {
@@ -68,7 +68,7 @@ test('allows addition of new root elements', function (t) {
     var totalNodes = Object.keys(tree.nodes).length
     tree.add({label: 'New root node', id: 1010})
     t.equal(tree.root.length, 3, 'three root nodes')
-    t.equal(tree.node[0].length, 5, '5 list elements displayed')
+    t.equal(tree.node[0].length, 3, '3 list elements displayed')
     t.equal(Object.keys(tree.nodes).length, totalNodes + 1, 'one more node added to all nodes')
     t.equal(Object.keys(tree.nodes).length, Object.keys(tree._layout).length, '.nodes length equal _layout length ')
     t.end()
@@ -169,8 +169,10 @@ test('dnd allows a root nodes to change order', function (t) {
     , dnd = new Dnd(tree)
 
   s.on('end', function () {
+    tree.select(1003, {animate: false})
     var node = tree.node[0][2]
       , data = tree._layout[1003]
+
     d3.event = new Event
     d3.event.sourceEvent = new Event
 
@@ -208,6 +210,8 @@ test('dnd allows a node to become a new root', function (t) {
     , dnd = new Dnd(tree)
 
   s.on('end', function () {
+    tree.select(1003, {animate: false})
+
     process.nextTick(function () {
       var node = tree.node[0][2]
         , data = tree._layout[1003]
