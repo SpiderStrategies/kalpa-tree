@@ -134,7 +134,7 @@ Tree.prototype.render = function () {
     }
 
     if (self.options.initialSelection === _n.id) {
-      self.select(_n.id, { silent: true })
+      self.select(_n.id, { silent: true, animate: false })
     } else if (!_n.collapsed) {
       // we may need to draw the tree to show the incoming node
       self._fly()
