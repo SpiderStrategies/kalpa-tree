@@ -695,10 +695,10 @@ Tree.prototype.expandAll = function () {
   } else {
     var prefix = this.prefix
     this._rebind()
-        .call(this.updater)
         .call(this.enter, function (d) {
           return 'translate(0px,' + d._y + 'px)'
         })
+        .call(this.updater)
   }
 
 }
