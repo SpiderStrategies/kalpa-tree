@@ -431,11 +431,12 @@ Tree.prototype.copy = function (node, to, transformer) {
  *    - force: Forces a select. Can be used to bypass the no-op selection if the node is already selected. This forces a redraw.
  */
 Tree.prototype.select = function (id, opt) {
+  opt = opt || {}
   // handle no-op selection quickly without messing with the dom
   if ((this._selected && this._selected.id == id) && opt.force != true) {
     return
   }
-  opt = opt || {}
+
   if (typeof opt.toggleOnSelect === 'undefined') {
     opt.toggleOnSelect = this.options.toggleOnSelect
   }
