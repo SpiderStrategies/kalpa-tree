@@ -50,7 +50,7 @@ $transition: 300ms ease-out;
     cursor: move;
 
     .node-contents {
-      padding-left: 20px;
+      padding-left: 14px;
       @include transition(transform $transition, opacity $transition);
 
       .label {
