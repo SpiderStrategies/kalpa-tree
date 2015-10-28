@@ -1,6 +1,6 @@
 {
   "name": "scoreboard-tree",
-  "version": "1.0.16",
+  "version": "1.0.17",
   "description": "A Scoreboard tree rendered from a stream using d3",
   "main": "index.js",
   "dependencies": {
