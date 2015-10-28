@@ -4,6 +4,24 @@ var test = require('tape').test
   , stream = require('./tree-stream')
   , Transform = require('stream').Transform
 
+test('search call is noop if not displaying search results', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  s.on('end', function () {
+    tree.select(1058)
+    t.equal(tree.node.size(), 8, '8 initial nodes')
+    tree.search()
+    t.equal(tree.node.size(), 8, '8 nodes displayed after search for null')
+    tree.search()
+    t.equal(tree.node.size(), 8, '8 nodes displayed because it should not toggle')
+
+    tree.remove()
+    t.end()
+  })
+})
+
 test('search', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
