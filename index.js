@@ -838,7 +838,9 @@ Tree.prototype.removeNode = function (obj) {
 
 Tree.prototype.search = function (term) {
   if (term == null) {
-    return this.select((this._selected && this._selected.id) || (this.options.forest ? this.root[0].id : this.root.id), {force: true})
+    return this.select((this._selected && this._selected.id) || (this.options.forest ? this.root[0].id : this.root.id), {
+      force: this.node.classed('search-result')
+    })
   }
 
   var re = new RegExp(regexEscape(term), 'ig')
