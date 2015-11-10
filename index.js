@@ -433,7 +433,7 @@ Tree.prototype.copy = function (node, to, transformer) {
 Tree.prototype.select = function (id, opt) {
   opt = opt || {}
   // handle no-op selection quickly without messing with the dom
-  if ((this._selected && this._selected.id == id) && opt.force != true) {
+  if ((this._selected && this._selected.id == id) && opt.force !== true) {
     return
   }
 
@@ -693,14 +693,12 @@ Tree.prototype.expandAll = function () {
                     .call(this.updater)
     })()
   } else {
-    var prefix = this.prefix
     this._rebind()
         .call(this.enter, function (d) {
           return 'translate(0px,' + d._y + 'px)'
         })
         .call(this.updater)
   }
-
 }
 
 Tree.prototype.collapseAll = function () {
