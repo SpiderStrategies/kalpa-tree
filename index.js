@@ -143,6 +143,7 @@ Tree.prototype.render = function () {
   })
   .on('end', function () {
     self._fly()
+    self.emit('end')
   })
 
   return this
