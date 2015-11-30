@@ -40,6 +40,21 @@ test('render populates data from stream', function (t) {
   t.end()
 })
 
+test('allows node drawing overrides', function (t) {
+  var tree = new Tree({
+    stream: stream(),
+    contents: function (selection) {
+      selection.append('div')
+               .attr('class', 'node-child')
+               .text(function (d) { return 'node-child-' + d.id })
+    }
+  }).render()
+
+  t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child')[0].innerHTML, '<div class="node-child">node-child-1001</div>', 'node contents overriden')
+  tree.remove()
+  t.end()
+})
+
 test('does not apply indicator class to label-mask by default', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()

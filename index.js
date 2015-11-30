@@ -19,6 +19,7 @@ var defaults = function () {
     maxAnimatable: 100, // Disable animations if a node has children greater than this amount
     indicator: false, // show indicator light nodes on the right
     forest: false, // Indicates whether this tree can have multiple root nodes
+    contents: require('./lib/contents'),
     accessors: {
       id: 'id',
       label: 'label',
