@@ -34,6 +34,8 @@ http.createServer(function (req, res) {
     return fs.createReadStream(__dirname + '/bundle.js').pipe(res)
   } else if (path == '/sms-tree.json') {
     return fs.createReadStream(__dirname + '/tree.json').pipe(res)
+  } else if (path == '/15-k-nodes.json') {
+    return fs.createReadStream(__dirname + '/15-k-nodes.json').pipe(res)
   } else if (path == '/tree.json') {
     res.end(JSON.stringify(d3.layout.tree().nodes(tree(_url.query.depth || 5)).map(function (n) {
       n.parentId = n.parent && n.parent.id
