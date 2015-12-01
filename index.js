@@ -168,8 +168,14 @@ Tree.prototype._transitionWrap = function (fn, animate) {
   return function (d) {
     animate = typeof animate !== 'undefined' ? animate : self.node.size() < self.options.maxAnimatable
 
-    if (d && d._allChildren && d._allChildren.length > self.options.maxAnimatable) {
-      animate = false
+    if (animate) {
+      // Check to make sure we're not going to show too many nodes by grabbing ALL of this node's children
+      // and summing that number with each child's visible descendants
+      var count = (d && d._allChildren || []).reduce(function (p, c) {
+                              p += self._descendants(c, 'children').length
+                              return p
+                     }, 0)
+      animate = count > self.options.maxAnimatable ? false : animate
     }
 
     if (animate) {
@@ -348,10 +354,13 @@ Tree.prototype.move = function (node, to) {
   this._transitionWrap(this._slide)()
 }
 
-Tree.prototype._descendants = function (node) {
+Tree.prototype._descendants = function (node, prop) {
+  if (!prop) {
+    prop = '_allChildren'
+  }
   return [node].reduce(function reduce (p, c) {
-    if (c._allChildren) {
-      return p.concat(c._allChildren.reduce(reduce, [c]))
+    if (c[prop]) {
+      return p.concat(c[prop].reduce(reduce, [c]))
     }
     return p.concat(c)
   }, [])
