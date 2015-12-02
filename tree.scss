@@ -1,6 +1,7 @@
 @import "bourbon";
 
-$transition: 300ms ease-out;
+$delay: 300ms;
+$timing-fn: ease-out;
 
 @mixin base-node() {
   list-style: none;
@@ -51,7 +52,9 @@ $transition: 300ms ease-out;
 
     .node-contents {
       padding-left: 14px;
-      @include transition(transform $transition, opacity $transition);
+      @include transition-property(transform, opacity);
+      @include transition-duration($delay);
+      @include transition-timing-function($timing-fn);
 
       .label {
         color: #2d3135;
@@ -84,11 +87,16 @@ $transition: 300ms ease-out;
     &.transitions {
       ul {
         li.node {
-           @include transition(transform $transition, opacity $transition, height $transition);
+           @include transition-property(transform, opacity, height);
+           @include transition-duration($delay);
+           @include transition-timing-function($timing-fn);
           .node-contents {
-            @include transition(transform $transition, opacity $transition);
+            @include transition-property(transform, opacity);
+            @include transition-duration($delay);
+            @include transition-timing-function($timing-fn);
+
             .toggler {
-              @include transition(all $transition);
+              @include transition(all $delay $timing-fn);
             }
           }
         }
