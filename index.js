@@ -746,16 +746,16 @@ Tree.prototype.collapseAll = function () {
  */
 Tree.prototype.patch = function (obj) {
   var self = this
-  if (obj instanceof Stream) {
+  if (Array.isArray(obj)) {
+    obj.forEach(this._patch.bind(this))
+    self._transitionWrap(self._slide)()
+  } else if (typeof obj.on === 'function' ) {
     obj.on('data', function (d) {
          self._patch(d)
        })
        .on('end', function () {
          self._transitionWrap(self._slide)()
        })
-  } else if (Array.isArray(obj)) {
-    obj.forEach(this._patch.bind(this))
-    self._transitionWrap(self._slide)()
   }
 }
 
