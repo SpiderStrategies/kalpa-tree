@@ -119,16 +119,17 @@ test('copies with explicit null to', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
 
-  t.equal(tree.root.length, 2, 'two root nodes')
-  tree.copy(1003, null, function (n) {
-    n.id *= 100
-    return n
-  })
-
-  process.nextTick(function () {
-    t.equal(tree.root.length, 3, 'three root nodes')
-    t.deepEqual(tree.root[2], tree._layout[100300], 'last root node is 100300')
-    t.end()
+  s.on('end', function (d) {
+    t.equal(tree.root.length, 2, 'two root nodes')
+    tree.copy(1003, null, function (n) {
+      n.id *= 100
+      return n
+    })
+    process.nextTick(function () {
+      t.equal(tree.root.length, 3, 'three root nodes')
+      t.deepEqual(tree.root[2], tree._layout[100300], 'last root node is 100300')
+      t.end()
+    })
   })
 })
 
@@ -136,16 +137,18 @@ test('copies a node to a new root', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
 
-  t.equal(tree.root.length, 2, 'two root nodes')
-  tree.copy(1003, function (n) {
-    n.id *= 100
-    return n
-  })
+  s.on('end', function () {
+    t.equal(tree.root.length, 2, 'two root nodes')
+    tree.copy(1003, function (n) {
+      n.id *= 100
+      return n
+    })
 
-  process.nextTick(function () {
-    t.equal(tree.root.length, 3, 'three root nodes')
-    t.deepEqual(tree.root[2], tree._layout[100300], 'last root node is 100300')
-    t.end()
+    process.nextTick(function () {
+      t.equal(tree.root.length, 3, 'three root nodes')
+      t.deepEqual(tree.root[2], tree._layout[100300], 'last root node is 100300')
+      t.end()
+    })
   })
 })
 
@@ -153,13 +156,15 @@ test('moves a node to a new root', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
 
-  tree.move(1003)
+  s.on('end', function () {
+    tree.move(1003)
 
-  process.nextTick(function () {
-    t.equal(tree.root.length, 3, 'three root nodes')
-    t.deepEqual(tree.root[2], tree._layout[1003], 'last root node is 1003')
-    t.equal(tree._layout[1002]._allChildren.length, 1, '1002 has one child')
-    t.end()
+    process.nextTick(function () {
+      t.equal(tree.root.length, 3, 'three root nodes')
+      t.deepEqual(tree.root[2], tree._layout[1003], 'last root node is 1003')
+      t.equal(tree._layout[1002]._allChildren.length, 1, '1002 has one child')
+      t.end()
+    })
   })
 })
 

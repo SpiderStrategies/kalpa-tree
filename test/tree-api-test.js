@@ -6,37 +6,48 @@ var test = require('tape').test
   , data = require('./tree.json')
 
 test('get', function (t) {
-  var tree = new Tree({stream: stream()}).render()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
 
-  t.deepEqual(tree.get(), tree.root, 'get returns root by default')
-  t.deepEqual(tree.get(1002), tree.nodes[1002], 'get returns a node by id')
-  t.ok(tree.get(1006), 'get returns nodes that are hidden')
-  tree.el.remove()
-  t.end()
+  s.on('end', function () {
+    t.deepEqual(tree.get(), tree.root, 'get returns root by default')
+    t.deepEqual(tree.get(1002), tree.nodes[1002], 'get returns a node by id')
+    t.ok(tree.get(1006), 'get returns nodes that are hidden')
+    tree.el.remove()
+    t.end()
+  })
 })
 
 test('parent', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-  t.deepEqual(tree.parent(1002), tree.get(1001), 'returns a nodes parent by id')
-  t.deepEqual(tree.parent(tree.get(1002)), tree.get(1001), 'returns a nodes parent by object')
-  t.ok(!tree.parent(1001), 'returns null for root')
-  tree.el.remove()
-  t.end()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    t.deepEqual(tree.parent(1002), tree.get(1001), 'returns a nodes parent by id')
+    t.deepEqual(tree.parent(tree.get(1002)), tree.get(1001), 'returns a nodes parent by object')
+    t.ok(!tree.parent(1001), 'returns null for root')
+    tree.el.remove()
+    t.end()
+  })
 })
 
 test('children', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-  t.equal(tree.children(1001).length, 2, 'root has two children')
-  t.equal(tree.children(1007).length, 0, 'a leaf has no children')
-  t.equal(tree.children(1058).length, 5, 'a collapsed node has children')
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
 
-  var children = tree.children(1003)
-  t.equal(children.length, 10, '1003 has ten children')
+  s.on('end', function () {
+    t.equal(tree.children(1001).length, 2, 'root has two children')
+    t.equal(tree.children(1007).length, 0, 'a leaf has no children')
+    t.equal(tree.children(1058).length, 5, 'a collapsed node has children')
 
-  tree.patch([{id: 1006, visible: false}, {id: 1007, visible: false}])
-  t.deepEqual(children, tree.children(1003), '1003 has the same number of children')
-  tree.el.remove()
-  t.end()
+    var children = tree.children(1003)
+    t.equal(children.length, 10, '1003 has ten children')
+
+    tree.patch([{id: 1006, visible: false}, {id: 1007, visible: false}])
+    t.deepEqual(children, tree.children(1003), '1003 has the same number of children')
+    tree.el.remove()
+    t.end()
+  })
 })
 
 test('siblings', function (t) {
@@ -59,60 +70,72 @@ test('siblings', function (t) {
 })
 
 test('moves a node', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-     , el = tree.el.node()
-     , orgParent = tree._layout[1003].parent
-     , orgChildrenLength = orgParent._allChildren.length
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+   , el = tree.el.node()
 
-  tree.move(1003, 1025)
+  s.on('end', function () {
+    var orgParent = tree._layout[1003].parent
+      , orgChildrenLength = orgParent._allChildren.length
 
-  process.nextTick(function () {
-    t.equal(orgParent._allChildren.length, orgChildrenLength - 1, 'orginal parent is missing a child')
-    t.deepEqual(tree._layout[1003].parent, tree._layout[1025], 'moved node has new parent')
-    t.deepEqual(tree._layout[1025]._allChildren[tree._layout[1025]._allChildren.length -1], tree._layout[1003], '1003 was pushed to end of 1025')
-    t.end()
+    tree.move(1003, 1025)
+
+    process.nextTick(function () {
+      t.equal(orgParent._allChildren.length, orgChildrenLength - 1, 'orginal parent is missing a child')
+      t.deepEqual(tree._layout[1003].parent, tree._layout[1025], 'moved node has new parent')
+      t.deepEqual(tree._layout[1025]._allChildren[tree._layout[1025]._allChildren.length -1], tree._layout[1003], '1003 was pushed to end of 1025')
+      t.end()
+    })
   })
 })
 
 test('copies a node', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-     , el = tree.el.node()
-     , orgParent = tree._layout[1003].parent
-     , orgChildrenLength = orgParent._allChildren.length
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
 
-  tree.copy(1003, 1025, function (d) {
-    d.id = d.id + 10000
-    return d
-  })
+  s.on('end', function () {
+    var orgParent = tree._layout[1003].parent
+       , orgChildrenLength = orgParent._allChildren.length
 
-  process.nextTick(function () {
-    t.equal(orgParent._allChildren.length, orgChildrenLength, 'orginal parent has its children')
-    t.deepEqual(tree._layout[11003].parent, tree._layout[1025], 'moved node has new parent')
-    t.end()
+    tree.copy(1003, 1025, function (d) {
+      d.id = d.id + 10000
+      return d
+    })
+
+    process.nextTick(function () {
+      t.equal(orgParent._allChildren.length, orgChildrenLength, 'orginal parent has its children')
+      t.deepEqual(tree._layout[11003].parent, tree._layout[1025], 'moved node has new parent')
+      t.end()
+    })
   })
 })
 
 test('selects a node', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-  tree.select(1003)
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
 
-  var selected = tree.selected()
-  t.deepEqual(selected, tree.get(1003), 'selected gives us the selected node')
-  t.ok(tree._layout[1003].selected,  '_layout selected node is selected')
-  t.ok(tree._layout[1003].children, 'selected node is expanded')
+  s.on('end', function () {
+    tree.select(1003)
 
-  tree.collapseAll()
-  process.nextTick(function () {
-    // wait for the tree to be collapsed, then select a deep leaf.
-    tree.select(1004)
-    // Make sure all ancestors of the selected node are also expanded.
-    var leaf = tree._layout[1004]
-    t.equal(leaf.id, tree.selected().id, 'selected returns the correct node')
-    t.ok(leaf.parent.children, '01 has children')
-    t.ok(leaf.parent.parent.children, 'P1 has children')
-    t.ok(leaf.parent.parent.parent.children, 'Root has children')
-    tree.el.remove()
-    t.end()
+    var selected = tree.selected()
+    t.deepEqual(selected, tree.get(1003), 'selected gives us the selected node')
+    t.ok(tree._layout[1003].selected,  '_layout selected node is selected')
+    t.ok(tree._layout[1003].children, 'selected node is expanded')
+
+    tree.collapseAll()
+    process.nextTick(function () {
+      // wait for the tree to be collapsed, then select a deep leaf.
+      tree.select(1004)
+      // Make sure all ancestors of the selected node are also expanded.
+      var leaf = tree._layout[1004]
+      t.equal(leaf.id, tree.selected().id, 'selected returns the correct node')
+      t.ok(leaf.parent.children, '01 has children')
+      t.ok(leaf.parent.parent.children, 'P1 has children')
+      t.ok(leaf.parent.parent.parent.children, 'Root has children')
+      tree.el.remove()
+      t.end()
+    })
   })
 })
 
@@ -157,31 +180,37 @@ test('selects a node without animations', function (t) {
 })
 
 test('select will not toggle an already expanded node', function (t) {
-  var tree = new Tree({stream: stream()}).render()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
 
-  tree.expandAll()
-  tree.select(1003)
-  t.ok(tree._layout[1003].children, 'previously expanded node is still expanded after select')
+  s.on('end', function () {
+    tree.expandAll()
+    tree.select(1003)
+    t.ok(tree._layout[1003].children, 'previously expanded node is still expanded after select')
 
-  tree.el.remove()
-  t.end()
+    tree.el.remove()
+    t.end()
+  })
 })
 
 test('selects a node with options', function (t) {
-  var tree = new Tree({stream: stream()}).render()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
     , calls = 0
 
-  tree.on('select', function (node) {
-    t.equal(node.label, 'O1', 'select event provides real node, not layout node')
-    t.equal(node.id, 1003, 'select node event is correct')
+  s.on('end', function () {
+    tree.on('select', function (node) {
+      t.equal(node.label, 'O1', 'select event provides real node, not layout node')
+      t.equal(node.id, 1003, 'select node event is correct')
+    })
+
+    tree.select(1058, {silent: true})
+    tree.select(1003, {toggleOnSelect: false})
+
+    t.ok(++calls, 1, 'select only fired once')
+    tree.el.remove()
+    t.end()
   })
-
-  tree.select(1058, {silent: true})
-  tree.select(1003, {toggleOnSelect: false})
-
-  t.ok(++calls, 1, 'select only fired once')
-  tree.el.remove()
-  t.end()
 })
 
 test('select disables animations if selected node parent is not visible', function (t) {
@@ -204,59 +233,73 @@ test('select disables animations if selected node parent is not visible', functi
 })
 
 test('select scrolls into view', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-  tree.el.select('.tree')
-           .style('overflow', 'auto')
-           .style('height', '36px')
-  document.body.appendChild(tree.el.node())
-  t.equal(tree.el.select('.tree').node().scrollTop, 0, 'scroll top is 0')
-  tree.select(1029, {animate: false})
-  t.ok(tree.el.select('.tree').node().scrollTop > 0, 'scroll top is larger than 0')
-  tree.remove()
-  t.end()
-})
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
 
-test('select does not scroll if node is within viewport', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-  tree.el.select('.tree')
-           .style('overflow', 'auto')
-           .style('height', '150px')
-
-  document.body.appendChild(tree.el.node())
-  tree.select(1058, {animate: false})
-  t.equal(tree.el.select('.tree').node().scrollTop, 0, 'scroll top is 0')
-  tree.remove()
-  t.end()
-})
-
-test('getSelectedEl returns the selected node\'s dom element', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-
-  tree.select(1003)
-
-  var data = tree.selected()
-    , el = tree.selectedEl()
-  process.nextTick(function () {
-    t.equal(data.label, el.querySelector('.label').innerHTML, 'selected dom node label is correct')
-    tree.el.remove()
+  s.on('end', function () {
+    tree.el.select('.tree')
+             .style('overflow', 'auto')
+             .style('height', '36px')
+    document.body.appendChild(tree.el.node())
+    t.equal(tree.el.select('.tree').node().scrollTop, 0, 'scroll top is 0')
+    tree.select(1029, {animate: false})
+    t.ok(tree.el.select('.tree').node().scrollTop > 0, 'scroll top is larger than 0')
+    tree.remove()
     t.end()
   })
 })
 
+test('select does not scroll if node is within viewport', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    tree.el.select('.tree')
+             .style('overflow', 'auto')
+             .style('height', '150px')
+
+    document.body.appendChild(tree.el.node())
+    tree.select(1058, {animate: false})
+    t.equal(tree.el.select('.tree').node().scrollTop, 0, 'scroll top is 0')
+    tree.remove()
+    t.end()
+  })
+})
+
+test('getSelectedEl returns the selected node\'s dom element', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    tree.select(1003)
+
+    var data = tree.selected()
+      , el = tree.selectedEl()
+    process.nextTick(function () {
+      t.equal(data.label, el.querySelector('.label').innerHTML, 'selected dom node label is correct')
+      tree.el.remove()
+      t.end()
+    })
+  })
+})
+
 test('editable', function (t) {
-  var tree = new Tree({stream: stream()}).render()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  tree.editable()
-  t.ok(el.querySelector('.tree.editable'), 'there is an tree editable object')
-  t.ok(tree.isEditable(), 'the tree is editable')
+  s.on('end', function () {
+    tree.editable()
+    t.ok(el.querySelector('.tree.editable'), 'there is an tree editable object')
+    t.ok(tree.isEditable(), 'the tree is editable')
 
-  tree.editable()
-  t.ok(!el.querySelector('.tree.editable'), 'there is not an tree editable object')
-  t.ok(!tree.isEditable(), 'the tree is not editable')
+    tree.editable()
+    t.ok(!el.querySelector('.tree.editable'), 'there is not an tree editable object')
+    t.ok(!tree.isEditable(), 'the tree is not editable')
 
-  tree.el.remove()
-  t.end()
+    tree.el.remove()
+    t.end()
+  })
 })
 
 test('expand all', function (t) {
@@ -446,104 +489,119 @@ test('prevents add for a node w/ that id', function (t) {
 })
 
 test('adds a node to a parent without children', function (t) {
-  var tree = new Tree({stream: stream()}).render()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  var d = tree.add({
-    id: 1001010101,
-    label: 'Newest node',
-    color: 'green',
-    nodeType: 'metric'
-  }, 1070)
+  s.on('end', function () {
+    var d = tree.add({
+      id: 1001010101,
+      label: 'Newest node',
+      color: 'green',
+      nodeType: 'metric'
+    }, 1070)
 
-  process.nextTick(function () {
-    t.deepEqual(tree._layout[1001010101].parent, tree._layout[1070], 'new node\'s parent is correct')
-    t.equal(tree.nodes[1001010101], d, 'node was added to nodes')
-    t.end()
+    process.nextTick(function () {
+      t.deepEqual(tree._layout[1001010101].parent, tree._layout[1070], 'new node\'s parent is correct')
+      t.equal(tree.nodes[1001010101], d, 'node was added to nodes')
+      t.end()
+    })
   })
 })
 
 test('adds a node to a parent', function (t) {
-  var tree = new Tree({stream: stream()}).render()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  tree.expandAll()
+  s.on('end', function () {
+    tree.expandAll()
 
-  var d = tree.add({
-    id: 3020,
-    label: 'Newest node',
-    color: 'green',
-    nodeType: 'metric'
-  }, 1003)
+    var d = tree.add({
+      id: 3020,
+      label: 'Newest node',
+      color: 'green',
+      nodeType: 'metric'
+    }, 1003)
 
-  process.nextTick(function () {
-    t.deepEqual(tree._layout[3020].parent, tree._layout[1003], 'new node\'s parent is correct')
-    t.equal(tree.nodes[3020], d, 'node was added to nodes')
-    t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node', 'new node label is correct')
-    t.end()
+    process.nextTick(function () {
+      t.deepEqual(tree._layout[3020].parent, tree._layout[1003], 'new node\'s parent is correct')
+      t.equal(tree.nodes[3020], d, 'node was added to nodes')
+      t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node', 'new node label is correct')
+      t.end()
+    })
   })
 })
 
 test('adds a node to a parent and before sibling', function (t) {
-  var tree = new Tree({stream: stream()}).render()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  tree.expandAll()
+  s.on('end', function () {
+    tree.expandAll()
 
-  var d = tree.add({
-    id: 3020,
-    label: 'Newest node sibling',
-    color: 'green',
-    nodeType: 'metric'
-  }, 1003, 1) // Add as the second node
+    var d = tree.add({
+      id: 3020,
+      label: 'Newest node sibling',
+      color: 'green',
+      nodeType: 'metric'
+    }, 1003, 1) // Add as the second node
 
-  process.nextTick(function () {
-    t.equal(tree._layout[1003].children.indexOf(tree._layout[3020]), 1, 'new node index is correct in parent\'s children')
-    t.deepEqual(tree._layout[3020].parent.children[2], tree._layout[1005], 'sibling 1005 is after the new node')
-    t.equal(tree.nodes[3020], d, 'stored the node in nodes')
-    t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node sibling', 'new node label is correct')
-    t.end()
+    process.nextTick(function () {
+      t.equal(tree._layout[1003].children.indexOf(tree._layout[3020]), 1, 'new node index is correct in parent\'s children')
+      t.deepEqual(tree._layout[3020].parent.children[2], tree._layout[1005], 'sibling 1005 is after the new node')
+      t.equal(tree.nodes[3020], d, 'stored the node in nodes')
+      t.equal(el.querySelector('.tree ul li:last-child .label').innerHTML, 'Newest node sibling', 'new node label is correct')
+      t.end()
+    })
   })
 })
 
 test('edits a node', function (t) {
-  var tree = new Tree({stream: stream()}).render()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  tree.edit({
-    id: 1001,
-    label: 'New label for root',
-    color: 'green'
-  })
+  s.on('end', function () {
+    tree.edit({
+      id: 1001,
+      label: 'New label for root',
+      color: 'green'
+    })
 
-  var d = tree.get(1001)
-  t.equal(d.label, 'New label for root', 'label changed')
-  t.equal(d.color, 'green', 'color changed')
-  t.equal(d.nodeType, 'root', 'nodeType remained the same')
+    var d = tree.get(1001)
+    t.equal(d.label, 'New label for root', 'label changed')
+    t.equal(d.color, 'green', 'color changed')
+    t.equal(d.nodeType, 'root', 'nodeType remained the same')
 
-  process.nextTick(function () {
-    t.equal(el.querySelector('.tree ul li:nth-child(1) .label').innerHTML, 'New label for root', 'dom label changed')
-    t.end()
+    process.nextTick(function () {
+      t.equal(el.querySelector('.tree ul li:nth-child(1) .label').innerHTML, 'New label for root', 'dom label changed')
+      t.end()
+    })
   })
 })
 
 test('patch the tree by array of changes', function (t) {
-  var tree = new Tree({stream: stream(), indicator: true}).render()
+  var s = stream()
+    , tree = new Tree({stream: s, indicator: true}).render()
     , el = tree.el.node()
 
-  tree.patch([{id: 1002, color: 'red', nodeType: 'perspective', label: 'Patched 1002'}])
+  s.on('end', function () {
+    tree.patch([{id: 1002, color: 'red', nodeType: 'perspective', label: 'Patched 1002'}])
 
-  var d = tree.get(1002)
-  t.equal(d.label, 'Patched 1002', 'labels are equal')
-  t.equal(d.color, 'red', 'colors are equal')
-  t.equal(d.nodeType, 'perspective', 'nodeType changed')
+    var d = tree.get(1002)
+    t.equal(d.label, 'Patched 1002', 'labels are equal')
+    t.equal(d.color, 'red', 'colors are equal')
+    t.equal(d.nodeType, 'perspective', 'nodeType changed')
 
-  process.nextTick(function () {
-    var node = el.querySelector('.tree ul li:nth-child(2)')
-    t.equal(node.querySelector('.label').innerHTML, 'Patched 1002', 'dom label changed')
-    t.ok(node.querySelector('.indicator.red'), 'red indicator exists')
-    tree.remove()
-    t.end()
+    process.nextTick(function () {
+      var node = el.querySelector('.tree ul li:nth-child(2)')
+      t.equal(node.querySelector('.label').innerHTML, 'Patched 1002', 'dom label changed')
+      t.ok(node.querySelector('.indicator.red'), 'red indicator exists')
+      tree.remove()
+      t.end()
+    })
   })
 })
 
@@ -614,7 +672,8 @@ test('patch visibility toggling', function (t) {
 })
 
 test('patch the tree with stream of data events containing the changes', function (t) {
-  var tree = new Tree({stream: stream()}).render()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
     , patchStream = new Readable({objectMode: true})
     , i = 1002
@@ -626,23 +685,31 @@ test('patch the tree with stream of data events containing the changes', functio
     }
     patchStream.push(null)
   }
-  tree.patch(patchStream)
-  t.equal(tree.get(1002).label, 'Patched 1002', '1002 labels are equal')
-  t.equal(tree.get(1003).label, 'Patched 1003', '1003 labels are equal')
-  tree.remove()
-  t.end()
+
+  s.on('end', function () {
+    patchStream.on('end', function () {
+      t.equal(tree.get(1002).label, 'Patched 1002', '1002 labels are equal')
+      t.equal(tree.get(1003).label, 'Patched 1003', '1003 labels are equal')
+      tree.remove()
+      t.end()
+    })
+    tree.patch(patchStream)
+  })
 })
 
 test('toggle a specific node', function (t) {
-  var tree = new Tree({stream: stream()}).render()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  var d = tree.get(1002)
-  tree.toggle(d) // 1002 is the first child of root
-  t.ok(tree._layout[1002].children, 'node should have children')
-  t.ok(!tree._layout[1002]._children, 'node should not have hidden children')
-  t.equal(el.querySelectorAll('.tree ul li').length, 8, 'root + children + first child expanded')
- t.end()
+  s.on('end', function () {
+    var d = tree.get(1002)
+    tree.toggle(d) // 1002 is the first child of root
+    t.ok(tree._layout[1002].children, 'node should have children')
+    t.ok(!tree._layout[1002]._children, 'node should not have hidden children')
+    t.equal(el.querySelectorAll('.tree ul li').length, 8, 'root + children + first child expanded')
+    t.end()
+  })
 })
 
 test('click toggler listener', function (t) {

@@ -34,15 +34,20 @@ test('emits node events', function (t) {
 })
 
 test('render populates data from stream', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-  t.equal(Object.keys(tree.nodes).length, data.length, 'nodes contains all data')
-  tree.remove()
-  t.end()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    t.equal(Object.keys(tree.nodes).length, data.length, 'nodes contains all data')
+    tree.remove()
+    t.end()
+  })
 })
 
 test('allows node drawing overrides', function (t) {
-  var tree = new Tree({
-    stream: stream(),
+  var s = stream()
+    , tree = new Tree({
+    stream: s,
     contents: function (selection) {
       selection.append('div')
                .attr('class', 'node-child')
@@ -50,18 +55,24 @@ test('allows node drawing overrides', function (t) {
     }
   }).render()
 
-  t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child')[0].innerHTML, '<div class="node-child">node-child-1001</div>', 'node contents overriden')
-  tree.remove()
-  t.end()
+  s.on('end', function () {
+    t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child')[0].innerHTML, '<div class="node-child">node-child-1001</div>', 'node contents overriden')
+    tree.remove()
+    t.end()
+  })
 })
 
 test('does not apply indicator class to label-mask by default', function (t) {
-  var tree = new Tree({stream: stream()}).render()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
-  t.equal(el.querySelectorAll('.tree ul li:first-child .label-mask').length, 1, 'we have a label mask')
-  t.equal(el.querySelectorAll('.tree ul li:first-child .label-mask.indicator').length, 0, 'label mask is missing an indicator class')
-  tree.remove()
-  t.end()
+
+  s.on('end', function () {
+    t.equal(el.querySelectorAll('.tree ul li:first-child .label-mask').length, 1, 'we have a label mask')
+    t.equal(el.querySelectorAll('.tree ul li:first-child .label-mask.indicator').length, 0, 'label mask is missing an indicator class')
+    tree.remove()
+    t.end()
+  })
 })
 
 test('render populates and hides visible: false nodes', function (t) {
@@ -113,15 +124,19 @@ test('displays root and its children by default', function (t) {
 })
 
 test('root node has a class of root', function (t) {
-  var tree = new Tree({stream: stream()}).render()
-  t.ok(d3.select(tree.node[0][0]).classed('root'), 'root node has root class')
-  tree.node.each(function (d, i) {
-    if (i !== 0) {
-      t.ok(!d3.select(this).classed('root'), 'non root nodes do not have root class')
-    }
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    t.ok(d3.select(tree.node[0][0]).classed('root'), 'root node has root class')
+    tree.node.each(function (d, i) {
+      if (i !== 0) {
+        t.ok(!d3.select(this).classed('root'), 'non root nodes do not have root class')
+      }
+    })
+    tree.remove()
+    t.end()
   })
-  tree.remove()
-  t.end()
 })
 
 test('displays a node as selected on render', function (t) {

@@ -4,13 +4,17 @@ var test = require('tape').test
   , Dnd = require('../lib/dnd')
 
 function before (next) {
-  var tree = new Tree({stream: stream()}).render()
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
     , dnd = new Dnd(tree)
-  tree.select(1004) // so it's expanded
-  // Mock d3.event
-  d3.event = new Event
-  d3.event.sourceEvent = new Event
-  next(tree, dnd)
+
+  s.on('end', function () {
+    tree.select(1004) // so it's expanded
+    // Mock d3.event
+    d3.event = new Event
+    d3.event.sourceEvent = new Event
+    next(tree, dnd)
+  })
 }
 
 test('fires dnd events', function (t) {
