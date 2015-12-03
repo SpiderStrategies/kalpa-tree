@@ -11,12 +11,12 @@
   },
   "devDependencies": {
     "JSONStream": "^1.0.6",
-    "browserify": "^3.46.0",
+    "browserify": "^12.0.1",
     "lodash": "^2.4.1",
     "request": "^2.36.0",
     "tape": "^3.5.0",
     "testling": "^1.7.1",
-    "watchify": "^0.10.2"
+    "watchify": "^3.6.1"
   },
   "scripts": {
     "bundle": "browserify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
