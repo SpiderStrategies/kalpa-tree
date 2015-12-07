@@ -2,6 +2,7 @@ var test = require('tape').test
   , Tree = require('../')
   , stream = require('./tree-stream')
   , Dnd = require('../lib/dnd')
+  , Event = require('./_event')
 
 function before (next) {
   var s = stream()
@@ -134,7 +135,8 @@ test('drag moves traveler', function (t) {
       process.nextTick(function () {})
       t.ok(tree.el.select('.traveling-node').datum()._y > data._y, 'traveler _y moved down')
       t.equal(tree.el.select('.traveling-node').datum().i, 8, 'moved down nodes')
-      t.equal(tree.el.select('.traveling-node').attr('style'), tree.prefix + 'transform: translate(0px, 290px); opacity: 1;', 'transform changed')
+      var _translate = /translate\((.*)\)/.exec(tree.el.select('.traveling-node').attr('style'))[0]
+      t.equal(_translate, 'translate(0px, 290px)', 'transform changed')
       t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(60px,0px)', '60px y indentation')
       d3.event.y = 290 // move the node up a little
       dnd.drag.apply(node, [data, 3])
