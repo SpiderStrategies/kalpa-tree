@@ -79,9 +79,9 @@ test('start followed by end will clear timeout', function (t) {
   before(function (tree, dnd) {
     tree.editable()
     dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
-    t.ok(dnd.timeout, 'timeout exists')
+    t.ok(dnd._travelerTimeout, 'timeout exists')
     dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
-    t.ok(dnd.timeout, 'timeout does not exists')
+    t.ok(dnd._travelerTimeout, 'timeout does not exists')
     tree.remove()
     document.querySelector('.container').remove()
     t.end()
@@ -118,11 +118,11 @@ test('creates a traveler on first drag ', function (t) {
   before(function (tree, dnd) {
     tree.editable()
     dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
-    t.ok(dnd.timeout, 'timeout was set')
+    t.ok(dnd._travelerTimeout, 'timeout was set')
     d3.event.y = tree._layout[1004]._y + 20// new y location
     dnd.drag.apply(tree.node[0][3], [tree._layout[1004], 3])
     t.ok(tree.el.select('.tree').classed('dragging', true), 'tree has dragging class')
-    t.ok(!dnd.timeout, 'timeout was cleared')
+    t.ok(!dnd._travelerTimeout, 'timeout was cleared')
     t.ok(tree.el.select('.traveling-node').size(), 1, 'traveling node exists as a sibling')
     dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
     tree.remove()
@@ -138,7 +138,7 @@ test('drag moves traveler', function (t) {
     tree.editable()
     process.nextTick(function () {
       dnd.start.apply(node, [data, 3])
-      t.ok(dnd.timeout, 'timeout was set')
+      t.ok(dnd._travelerTimeout, 'timeout was set')
       d3.event.y = data._y
       dnd.drag.apply(node, [data, 3])
       t.equal(tree.el.select('.traveling-node').datum()._y, data._y - tree.options.height / 2, 'traveler _y starts centered on the the src')
