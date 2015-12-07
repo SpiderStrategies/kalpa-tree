@@ -2,6 +2,7 @@ var test = require('tape').test
   , Tree = require('../')
   , Readable = require('stream').Readable
   , Dnd = require('../lib/dnd')
+  , Event = require('./_event')
   , nodes = [{
       "id": 1001,
       "label": "Folder A"

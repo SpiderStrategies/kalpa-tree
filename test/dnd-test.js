@@ -2,6 +2,7 @@ var test = require('tape').test
   , Tree = require('../')
   , stream = require('./tree-stream')
   , Dnd = require('../lib/dnd')
+  , Event = require('./_event')
 
 function before (next) {
   var s = stream()
