@@ -104,7 +104,6 @@ test('creates a traveler after timeout', function (t) {
       var travelerData = traveler.datum()
       t.equal(travelerData._initialParent, 1003, 'stores initial parent on the traveler')
       t.deepEqual(travelerData._source, tree._layout[1004], 'stores source node on the travler')
-      t.deepEqual(travelerData.i, 3, 'sets i')
       t.deepEqual(travelerData.embedded, false, 'embedded is false by default')
       dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
       tree.remove()
@@ -145,7 +144,6 @@ test('drag moves traveler', function (t) {
       d3.event.y = data._y + 200// new y location
       dnd.drag.apply(node, [data, 3])
       t.ok(tree.el.select('.traveling-node').datum()._y > data._y, 'traveler _y moved down')
-      t.equal(tree.el.select('.traveling-node').datum().i, 8, 'moved down nodes')
       var _translate = /translate\((.*)\)/.exec(tree.el.select('.traveling-node').attr('style'))[0]
       t.equal(_translate, 'translate(0px, 290px)', 'transform changed')
       t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(60px,0px)', '60px y indentation')
