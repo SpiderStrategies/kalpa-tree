@@ -20,6 +20,7 @@ var defaults = function () {
     indicator: false, // show indicator light nodes on the right
     forest: false, // Indicates whether this tree can have multiple root nodes
     contents: require('./lib/contents'),
+    performanceThreshold: 1000, // If the node data count exceeds this threshold, the tree goes into performance mode
     accessors: {
       id: 'id',
       label: 'label',
@@ -82,10 +83,6 @@ var Tree = function (options) {
 
 util.inherits(Tree, EventEmitter)
 
-Tree.prototype._hasTransitions = function () {
-  return ('transition' in document.documentElement.style) || ('WebkitTransition' in document.documentElement.style)
-}
-
 Tree.prototype.render = function () {
   var self = this
 
@@ -94,6 +91,17 @@ Tree.prototype.render = function () {
 
   this.node = this.el.append('div')
                        .attr('class', 'tree')
+                       .on('scroll', function () {
+                         var scroll = self.el.select('.tree').node().scrollTop
+                         if (!self._scrollTop) {
+                           self._scrollTop = scroll
+                         }
+
+                         if (Math.abs(scroll - self._scrollTop) > self.options.height) {
+                           self.adjustViewport()
+                           self._scrollTop = scroll
+                         }
+                       })
                        .classed('forest-tree', this.options.forest)
                        .append('ul')
                          .selectAll('li.node')
@@ -158,12 +166,15 @@ Tree.prototype._forceRedraw = function () {
   return this.el[0][0].offsetHeight
 }
 
+
 /*
  * Makes some operation (fn) have transitions, by applying
  * the transitions class to the tree before the operation is performed,
  * and then removing the class after the operation has finished
+ *
+ * If force is passed in, we always animate. Use w/ caution.
  */
-Tree.prototype._transitionWrap = function (fn, animate) {
+Tree.prototype._transitionWrap = function (fn, animate, force) {
   var self = this
   return function (d) {
     animate = typeof animate !== 'undefined' ? animate : self.node.size() < self.options.maxAnimatable
@@ -176,6 +187,17 @@ Tree.prototype._transitionWrap = function (fn, animate) {
                               return p
                      }, 0)
       animate = count > self.options.maxAnimatable ? false : animate
+    }
+
+    if (self._tuned) {
+      // The tree is in a performanced tuning mode, which means nodes that should be visible aren't.
+      // We turn off all animations
+      animate = false
+    }
+
+    if (force) {
+      // Force animations, ignoring everything else
+      animate = true
     }
 
     if (animate) {
@@ -194,31 +216,70 @@ Tree.prototype._transitionWrap = function (fn, animate) {
   }
 }
 
+Tree.prototype.adjustViewport = function () {
+  this._rebind()
+      .call(this.enter, function (d) {
+        return 'translate(0px,' + d._y + 'px)'
+      })
+      .call(this.updater)
+      .exit()
+      .remove()
+}
+
 /*
  * Rebinds the data to the selection
  */
 Tree.prototype._rebind = function () {
   var data = null
     , self = this
+    , height = 'auto'
+
+  var n = this.el.select('.tree').node()
+    , viewport = {
+      top: Math.max(0, n.scrollTop - self.options.height * 2),
+      bottom: n.scrollTop + n.offsetHeight + self.options.height * 2
+    }
+    , mapper = function (d, i) {
+                 // Store sane copies of x,y that denote our true coords in the tree
+                 d._x = d.y
+                 d._y = i * self.options.height
+                 return d
+               }
 
   if (this.options.forest) {
     data = this.root.reduce(function (p, subTree) {
                       return p.concat(self.tree.nodes(subTree))
                     }, [])
+                    .map(mapper)
   } else if (this.root) {
     data = this.tree.nodes(this.root)
+                    .map(mapper)
   } else {
     data = []
   }
 
-  this.node = this.node.data(data.map(function (d, i) {
-    // Store sane copies of x,y that denote our true coords in the tree
-    d._x = d.y
-    d._y = i * self.options.height
-    return d
-  }), function (d) {
-    return d[self.options.accessors.id]
-  })
+  this._tuned = false
+
+  if (data.length > this.options.performanceThreshold) {
+    var last = data[data.length - 1]
+    data = data.filter(function (d, i) {
+                  var inside = d._y >= viewport.top && d._y <= viewport.bottom
+                  if (!inside) {
+                    // Set a flag on the tree if we're optimized because the dataset is too large
+                    self._tuned = true
+                  }
+                  return inside
+                })
+    if (self._tuned) {
+      height = last._y + this.options.height + 'px'
+    }
+  }
+
+  this.el.select('.tree ul').style('height', height)
+
+  this.node = this.node.data(data, function (d) {
+                         return d[self.options.accessors.id]
+                       })
   return this.node
 }
 
@@ -458,6 +519,7 @@ Tree.prototype.select = function (id, opt) {
       var visible = this.node.filter(function (_d) {
         return d.parent.id === _d.id
       }).size()
+
       if (!visible) {
         opt.animate = false
       }
@@ -470,13 +532,18 @@ Tree.prototype.select = function (id, opt) {
 
     if (d._y < n.scrollTop || d._y > n.offsetHeight + n.scrollTop) {
       // Now scroll the node into view
-      if (opt.animate === false || !this._hasTransitions()) {
+      if (opt.animate === false || this._tuned) {
         n.scrollTop = d._y
       } else {
         d3.timer(function () {
           n.scrollTop = d._y
           return true
         }, this.transitionTimeout)
+      }
+
+      if (this._tuned) {
+        // Where we scrolled may not have anything drawn, so redraw based on the viewport
+        this.adjustViewport()
       }
     }
   }
@@ -708,6 +775,8 @@ Tree.prototype.expandAll = function () {
           return 'translate(0px,' + d._y + 'px)'
         })
         .call(this.updater)
+        .exit()
+        .remove()
   }
 }
 
@@ -735,8 +804,10 @@ Tree.prototype.collapseAll = function () {
     })()
   } else {
     this._rebind()
+        .call(this.enter)
         .call(this.updater)
-        .exit().remove()
+        .exit()
+        .remove()
   }
 }
 
