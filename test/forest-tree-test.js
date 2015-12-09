@@ -18,6 +18,7 @@ var test = require('tape').test
       "label": "The cat's second birthday",
       "parentId": 1002
     }]
+  , d3 = require('d3')
 
 function stream () {
   var stream = new Readable({objectMode: true})
