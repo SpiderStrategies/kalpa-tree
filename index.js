@@ -206,10 +206,10 @@ Tree.prototype._transitionWrap = function (fn, animate, force) {
 
     var result = fn.apply(self, arguments)
     if (animate) {
-      d3.selectAll('.node')
-        .on('transitionend', function () {
-          self.el.select('.tree').classed('transitions', false)
-        })
+      self.el.selectAll('.node')
+               .on('transitionend', function () {
+                 self.el.select('.tree').classed('transitions', false)
+               })
     }
 
     return result
