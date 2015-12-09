@@ -5,7 +5,7 @@
   "main": "index.js",
   "dependencies": {
     "bourbon": "^4.2.4",
-    "d3": "^3.5.2",
+    "d3": "^3.5.10",
     "escape-string-regexp": "^1.0.3",
     "node-sass": "^3.4.2"
   },
@@ -20,7 +20,9 @@
     "watchify": "^3.6.1"
   },
   "browserify": {
-    "transform": ["browserify-css"]
+    "transform": [
+      "browserify-css"
+    ]
   },
   "scripts": {
     "bundle": "browserify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
