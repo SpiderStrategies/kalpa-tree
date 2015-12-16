@@ -61,6 +61,18 @@ $timing-fn: ease-out;
       }
     }
 
+     &.illegal {
+      .node-contents {
+        .label {
+          color: red;
+
+          &:after {
+            content: "\1F6AB";
+          }
+        }
+      }
+    }
+
     &:after {
       content: "";
       position: absolute;

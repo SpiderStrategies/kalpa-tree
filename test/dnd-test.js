@@ -277,3 +277,111 @@ test('dnd autoscrolls', function (t) {
     })
   })
 })
+
+test('disable non-metrics dropped onto metrics', function (t) {
+  before(function (tree, dnd) {
+    var node = tree.node[0][3]
+      , data = tree._layout[1058]
+
+    tree.options.droppable = function (d, parent) {
+      if (d.nodeType === 'metric') {
+        // Metrics can go anywhere
+        return true
+      } else if (parent.nodeType === 'metric') {
+        // Can't move a non-metric onto a metric
+        return false
+      } else {
+        return true
+      }
+    }
+
+    tree.editable()
+    dnd.start.apply(node, [data, 3])
+    d3.event.y = 290 // This would move 1058 onto 1008 which is a metric
+    dnd.drag.apply(node, [data, 3])
+
+    t.equal(data._x, tree._layout[1008]._x, '1058 is a sibling of 1008')
+
+    tree.once('move', function (n, newParent, previousParent, newIndex, previousIndex) {
+      t.equal(newParent.label, 'O1', 'moved node new parent label is correct')
+      t.equal(newIndex, 5, 'new index is correct')
+      tree.remove()
+      document.querySelector('.container').remove()
+      t.end()
+    })
+    dnd.end.apply(node, [data, 3])
+  })
+})
+
+test('marks traveler as illegal if its too deep', function (t) {
+  before(function (tree, dnd) {
+    tree.options.droppable = function (d, parent) {
+      if (d.nodeType === 'metric') {
+        // Metrics can go anywhere
+        return true
+      } else if (parent.nodeType === 'metric') {
+        // Can't move a non-metric onto a metric
+        return false
+      } else {
+        return true
+      }
+    }
+
+    tree.editable()
+    // Move 1005 under 1004
+    var m2 = tree.node[0][4]
+      , m2d = tree._layout[1005]
+
+    dnd.start.apply(m2, [m2d, 4])
+    d3.event.y = 150
+    dnd.drag.apply(m2, [m2d, 4])
+
+    tree.once('move', function (n, newParent, previousParent, newIndex, previousIndex) {
+      t.equal(newParent.label, 'M1', 'moved node new parent label is correct')
+
+      process.nextTick(function () {
+        // Now move 1006 under 1005
+        var m3 = tree.node[0][5]
+          , m3d = tree._layout[1006]
+
+        dnd.start.apply(m3, [m3d, 5])
+        d3.event.y = 190
+        dnd.drag.apply(m3, [m3d, 5])
+
+        tree.once('move', function (n, newParent, previousParent, newIndex, previousIndex) {
+          t.equal(newParent.label, 'M2', 'M3 moved node new parent label is correct')
+
+          // Now we have
+          //...
+          //  m1
+          //    m2
+          //      m3
+          //  m4
+          //...
+          // Grab a non metric (i.e. 1058) and try to throw it under M3
+          process.nextTick(function () {
+            // Now move 1006 under 1005
+            var nonMetric = tree.node[0][17]
+              , nonMetricData = tree._layout[1058]
+
+            dnd.start.apply(nonMetric, [nonMetricData, 17])
+            d3.event.y = 190
+            dnd.drag.apply(nonMetric, [nonMetricData, 17])
+
+            t.ok(dnd.traveler.datum().illegal, 'traveler is illegal')
+            t.ok(dnd.traveler.classed('illegal'), 'traveler has illegal classname')
+
+            dnd.end.apply(nonMetric, [nonMetricData, 17])
+            t.equal(nonMetricData.parent.id, 1001, 'back to root parent')
+            tree.remove()
+            document.querySelector('.container').remove()
+            t.end()
+          })
+        })
+        dnd.end.apply(m3, [m3d, 5])
+      })
+
+    })
+    dnd.end.apply(m2, [m2d, 4])
+  })
+})
