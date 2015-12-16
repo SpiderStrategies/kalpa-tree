@@ -19,6 +19,12 @@ var defaults = function () {
     maxAnimatable: 100, // Disable animations if a node has children greater than this amount
     indicator: false, // show indicator light nodes on the right
     forest: false, // Indicates whether this tree can have multiple root nodes
+    droppable: function (d, parent) {
+      // `d` is the node being moved
+      // `parent` is its new parent. May be undefined if node is being moved to root in a forest tree
+
+      return true // By default, any node can be dropped on any other node
+    },
     contents: require('./lib/contents'),
     performanceThreshold: 1000, // If the node data count exceeds this threshold, the tree goes into performance mode
     accessors: {

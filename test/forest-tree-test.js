@@ -264,3 +264,73 @@ test('dnd allows a node to become a new root', function (t) {
     })
   })
 })
+
+test('dnd flat forest', function (t) {
+  var stream = new Readable({objectMode: true})
+    , data = JSON.parse(JSON.stringify(nodes))
+    , container = document.createElement('div')
+
+  container.className = 'container'
+  container.style.height = '700px'
+  document.body.appendChild(container)
+
+  stream._read = function () {
+    var n = data.shift()
+    if (n) {
+      delete n.parentId
+      return stream.push(n)
+    }
+    stream.push(null)
+  }
+
+  var tree = new Tree({
+      stream: stream,
+      forest: true,
+      droppable: function (node, parent) {
+        // return true
+        return !parent
+      }
+    }).render()
+    , dnd = new Dnd(tree)
+
+  container.appendChild(tree.el.node())
+
+  stream.on('end', function () {
+    tree.select(1003, {animate: false})
+
+    process.nextTick(function () {
+      var node = tree.node[0][2]
+        , data = tree._layout[1003]
+      d3.event = new Event
+      d3.event.sourceEvent = new Event
+
+      t.equal(tree.root.length, 4, 'four root nodes to start')
+
+      tree.editable()
+      dnd.start.apply(node, [data, 2])
+      d3.event.y = 76 // This position would indent 1003 by default
+      dnd.drag.apply(node, [data, 2])
+      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(0px,0px)', '0px y indentation')
+
+      d3.event.y = 65 // This keeps moving 1003 up
+      dnd.drag.apply(node, [data, 2])
+
+      tree.on('move', function (n, newParent, previousParent, newIndex, previousIndex) {
+        t.equal(n.id, 1003, 'moved node id matches 1003')
+        t.ok(!newParent, 'no new parent')
+        t.ok(!newParent, 'no previous parent')
+
+        t.equal(newIndex, 1, 'new index 1')
+        t.equal(previousIndex, 2, 'prev index 2')
+
+        t.equal(tree.root.length, 4, 'still four root nodes')
+        t.deepEqual(tree.root[1], data, 'node moved is at index 1 of root nodes')
+
+        tree.remove()
+        t.end()
+      })
+      dnd.end.apply(node, [data, 2])
+    })
+  })
+})
+
