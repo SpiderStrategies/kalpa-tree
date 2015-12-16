@@ -1,5 +1,6 @@
 var test = require('tape').test
   , Tree = require('../')
+  , css = require('./../dist/tree.css')
   , Readable = require('stream').Readable
   , Dnd = require('../lib/dnd')
   , Event = require('./_event')
@@ -174,6 +175,12 @@ test('dnd allows a root nodes to change order', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
     , dnd = new Dnd(tree)
+    , container = document.createElement('div')
+
+  container.className = 'container'
+  container.style.height = '700px'
+  document.body.appendChild(container)
+  container.appendChild(tree.el.node())
 
   s.on('end', function () {
     tree.select(1003, {animate: false})
@@ -207,6 +214,7 @@ test('dnd allows a root nodes to change order', function (t) {
     dnd.end.apply(node, [data, 2])
     var newOrder = tree.root.map(function (node) { return node.id })
     t.deepEqual(newOrder, [1002, 1003, 1001 ], 'new root order is 1002, 1003, 1001')
+    tree.remove()
     t.end()
   })
 })
@@ -215,6 +223,12 @@ test('dnd allows a node to become a new root', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
     , dnd = new Dnd(tree)
+    , container = document.createElement('div')
+
+  container.className = 'container'
+  container.style.height = '700px'
+  document.body.appendChild(container)
+  container.appendChild(tree.el.node())
 
   s.on('end', function () {
     tree.select(1003, {animate: false})
