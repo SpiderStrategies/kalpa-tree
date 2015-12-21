@@ -91,6 +91,7 @@ $timing-fn: ease-out;
 
   .tree {
     overflow: auto;
+    overflow-x: hidden;
     width: 100%;
     height: 100%;
 
