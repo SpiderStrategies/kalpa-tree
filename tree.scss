@@ -62,18 +62,17 @@ $timing-fn: ease-out;
     }
 
      &.illegal {
-      .node-contents {
-        .label {
-          color: red;
-
-          &:after {
-            content: "\1F6AB";
-          }
-        }
+       &:after {
+         content: "\00d7";
+         color: red;
+         position: absolute;
+         font-size: 24px;
+         top: 2px;
+         right: 6px;
       }
     }
 
-    &:after {
+    &:not(.illegal):after {
       content: "";
       position: absolute;
       width: 12px;
