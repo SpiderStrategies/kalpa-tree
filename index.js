@@ -196,7 +196,7 @@ Tree.prototype._transitionWrap = function (fn, animate, force) {
     }
 
     if (self._tuned) {
-      // The tree is in a performanced tuning mode, which means nodes that should be visible aren't.
+      // The tree is in a performance tuning mode, which means nodes that should be visible aren't.
       // We turn off all animations
       animate = false
     }
@@ -223,13 +223,15 @@ Tree.prototype._transitionWrap = function (fn, animate, force) {
 }
 
 Tree.prototype.adjustViewport = function () {
-  this._rebind()
-      .call(this.enter, function (d) {
-        return 'translate(0px,' + d._y + 'px)'
-      })
-      .call(this.updater)
-      .exit()
-      .remove()
+  if (this._tuned) {
+    this._rebind()
+        .call(this.enter, function (d) {
+          return 'translate(0px,' + d._y + 'px)'
+        })
+        .call(this.updater)
+        .exit()
+        .remove()
+  }
 }
 
 /*
