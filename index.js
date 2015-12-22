@@ -296,7 +296,6 @@ Tree.prototype._join = function (data) {
   }
 
   this.el.select('.tree ul').style('height', height)
-
   this.node = this.node.data(data, function (d) {
                          return d[self.options.accessors.id]
                        })
@@ -810,14 +809,14 @@ Tree.prototype.collapseAll = function () {
       this._rebind()
           .call(this.updater)
           .call(this.flyExit, null, function (d) {
-            // Determine our top ancestor
-            var p = d.parent
-              , c = null
+            var c = p = d.parent
 
+            // Determine our top ancestor
             while (p.parent) {
               c = p
               p = p.parent
             }
+
             // Move this node to the ancestors location
             return 'translate(0px,' + c._y + 'px)'
           })
