@@ -118,7 +118,7 @@ $timing-fn: ease-out;
     // Show the expand/collapse indicators on hover
     &:hover {
       // Don't show it for the root node on normal trees
-      li.node:not(.root):not(.search-result) {
+      li.node:not(.root) {
         .toggler { opacity: 1; }
       }
     }
