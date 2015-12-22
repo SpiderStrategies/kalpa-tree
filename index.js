@@ -224,8 +224,8 @@ Tree.prototype._transitionWrap = function (fn, animate, force) {
 
 Tree.prototype.adjustViewport = function () {
   if (this._tuned) {
-    this._rebind()
-        .call(this.enter, function (d) {
+    var node = this._searchResults ? this._join(this._searchResults) : this._rebind()
+    node.call(this.enter, function (d) {
           return 'translate(0px,' + d._y + 'px)'
         })
         .call(this.updater)
@@ -235,18 +235,11 @@ Tree.prototype.adjustViewport = function () {
 }
 
 /*
- * Rebinds the data to the selection
+ * Rebinds the data to the selection based on the data model in the tree.
  */
 Tree.prototype._rebind = function () {
   var data = null
     , self = this
-    , height = 'auto'
-
-  var n = this.el.select('.tree').node()
-    , viewport = {
-      top: Math.max(0, n.scrollTop - self.options.height * 2),
-      bottom: n.scrollTop + n.offsetHeight + self.options.height * 2
-    }
     , mapper = function (d, i) {
                  // Store sane copies of x,y that denote our true coords in the tree
                  d._x = d.y
@@ -256,6 +249,7 @@ Tree.prototype._rebind = function () {
 
   // Any rebind of data removes the search-results class
   this.el.select('.tree').classed('search-results', false)
+  this._searchResults = null
 
   if (this.options.forest) {
     data = this.root.reduce(function (p, subTree) {
@@ -269,6 +263,21 @@ Tree.prototype._rebind = function () {
     data = []
   }
 
+  return this._join(data)
+}
+
+/*
+ * Joins the data to the dom seletion
+ */
+Tree.prototype._join = function (data) {
+  var self = this
+    , height = 'auto'
+    , n = this.el.select('.tree').node()
+    , viewport = {
+      top: Math.max(0, n.scrollTop - this.options.height * 2),
+      bottom: n.scrollTop + n.offsetHeight + this.options.height * 2
+    }
+
   this._tuned = false
 
   if (data.length > this.options.performanceThreshold) {
@@ -281,7 +290,7 @@ Tree.prototype._rebind = function () {
                   }
                   return inside
                 })
-    if (self._tuned) {
+    if (this._tuned) {
       height = last._y + this.options.height + 'px'
     }
   }
@@ -951,15 +960,13 @@ Tree.prototype.search = function (term) {
 
   this._transitionWrap(function () {
     this.el.select('.tree').classed('search-results', true)
-    this.node = this.node.data(data, function (d) {
-                           return d[self.options.accessors.id]
-                         })
-                         .call(this.enter)
-                         .call(this.updater)
-                         .call(function (selection) {
-                           selection.exit().remove() // No animations on exit
-                         })
-                         .classed('search-result', true)
+    this._searchResults = data
+    this._join(data)
+        .call(this.enter)
+        .call(this.updater)
+        .call(function (selection) {
+          selection.exit().remove() // No animations on exit
+        })
   })()
 }
 
