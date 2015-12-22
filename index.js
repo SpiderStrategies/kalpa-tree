@@ -254,6 +254,9 @@ Tree.prototype._rebind = function () {
                  return d
                }
 
+  // Any rebind of data removes the search-results class
+  this.el.select('.tree').classed('search-results', false)
+
   if (this.options.forest) {
     data = this.root.reduce(function (p, subTree) {
                       return p.concat(self.tree.nodes(subTree))
@@ -930,7 +933,7 @@ Tree.prototype.removeNode = function (obj) {
 Tree.prototype.search = function (term) {
   if (term == null) {
     return this.select((this._selected && this._selected.id) || (this.options.forest ? this.root[0].id : this.root.id), {
-      force: this.node.classed('search-result')
+      force: this.el.select('.tree').classed('search-results')
     })
   }
 
@@ -947,6 +950,7 @@ Tree.prototype.search = function (term) {
              })
 
   this._transitionWrap(function () {
+    this.el.select('.tree').classed('search-results', true)
     this.node = this.node.data(data, function (d) {
                            return d[self.options.accessors.id]
                          })
