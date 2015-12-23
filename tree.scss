@@ -61,18 +61,19 @@ $timing-fn: ease-out;
       }
     }
 
-     &.illegal {
-       &:after {
-         content: "\00d7";
-         color: red;
-         position: absolute;
-         font-size: 24px;
-         top: 2px;
-         right: 6px;
+    &.illegal {
+      .node-contents {
+        opacity: .5;
+      }
+
+      &:after {
+        color: red;
+        background: red;
+        box-shadow: 0 0.25em 0 0 red, 0 0.5em 0 0 red;
       }
     }
 
-    &:not(.illegal):after {
+    &:after {
       content: "";
       position: absolute;
       width: 12px;
