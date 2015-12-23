@@ -385,3 +385,24 @@ test('marks traveler as illegal if its too deep', function (t) {
     dnd.end.apply(m2, [m2d, 4])
   })
 })
+
+test('multiple moves with embedded traveler if target node equals the previous node', function (t) {
+  // See issue #252
+  before(function (tree, dnd) {
+    tree.editable()
+    dnd.start.apply(tree.node[0][4], [tree._layout[1005], 4])
+
+    var moves = [102,119]
+    moves.forEach(function (pos) {
+      d3.event.y = pos
+      dnd.drag.apply(tree.node[0][4], [tree._layout[1005], 4])
+    })
+
+    // now it should be embedded
+    t.ok(dnd.traveler.datum().embedded, 'the traveler is embedded')
+    t.equal(tree._layout[1005]._y, 108, '1005 is the first child, at 108')
+    tree.remove()
+    document.querySelector('.container').remove()
+    t.end()
+  })
+})
