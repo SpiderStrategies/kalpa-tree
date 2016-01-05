@@ -143,7 +143,7 @@ test('displays a node as selected on render', function (t) {
   var s = stream()
     , tree = new Tree({
     stream: s,
-    initialSelection: 1003
+    initialSelection: '1003'
   })
 
   tree.on('select', function () {
