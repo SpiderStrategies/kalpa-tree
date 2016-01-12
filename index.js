@@ -172,7 +172,6 @@ Tree.prototype._forceRedraw = function () {
   return this.el[0][0].offsetHeight
 }
 
-
 /*
  * Makes some operation (fn) have transitions, by applying
  * the transitions class to the tree before the operation is performed,
@@ -715,6 +714,11 @@ Tree.prototype.add = function (d, parent, idx) {
       parent._allChildren = []
     }
     parent._allChildren.push(_d)
+  }
+
+  if (parent && parent.selected) {
+    // The parent is selected, we want to expand its children (#259)
+    delete parent.collapsed
   }
 
   this._transitionWrap(this._slide)()

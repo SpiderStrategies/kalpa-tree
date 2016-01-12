@@ -558,6 +558,33 @@ test('adds a node to a parent and before sibling', function (t) {
   })
 })
 
+test('add node toggles tree nodes if parent is selected', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  s.on('end', function () {
+    // Select the parent, but keep it collapsed
+    tree.select(1003, {toggleOnSelect: false})
+    t.ok(!tree._layout[1003].children, 'selected node is not expanded so it does not have children')
+    t.equal(el.querySelectorAll('.tree ul li.node').length, 8, '8 nodes visible')
+
+    var d = tree.add({
+      id: 3020,
+      label: 'Newest node sibling',
+      color: 'green',
+      nodeType: 'metric'
+    }, 1003)
+
+    process.nextTick(function () {
+      t.ok(tree._layout[1003].children, 'parent is now expanded')
+      t.equal(el.querySelectorAll('.tree ul li.node').length, 19, '19 nodes visible')
+      t.end()
+    })
+
+  })
+})
+
 test('edits a node', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
