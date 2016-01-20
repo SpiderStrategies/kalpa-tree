@@ -45,6 +45,9 @@ $timing-fn: ease-out;
 
   .traveling-node {
     @include base-node;
+    @include transition-property(opacity);
+    @include transition-duration($delay);
+    @include transition-timing-function($timing-fn);
 
     background-color: #D9E2E8;
     width: calc(#{"100% + 13px"});
@@ -58,18 +61,31 @@ $timing-fn: ease-out;
 
       .label {
         color: #2d3135;
+        @include transition-property(color);
+        @include transition-duration($delay);
+        @include transition-timing-function($timing-fn);
       }
     }
 
     &.illegal {
+      opacity: .9 !important; // Override element's opacity style set in JS
+
       .node-contents {
-        opacity: .5;
+        opacity: .7;
+
+        .icon {
+          fill: #3a4045;
+        }
+
+        .label {
+          color: #3a4045;
+        }
       }
 
       &:after {
-        color: red;
-        background: red;
-        box-shadow: 0 0.25em 0 0 red, 0 0.5em 0 0 red;
+        color: #f35132;
+        background: #f35132;
+        box-shadow: 0 0.25em 0 0 #f35132, 0 0.5em 0 0 #f35132;
       }
     }
 
@@ -77,11 +93,15 @@ $timing-fn: ease-out;
       content: "";
       position: absolute;
       width: 12px;
-      top: 14px;
-      right: 6px;
+      top: 13px;
+      right: 10px;
       height: .1em;
       background: #7fe1f4;
       box-shadow: 0 0.25em 0 0 #7fe1f4, 0 0.5em 0 0 #7fe1f4;
+
+      @include transition-property(background, box-shadow, color);
+      @include transition-duration($delay);
+      @include transition-timing-function($timing-fn);
     }
 
     .toggler, .indicator {
