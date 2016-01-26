@@ -204,10 +204,6 @@ $timing-fn: ease-out;
           }
         }
 
-        &:not(.selected) {
-          .icon { fill: gray !important; }
-        }
-
         &.placeholder {
           * {
             display: none;
