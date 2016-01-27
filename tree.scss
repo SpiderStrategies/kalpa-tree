@@ -254,7 +254,7 @@ $timing-fn: ease-out;
         }
       }
 
-      li.node {
+      li.node:not(.root) {
         cursor: move;
 
         &:hover {

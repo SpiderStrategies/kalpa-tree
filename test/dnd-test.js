@@ -68,8 +68,21 @@ test('dnd dependent on edit mode', function (t) {
     dnd.start()
     t.ok(!dnd._dragging, 'tree still not marked as dragging')
     tree.editable()
-    dnd.start({y: 0}) // set y to zero to prevent dragging
+    dnd.start({y: 100})
     t.ok(dnd._dragging, 'tree marked as dragging')
+    dnd._end()
+    tree.remove()
+    document.querySelector('.container').remove()
+    t.end()
+  })
+})
+
+test('cannot move root', function (t) {
+  before(function (tree, dnd) {
+    tree.editable()
+    dnd.start({y: 0})
+    t.ok(!dnd._dragging, 'tree not marked as dragging because trying to move root')
+    dnd._end()
     tree.remove()
     document.querySelector('.container').remove()
     t.end()
