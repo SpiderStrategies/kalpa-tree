@@ -43,7 +43,6 @@ $timing-fn: ease-out;
     height: 100%;
     top: 0;
     right: 0;
-    @include background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 90%));
 
     &:after {
       content: "";
@@ -53,10 +52,6 @@ $timing-fn: ease-out;
       top: 16px;
       right: 12px;
       border-radius: 50%;
-    }
-
-    &.indicator {
-      @include background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 50%));
     }
   }
 }
@@ -137,7 +132,7 @@ $timing-fn: ease-out;
       @include transition-timing-function($timing-fn);
     }
 
-    .toggler, .indicator {
+    .toggler, .indicator:after {
       display: none;
     }
   }
@@ -213,6 +208,14 @@ $timing-fn: ease-out;
 
             &.expanded { @include transform(rotate(0deg)); }
             &.leaf { visibility: hidden !important; }
+          }
+        }
+
+        .label-mask {
+          @include background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 90%));
+
+          &.indicator {
+            @include background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 50%));
           }
         }
 
