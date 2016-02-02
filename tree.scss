@@ -11,6 +11,9 @@ $timing-fn: ease-out;
   top: 0;
   left: 0;
   overflow-x: hidden;
+  @include transition-property(opacity);
+  @include transition-duration($delay);
+  @include transition-timing-function($timing-fn);
 
   .node-contents {
     padding: 11px 0px 10px;
@@ -64,9 +67,6 @@ $timing-fn: ease-out;
 
   .traveling-node {
     @include base-node;
-    @include transition-property(opacity);
-    @include transition-duration($delay);
-    @include transition-timing-function($timing-fn);
 
     background-color: #D9E2E8;
     width: calc(#{"100% + 13px"});
@@ -285,6 +285,12 @@ $timing-fn: ease-out;
           }
         }
       }
+      li.node:not(.selected) {
+        // Override opacity set in update.js
+        opacity: .6 !important;
+      }
+    }
+
     }
   }
 }
