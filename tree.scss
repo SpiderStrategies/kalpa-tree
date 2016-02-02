@@ -11,6 +11,9 @@ $timing-fn: ease-out;
   top: 0;
   left: 0;
   overflow-x: hidden;
+  @include transition-property(opacity);
+  @include transition-duration($delay);
+  @include transition-timing-function($timing-fn);
 
   .node-contents {
     padding: 11px 0px 10px;
@@ -22,7 +25,7 @@ $timing-fn: ease-out;
     svg.icon {
       display: inline-block;
       vertical-align: middle;
-      margin-left: 4px;
+      margin-left: 2px;
       width: 12px;
       height: 11px;
     }
@@ -284,6 +287,16 @@ $timing-fn: ease-out;
             box-shadow: 0 0.25em 0 0 #ADB8BC, 0 0.5em 0 0 #ADB8BC;
           }
         }
+      }
+      li.node:not(.selected) {
+        // Override opacity set in update.js
+        opacity: .6 !important;
+      }
+    }
+
+    &.forest-tree {
+      .node .node-contents {
+        padding-left: 8px;
       }
     }
   }
