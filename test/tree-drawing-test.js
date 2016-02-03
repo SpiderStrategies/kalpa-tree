@@ -180,6 +180,25 @@ test('emits stream on errors on tree', function (t) {
   tree.render()
 })
 
+test('adjust root node size', function (t) {
+  var s = stream()
+    , tree = new Tree({
+      stream: s,
+      height: 36,
+      rootHeight: 50
+    }).render()
+
+  s.on('end', function () {
+    t.equal(tree._rootOffset, 14, 'sets root offset')
+    t.ok(tree.el.select('.tree').classed('detached-root'), 'tree has detached-root class')
+    t.equal(tree.node.data()[0]._y, 0, 'root _y is 0')
+    t.equal(tree.node.data()[1]._y, 50, 'first node starts at root height')
+    t.equal(tree.node.data()[2]._y, 86, 'second node includes root offset')
+    tree.remove()
+    t.end()
+  })
+})
+
 test('rebind stores private fields', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
