@@ -6,9 +6,12 @@ var test = require('tape').test
   , Event = require('./_event')
   , d3 = require('d3')
 
-function before (next) {
-  var s = stream()
-    , tree = new Tree({stream: s}).render()
+function before (next, opts) {
+  opts = opts || {
+    stream: stream()
+  }
+
+  var tree = new Tree(opts).render()
     , dnd = new Dnd(tree)
     , container = document.createElement('div')
 
@@ -17,7 +20,7 @@ function before (next) {
   document.body.appendChild(container)
   container.appendChild(tree.el.node())
 
-  s.on('end', function () {
+  opts.stream.on('end', function () {
     tree.select(1004) // so it's expanded
     // Mock d3.event
     d3.event = new Event
@@ -323,6 +326,31 @@ test('disable non-metrics dropped onto metrics', function (t) {
       t.end()
     })
     dnd.end.apply(node, [data, 3])
+  })
+})
+
+test('moves a node below root, when root is detached', function (t) {
+  before(function (tree, dnd) {
+
+    tree.editable()
+    // Move 1005 under 1004
+    var m2 = tree.node[0][4]
+      , m2d = tree._layout[1005]
+
+    dnd.start.apply(m2, [m2d, 4])
+    d3.event.y = 5
+    dnd.drag.apply(m2, [m2d, 4])
+
+    tree.once('move', function (n, newParent, previousParent, newIndex, previousIndex) {
+      t.equal(newParent.label, 'Huge Scorecard', 'moved node new parent label is correct')
+      tree.remove()
+      document.querySelector('.container').remove()
+      t.end()
+    })
+    dnd.end.apply(m2, [m2d, 4])
+  }, {
+    stream: stream(),
+    rootHeight: 36
   })
 })
 

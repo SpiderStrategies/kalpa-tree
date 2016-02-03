@@ -16,6 +16,7 @@ var defaults = function () {
     toggleOnSelect: true, // By default each select will toggle the node if needed. This prevents the toggle
     depth: 20, // indentation depth
     height: 36, // height of each row (repeated in tree.less)
+    rootHeight: 36, // root node height can be overridden
     maxAnimatable: 100, // Disable animations if a node has children greater than this amount
     indicator: false, // show indicator light nodes on the right
     forest: false, // Indicates whether this tree can have multiple root nodes
@@ -67,8 +68,8 @@ var Tree = function (options) {
     }
   }
 
+  this._rootOffset = Math.max(this.options.rootHeight - this.options.height, 0)
   this.prefix = prefix
-
   this.transitionTimeout = 300 // Copied in css
   this.updater = update(this)
   this.enter = enter(this)
@@ -97,6 +98,7 @@ Tree.prototype.render = function () {
 
   this.node = this.el.append('div')
                        .attr('class', 'tree')
+                       .classed('detached-root', !!this._rootOffset)
                        .on('scroll', function () {
                          var scroll = self.el.select('.tree').node().scrollTop
                          if (!self._scrollTop) {
@@ -242,7 +244,7 @@ Tree.prototype._rebind = function () {
     , mapper = function (d, i) {
                  // Store sane copies of x,y that denote our true coords in the tree
                  d._x = d.y
-                 d._y = i * self.options.height
+                 d._y = i * self.options.height + (i > 0 ? self._rootOffset : 0)
                  return d
                }
 
@@ -290,7 +292,7 @@ Tree.prototype._join = function (data) {
                   return inside
                 })
     if (this._tuned) {
-      height = last._y + this.options.height + 'px'
+      height = last._y + this.options.height + this._rootOffset + 'px'
     }
   }
 
@@ -957,7 +959,7 @@ Tree.prototype.search = function (term) {
              }).map(function (key, i) {
                var _d = self._layout[key]
                _d._x = 0
-               _d._y = i * self.options.height
+               _d._y = i * self.options.height + (i > 0 ? self._rootOffset : 0)
                return _d
              })
 
