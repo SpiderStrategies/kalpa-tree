@@ -159,6 +159,35 @@ test('select a node adds transitions by default', function (t) {
   })
 })
 
+test('selected nodes descendants transition from correct location', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    tree.select(1004, {animate: false}) // Expand 1004 (M1)
+    tree.select(1015, {animate: false}) // Expand 1015 (This has a different parent)
+    // Now collapse P1 so the tree is basically collapsed
+    tree.toggle({id: 1002}, {animate: false})
+
+    // The tree is in a state we want for this test. If P1 is clicked, it will expand, and show grandchildren
+    // because two of its children (1004 and 1015) were previously expanded
+
+    // Verify the previous comment
+    t.equal(tree.el.node().querySelectorAll('.tree ul li').length, 3, 'tree has 3 visible')
+
+    var updater = tree.updater
+    tree.updater = function () {
+      // Enter called by now, so the node is in the dom.
+      var n = tree.el.select('.tree ul li.node[data-id="1016"]')
+        , _translate = /translate\((.*)\)/.exec(n.attr('style'))[0]
+
+      t.equal(_translate, 'translate(0px, 36px)', '1016 enters at 1002 spot')
+      t.end()
+    }
+    tree.toggle({id: 1002})
+  })
+})
+
 test('selects a node without animations', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
