@@ -270,3 +270,23 @@ test('disables animations if opts.maxAnimatable is exceeded', function (t) {
     tree.select(1002)
   })
 })
+
+test('sets icon class on svg', function (t) {
+  var stream = new Readable({objectMode: true})
+
+  stream._read = function () {
+    stream.push({
+      id: 1001,
+      label: 'Folder A',
+      color: 'red',
+      icon: 'root'
+    })
+    stream.push(null)
+  }
+  var tree = new Tree({stream: stream}).render()
+
+  stream.on('end', function () {
+    t.equal(tree.el.select('.tree ul li.node:first-child svg.icon').attr('class'), 'icon red root', 'svg icon classes set')
+    t.end()
+  })
+})
