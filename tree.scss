@@ -145,6 +145,9 @@ $timing-fn: ease-out;
 
     @include user-select(none);
 
+    // Most tree functions that modify the dom send a callback into transitionWrap where has some magic
+    // to determine whether or not we actually want transitions. It's in charge of adding the .transitions
+    // class, executing the callback (which modifies the dom), then removes the class.
     &.transitions {
       ul {
         li.node {
