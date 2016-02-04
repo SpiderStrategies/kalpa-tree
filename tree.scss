@@ -299,5 +299,11 @@ $timing-fn: ease-out;
         padding-left: 8px;
       }
     }
+
+    &.search-results {
+      .toggler {
+         opacity: 0 !important; // Never show the toggler when displaying search results
+      }
+    }
   }
 }
