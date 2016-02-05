@@ -7,7 +7,6 @@ var test = require('tape').test
 test('search call is noop if not displaying search results', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
-    , el = tree.el.node()
 
   s.on('end', function () {
     tree.select(1058)
@@ -16,7 +15,6 @@ test('search call is noop if not displaying search results', function (t) {
     t.equal(tree.node.size(), 8, '8 nodes displayed after search for null')
     tree.search()
     t.equal(tree.node.size(), 8, '8 nodes displayed because it should not toggle')
-
     tree.remove()
     t.end()
   })
@@ -25,7 +23,6 @@ test('search call is noop if not displaying search results', function (t) {
 test('search', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
-    , el = tree.el.node()
 
   s.on('end', function () {
     t.equal(tree.node.size(), 3, '3 initial nodes')
@@ -46,7 +43,6 @@ test('search', function (t) {
 test('search allows different characters', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
-    , el = tree.el.node()
 
   s.on('end', function () {
     tree.search('as\\')
@@ -69,7 +65,6 @@ test('search ignores `visible: false` nodes', function (t) {
 
   var s = stream().pipe(map)
     , tree = new Tree({stream: s}).render()
-    , el = tree.el.node()
 
   s.on('end', function () {
     t.equal(tree.node.size(), 2, '2 initial nodes')
@@ -83,7 +78,6 @@ test('search ignores `visible: false` nodes', function (t) {
 test('search for null clears search', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
-    , el = tree.el.node()
 
   s.on('end', function () {
     t.equal(tree.node.size(), 3, '3 initial nodes')
