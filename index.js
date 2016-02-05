@@ -98,7 +98,6 @@ Tree.prototype.render = function () {
 
   this.node = this.el.append('div')
                        .attr('class', 'tree')
-                       .classed('detached-root', !!this._rootOffset)
                        .on('scroll', function () {
                          var scroll = self.el.select('.tree').node().scrollTop
                          if (!self._scrollTop) {
@@ -250,6 +249,7 @@ Tree.prototype._rebind = function () {
 
   // Any rebind of data removes the search-results class
   this.el.select('.tree').classed('search-results', false)
+                         .classed('detached-root', !!this._rootOffset)
   this._searchResults = null
 
   if (this.options.forest) {
@@ -937,12 +937,13 @@ Tree.prototype.search = function (term) {
              }).map(function (key, i) {
                var _d = self._layout[key]
                _d._x = 0
-               _d._y = i * self.options.height + (i > 0 ? self._rootOffset : 0)
+               _d._y = i * self.options.height
                return _d
              })
 
   this._transitionWrap(function () {
     this.el.select('.tree').classed('search-results', true)
+                           .classed('detached-root', false)
     this._searchResults = data
     this._join(data)
         .call(this.enter)

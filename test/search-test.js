@@ -90,3 +90,27 @@ test('search for null clears search', function (t) {
     t.end()
   })
 })
+
+test('ignores rootHeight overrides while showing results', function (t) {
+  var s = stream()
+    , tree = new Tree({
+      stream: s,
+      rootHeight: 50
+    }).render()
+
+  s.on('end', function () {
+    t.ok(tree.el.select('.tree').classed('detached-root'), 'detached root')
+    t.equal(tree.el.select('.tree ul li:nth-child(2)').datum()._y, 50, 'second node is at 50')
+    tree.search('M')
+    t.ok(!tree.el.select('.tree').classed('detached-root'), 'tree not showing a detached root')
+    t.equal(tree.el.select('.tree ul li:nth-child(2)').datum()._y, 36, 'second node is at 36 (regular height)')
+    tree.search(null)
+
+    setTimeout(function () {
+      t.ok(tree.el.select('.tree').classed('detached-root'), 'tree back to detached root')
+      t.equal(tree.el.select('.tree ul li:nth-child(2)').datum()._y, 50, 'second node back at 50')
+      tree.remove()
+      t.end()
+    }, 400)
+  })
+})
