@@ -4,3 +4,4 @@ npm-debug.log
 example/.bundle.js
 .sass-cache
 dist
+coverage

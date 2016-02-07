@@ -308,10 +308,26 @@ Tree.prototype._join = function (data) {
  * or having them released by their parent and flying down to their position.
  */
 Tree.prototype._fly = function (source) {
+  var visible = this._visibleNodes()
+
   this._rebind()
-      .call(this.enter)
+      .call(this.enter, this._defaultEnterFly.bind(this, visible))
       .call(this.updater)
       .call(this.flyExit, source)
+}
+
+Tree.prototype._defaultEnterFly = function (visible, d) {
+  var y = (function p (node) {
+    if (!node) {
+      return 0
+    }
+    if (visible[node.id]) {
+      return visible[node.id]
+    }
+    return p(node.parent)
+  })(d.parent)
+
+  return 'translate(0px,' + y + 'px)'
 }
 
 /*
@@ -762,6 +778,14 @@ Tree.prototype._toggleAll = function (fn) {
   })
 }
 
+Tree.prototype._visibleNodes = function () {
+  return this.node[0].reduce(function (p, c) {
+    var _c = d3.select(c).datum()
+    p[_c.id] = _c._y
+    return p
+  }, {})
+}
+
 Tree.prototype.expandAll = function () {
   this._toggleAll(function (d) {
     delete d.collapsed
@@ -769,7 +793,8 @@ Tree.prototype.expandAll = function () {
 
   if (Object.keys(this._layout).length < this.options.maxAnimatable) {
     this._transitionWrap(function () {
-      this._rebind().call(this.enter)
+      var visible = this._visibleNodes() // Fetch visible nodes before we rebind data
+      this._rebind().call(this.enter, this._defaultEnterFly.bind(null, visible))
                     .call(this.updater)
     })()
   } else {
