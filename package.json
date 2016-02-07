@@ -15,8 +15,8 @@
     "browserify-css": "^0.8.1",
     "lodash": "^2.4.1",
     "request": "^2.36.0",
+    "smokestack": "^3.4.1",
     "tape": "^3.5.0",
-    "testling": "^1.7.1",
     "watchify": "^3.6.1"
   },
   "scripts": {
@@ -24,8 +24,7 @@
     "css": "mkdir -p dist; node-sass --include-path $(node -e \"console.log(require('bourbon').includePaths[0])\") tree.scss > dist/tree.css",
     "postinstall": "npm run css",
     "start": "node example/server.js",
-    "test": "browserify -t browserify-css test/* | testling && killall phantomjs &> /dev/null",
-    "test-browser": "browserify -t browserify-css test/* | testling -x open && killall phantomjs &> /dev/null",
+    "test": "browserify -t browserify-css test/* | smokestack",
     "watch": "watchify -r ./index.js:tree -r http -r JSONStream -o example/bundle.js -d"
   },
   "repository": {
