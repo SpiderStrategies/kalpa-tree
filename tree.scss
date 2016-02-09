@@ -272,22 +272,25 @@ $timing-fn: ease-out;
         }
       }
 
-      li.node:not(.root) {
-        cursor: move;
+      &:not(.search-results) {
+        li.node:not(.root) {
+          cursor: move;
 
-        &:hover {
-          &:after {
-            content: "";
-            position: absolute;
-            width: 5px;
-            top: 14px;
-            right: 0;
-            height: .1em;
-            background: #ADB8BC;
-            box-shadow: 0 0.25em 0 0 #ADB8BC, 0 0.5em 0 0 #ADB8BC;
+          &:hover {
+            &:after {
+              content: "";
+              position: absolute;
+              width: 5px;
+              top: 14px;
+              right: 0;
+              height: .1em;
+              background: #ADB8BC;
+              box-shadow: 0 0.25em 0 0 #ADB8BC, 0 0.5em 0 0 #ADB8BC;
+            }
           }
         }
       }
+
       li.node:not(.selected) {
         // Override opacity set in update.js
         opacity: .6 !important;
