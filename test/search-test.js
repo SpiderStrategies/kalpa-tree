@@ -91,6 +91,23 @@ test('search for null clears search', function (t) {
   })
 })
 
+test('search prevents edit mode', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    tree.editable()
+    t.ok(tree.isEditable(), 'tree starts off in edit mode')
+    tree.search('M')
+    t.ok(!tree.isEditable(), 'tree no longer editable')
+    t.ok(tree.el.select('.tree').classed('search-results'), 'tree showing search results')
+    tree.editable()
+    t.ok(!tree.isEditable(), 'tree still not editable')
+    tree.remove()
+    t.end()
+  })
+})
+
 test('ignores rootHeight overrides while showing results', function (t) {
   var s = stream()
     , tree = new Tree({

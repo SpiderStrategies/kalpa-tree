@@ -752,6 +752,10 @@ Tree.prototype.isEditable = function () {
  */
 Tree.prototype.editable = function () {
   var t = this.el.select('.tree')
+  if (t.classed('search-results')) {
+    // search results cannot be in edit mode
+    return
+  }
   t.classed('editable', !t.classed('editable'))
 }
 
@@ -949,6 +953,9 @@ Tree.prototype.removeNode = function (obj) {
 }
 
 Tree.prototype.search = function (term) {
+  if (this.isEditable()) {
+    this.editable()
+  }
   if (term == null) {
     return this.select((this._selected && this._selected.id) || (this.options.forest ? this.root[0].id : this.root.id), {
       force: this.el.select('.tree').classed('search-results')
