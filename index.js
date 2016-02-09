@@ -234,6 +234,17 @@ Tree.prototype.adjustViewport = function () {
   }
 }
 
+Tree.prototype._clearSearch = function () {
+  // Any rebind of data removes the search-results class
+  this.el.select('.tree')
+           .classed('search-results', false)
+           .on('.search-click', null)
+
+  this._searchResults = null
+
+  return this
+}
+
 /*
  * Rebinds the data to the selection based on the data model in the tree.
  */
@@ -247,10 +258,8 @@ Tree.prototype._rebind = function () {
                  return d
                }
 
-  // Any rebind of data removes the search-results class
-  this.el.select('.tree').classed('search-results', false)
-                         .classed('detached-root', !!this._rootOffset)
-  this._searchResults = null
+  this._clearSearch()
+      .el.select('.tree').classed('detached-root', !!this._rootOffset)
 
   if (this.options.forest) {
     data = this.root.reduce(function (p, subTree) {
@@ -970,6 +979,13 @@ Tree.prototype.search = function (term) {
   this._transitionWrap(function () {
     this.el.select('.tree').classed('search-results', true)
                            .classed('detached-root', false)
+                           .on('click.search-click', function () {
+                              // Capture the click event at the tree level, and collapse all nodes
+                              // before the actual node is selected
+                              self._toggleAll(function (d) {
+                                d.collapsed = true
+                              })
+                           }, true)
     this._searchResults = data
     this._join(data)
         .call(this.enter)
