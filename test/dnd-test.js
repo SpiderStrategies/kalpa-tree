@@ -80,6 +80,20 @@ test('dnd dependent on edit mode', function (t) {
   })
 })
 
+test('dnd prevented if displaying search results', function (t) {
+  before(function (tree, dnd) {
+    tree.search('M')
+    tree.editable()
+    t.ok(!dnd._dragging, 'tree not marked as dragging')
+    dnd.start({y: 100})
+    t.ok(!dnd._dragging, 'tree still not marked as dragging')
+    dnd._end()
+    tree.remove()
+    document.querySelector('.container').remove()
+    t.end()
+  })
+})
+
 test('cannot move root', function (t) {
   before(function (tree, dnd) {
     tree.editable()
