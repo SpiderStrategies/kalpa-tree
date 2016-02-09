@@ -816,6 +816,7 @@ Tree.prototype.collapseAll = function () {
   if (Object.keys(this._layout).length < this.options.maxAnimatable) {
     this._transitionWrap(function () {
       this._rebind()
+          .call(this.enter) // Seems odd, but needed in case we're showing a subset of the tree (i.e. search results)
           .call(this.updater)
           .call(this.flyExit, null, function (d) {
             var c = p = d.parent
