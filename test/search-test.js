@@ -91,6 +91,25 @@ test('search for null clears search', function (t) {
   })
 })
 
+test('shows seleceted search result in a collapsed tree', function (t) {
+  var s = stream()
+    , tree = new Tree({ stream: s }).render()
+
+  document.body.appendChild(tree.el.node()) // Add to the dom so the click handlers work
+
+  s.on('end', function () {
+    tree.expandAll()
+    tree.search('M')
+    t.equal(tree.node.size(), 25, '25 nodes visible')
+    t.ok(tree.el.select('.tree').classed('search-results'), 'tree showing search-results')
+    tree.node[0][3].click() // Click on M4
+    t.equal(tree.node.size(), 18, '18 nodes visible') // Not all nodes from previous expandAll
+    t.ok(!tree.el.select('.tree').classed('search-results'), 'tree not showing search-results')
+    tree.remove()
+    t.end()
+  })
+})
+
 test('ignores rootHeight overrides while showing results', function (t) {
   var s = stream()
     , tree = new Tree({
