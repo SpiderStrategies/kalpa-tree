@@ -21,7 +21,7 @@
   },
   "scripts": {
     "bundle": "browserify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
-    "css": "node-sass --include-path $(node -e \"console.log(require('bourbon').includePaths[0])\") tree.scss > dist/tree.css",
+    "css": "node scripts/css.js",
     "postinstall": "npm run css",
     "start": "node example/server.js",
     "test": "browserify -t browserify-css test/* | testling && killall phantomjs &> /dev/null",
