@@ -159,6 +159,27 @@ test('select a node adds transitions by default', function (t) {
   })
 })
 
+test('marks freshly selected nodes as `selecting`', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    var redraw = tree._forceRedraw
+    tree._forceRedraw = function () {
+      var n = tree.el.selectAll('.tree li.node.selecting')
+      t.equal(n.size(), 1, 'we have a selecting node')
+      redraw.apply(this, arguments)
+    }
+    tree.on('select', function () {
+      t.equal(tree.el.selectAll('.tree li.node.selecting').size(), 0, 'no `selecting` nodes after select event')
+      tree.el.remove()
+      t.end()
+    })
+    t.equal(tree.el.selectAll('.tree li.node.selecting').size(), 0, 'no `selecting` nodes')
+    tree.select(1015)
+  })
+})
+
 test('selected nodes descendants transition from correct location', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()

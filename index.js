@@ -656,6 +656,7 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
 
   // tree_.selected stores a previously selected node
   if (this._selected) {
+    var prev = this._selected.id
     // delete the selected field from that node
     delete this._selected.selected
   }
@@ -674,8 +675,18 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
 
   // Adjust selected properties
   this.node.classed('selected', function (d) {
-    return d.selected
-  })
+             return d.selected
+           })
+           .classed('selecting', function (d) {
+             // Mark as `selecting` if it's newly selected
+             return d.selected && d.id !== prev
+           })
+
+  // Trigger a reflow to start any transitions
+  this._forceRedraw()
+
+  // Now the node is no longer `selecting`
+  this.node.classed('selecting', false)
 
   if (!opt.silent) {
     this.emit('select', this.nodes[d.id])
