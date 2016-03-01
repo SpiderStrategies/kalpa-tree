@@ -568,26 +568,6 @@ Tree.prototype.select = function (id, opt) {
     }
 
     this._onSelect(d, null, null, opt)
-
-    // check if we need to scroll this element into view
-    var n = this.el.select('.tree').node()
-
-    if (d._y < n.scrollTop || d._y > n.offsetHeight + n.scrollTop) {
-      // Now scroll the node into view
-      if (opt.animate === false || this._tuned) {
-        n.scrollTop = d._y
-      } else {
-        d3.timer(function () {
-          n.scrollTop = d._y
-          return true
-        }, this.transitionTimeout)
-      }
-
-      if (this._tuned) {
-        // Where we scrolled may not have anything drawn, so redraw based on the viewport
-        this.adjustViewport()
-      }
-    }
   }
 }
 
@@ -643,6 +623,32 @@ Tree.prototype._expandAncestors = function (d) {
   })(d.parent)
 }
 
+/*
+ * Scrolls a node into view
+ */
+Tree.prototype._scrollIntoView = function (d, opt) {
+  // check if we need to scroll this element into view
+  var n = this.el.select('.tree').node()
+
+  if (d._y < n.scrollTop || d._y > n.offsetHeight + n.scrollTop) {
+    // Now scroll the node into view
+    if (opt.animate === false || this._tuned) {
+      n.scrollTop = d._y
+    } else {
+      // We're playing animations, wait until they are done
+      d3.timer(function () {
+        n.scrollTop = d._y
+        return true
+      }, this.transitionTimeout)
+    }
+
+    if (this._tuned) {
+      // Where we scrolled may not have anything drawn, so redraw based on the viewport
+      this.adjustViewport()
+    }
+  }
+}
+
 Tree.prototype._onSelect = function (d, i, j, opt) {
   if (d3.event && d3.event.defaultPrevented) {
     return  // click events were suppressed by dnd (presumably)
@@ -687,6 +693,8 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
 
   // Now the node is no longer `selecting`
   this.node.classed('selecting', false)
+
+  this._scrollIntoView(d, opt)
 
   if (!opt.silent) {
     this.emit('select', this.nodes[d.id])
