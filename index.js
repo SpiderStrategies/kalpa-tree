@@ -784,16 +784,6 @@ Tree.prototype.editable = function () {
 }
 
 /*
- * Edits a single node
- */
-Tree.prototype.edit = function (d) {
-  if (d.id && this.nodes[d.id]) {
-    this._patch(d)
-    this._transitionWrap(this._slide)(this._layout[d.id])
-  }
-}
-
-/*
  * Toggle all isn't necessary the best name, because it doesn't toggle the root node,
  * since the first children are always visible
  */
@@ -869,17 +859,21 @@ Tree.prototype.collapseAll = function () {
 }
 
 /*
- * Receives an array of patch changes, or a stream that emits data events with
- * the node and the changes.
+ * Makes modifications to tree node(s). Can update a single node, an array of patch
+ * changes, or a stream that emits data events with the node and the changes
  */
-Tree.prototype.patch = function (obj) {
-  var self = this
-  if (Array.isArray(obj)) {
-    obj.forEach(this._patch.bind(this))
-    self._transitionWrap(self._slide)()
+Tree.prototype.edit = function (obj) {
+  if (typeof obj === 'object' && obj.id && this.nodes[obj.id]) {
+    this._edit(obj)
+    this._transitionWrap(this._slide)(this._layout[obj.id])
+  } else if (Array.isArray(obj)) {
+    obj.forEach(this._edit.bind(this))
+    this._transitionWrap(this._slide)()
   } else if (typeof obj.on === 'function' ) {
+    // Assume it's a stream.
+    var self = this
     obj.on('data', function (d) {
-         self._patch(d)
+         self._edit(d)
        })
        .on('end', function () {
          self._transitionWrap(self._slide)()
@@ -891,7 +885,7 @@ Tree.prototype.patch = function (obj) {
  * Merges properties from obj into the data object in the tree with the same id
  * as obj
  */
-Tree.prototype._patch = function (obj) {
+Tree.prototype._edit = function (obj) {
   var d = this.nodes[obj.id]
     , _d = this._layout[obj.id]
 

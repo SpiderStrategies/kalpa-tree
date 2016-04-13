@@ -43,7 +43,7 @@ test('children', function (t) {
     var children = tree.children(1003)
     t.equal(children.length, 10, '1003 has ten children')
 
-    tree.patch([{id: 1006, visible: false}, {id: 1007, visible: false}])
+    tree.edit([{id: 1006, visible: false}, {id: 1007, visible: false}])
     t.deepEqual(children, tree.children(1003), '1003 has the same number of children')
     tree.el.remove()
     t.end()
@@ -61,7 +61,7 @@ test('siblings', function (t) {
     t.deepEqual(tree.nextSibling(1007), tree.get(1008), 'correct next sibling')
     t.deepEqual(tree.previousSibling(1008), tree.get(1007), 'correct previous sibling')
 
-    tree.patch([{id: 1006, visible: false}, {id: 1007, visible: false}])
+    tree.edit([{id: 1006, visible: false}, {id: 1007, visible: false}])
     t.deepEqual(tree.nextSibling(1005), tree.get(1006), 'next sibling includes invisible nodes')
     t.deepEqual(tree.previousSibling(1008), tree.get(1007), 'previous sibling includes invisible nodes')
     tree.remove()
@@ -659,13 +659,13 @@ test('edits a node', function (t) {
   })
 })
 
-test('patch the tree by array of changes', function (t) {
+test('edit the tree by array of changes', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, indicator: true}).render()
     , el = tree.el.node()
 
   s.on('end', function () {
-    tree.patch([{id: 1002, color: 'red', nodeType: 'perspective', label: 'Patched 1002'}])
+    tree.edit([{id: 1002, color: 'red', nodeType: 'perspective', label: 'Patched 1002'}])
 
     var d = tree.get(1002)
     t.equal(d.label, 'Patched 1002', 'labels are equal')
@@ -682,7 +682,7 @@ test('patch the tree by array of changes', function (t) {
   })
 })
 
-test('patch changes nodes visibility', function (t) {
+test('edit changes nodes visibility', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
 
@@ -691,7 +691,7 @@ test('patch changes nodes visibility', function (t) {
       var el = tree.el.node()
       tree.expandAll()
 
-      tree.patch([{id: 1006, visible: false}, {id: 1008, visible: false}, {id: 1058, visible: false}])
+      tree.edit([{id: 1006, visible: false}, {id: 1008, visible: false}, {id: 1058, visible: false}])
 
       var n1 = tree._layout[1006]
       t.equal(n1.parent.children.length, n1.parent._allChildren.length - 2, 'parent has two invisible nodes')
@@ -700,7 +700,7 @@ test('patch changes nodes visibility', function (t) {
       t.equal(n2.parent.children.length, n2.parent._allChildren.length - 1, '1058 parent is missing 1058')
       t.equal(n2.parent.children.indexOf(n2), -1, 'expanded n2 parent does not have 1058 as a child')
 
-      tree.patch([{id: 1058, visible: true}])
+      tree.edit([{id: 1058, visible: true}])
       t.equal(n2.parent.children.indexOf(n2), 1, 'expanded n2 parent now contains 1058')
       t.end()
     })
@@ -722,18 +722,18 @@ test('patch visibility toggling', function (t) {
     var originalIndex = parent.children.indexOf(tree._layout[1006])
 
     // Set visible: false on 1006
-    tree.patch([{id: 1006, visible: false}])
+    tree.edit([{id: 1006, visible: false}])
     t.equal(parent.children.length, parent._allChildren.length - 1, '1003 has an invisible node')
     t.equal(parent.children.length, 9, '1003 is missing 1006')
 
     // Set visible: true on 1006
-    tree.patch([{id: 1006, visible: true}])
+    tree.edit([{id: 1006, visible: true}])
 
     t.equal(parent.children.length, parent._allChildren.length, '1003 does not have invisible nodes')
     t.equal(parent.children.indexOf(tree._layout[1006]), originalIndex, '1006 was restored to original location')
 
-    tree.patch([{id: 1006, visible: false}, {id: 1007, visible: false}, {id: 1008, visible: false}])
-    tree.patch([{id: 1008, visible: true}])
+    tree.edit([{id: 1006, visible: false}, {id: 1007, visible: false}, {id: 1008, visible: false}])
+    tree.edit([{id: 1008, visible: true}])
 
     t.equal(parent.children.length, 8, '1003 has two invisible nodes')
 
@@ -748,29 +748,29 @@ test('patch visibility toggling', function (t) {
   tree.render()
 })
 
-test('patch the tree with stream of data events containing the changes', function (t) {
+test('edit the tree with stream of data events containing the changes', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
-    , patchStream = new Readable({objectMode: true})
+    , editStream = new Readable({objectMode: true})
     , i = 1002
 
-  patchStream._read = function () {
+  editStream._read = function () {
     var id = i++
     if (id < 1004) {
-      return patchStream.push({id: id, label: 'Patched ' + id })
+      return editStream.push({id: id, label: 'Patched ' + id })
     }
-    patchStream.push(null)
+    editStream.push(null)
   }
 
   s.on('end', function () {
-    patchStream.on('end', function () {
+    editStream.on('end', function () {
       t.equal(tree.get(1002).label, 'Patched 1002', '1002 labels are equal')
       t.equal(tree.get(1003).label, 'Patched 1003', '1003 labels are equal')
       tree.remove()
       t.end()
     })
-    tree.patch(patchStream)
+    tree.edit(editStream)
   })
 })
 
