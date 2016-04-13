@@ -11,8 +11,17 @@ var d3 = require('d3')
   , update = require('./lib/update')
   , identity = function (v) { return v }
 
+var merge = function (from, to) {
+  to = to || {}
+  for (var prop in from) {
+    to[prop] = from[prop]
+  }
+  return to
+}
+
 var defaults = function () {
   return {
+    transientId: -1, // Node's that are `placeholders` are not part of the tree yet.
     toggleOnSelect: true, // By default each select will toggle the node if needed. This prevents the toggle
     depth: 20, // indentation depth
     height: 36, // height of each row (repeated in tree.less)
@@ -890,9 +899,7 @@ Tree.prototype._edit = function (obj) {
     , _d = this._layout[obj.id]
 
   if (d) {
-    for (var prop in obj) {
-      d[prop] = obj[prop]
-    }
+    d = merge(obj, d)
 
     // Check is the visible property has been set
     if (typeof obj.visible !== 'undefined') {
@@ -1018,6 +1025,56 @@ Tree.prototype.toggle = function (d, opt) {
   opt = opt || {}
   _d.collapsed = !_d.collapsed
   this._transitionWrap(this._fly, opt.animate)(_d)
+}
+
+Tree.prototype.addTransient = function (d, parent, idx) {
+  var t = merge(d)
+  t.id = this.options.transientId // Force feed it a fake id
+  var node = Tree.prototype.add.call(this, t, parent, idx)
+
+  // If we added the transient node (meaning we didn't already have a transient node)
+  if (node) {
+    this.node.filter(function (d) {
+               return d.id === node.id
+             })
+             .classed('transient', true)
+  }
+  return this
+}
+
+Tree.prototype.editTransient = function (d) {
+  var t = merge(d, this.nodes[this.options.transientId])
+  t.id = this.options.transientId // Force it the transient id
+  return Tree.prototype.edit.call(this, t)
+}
+
+/*
+ * Save the current transient node, giving it the new id
+ */
+Tree.prototype.saveTransient = function (id) {
+  var node = this.nodes[this.options.transientId]
+
+  if (!node) {
+    throw new Error('No transient node')
+  }
+
+  node.id = id
+  this.nodes[id] = node
+  delete this.nodes[this.options.transientId]
+
+  var l = this._layout[this.options.transientId]
+  if (l) {
+    l.id = id
+    this._layout[id] = l
+    delete this._layout[this.options.transientId]
+  }
+  this._rebind()
+      .call(this.updater)
+      .classed('transient', false)
+}
+
+Tree.prototype.removeTransient = function () {
+  this.removeNode(this.options.transientId)
 }
 
 module.exports = Tree
