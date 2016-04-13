@@ -351,13 +351,13 @@ Tree.prototype._slide = function (source) {
       .call(this.enter, function (d) {
         // if there's a source, enter at that source's position, otherwise add the node at its position
         return 'translate(0px,' + (source ? source._y : d._y) + 'px)'
-      }, 'fading-node placeholder')
+      }, 'fading-node transition-placeholder')
       .call(function (selection) {
         // Remove the fading-node class, now that it's in the dom
         selection.classed('fading-node', false)
-        // Then remove the placeholder class once the transitions have run
+        // Then remove the transition-placeholder class once the transitions have run
         d3.timer(function () {
-          selection.classed('placeholder', false)
+          selection.classed('transition-placeholder', false)
           return true // run once
         }, self.transitionTimeout)
       })
