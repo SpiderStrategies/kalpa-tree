@@ -228,6 +228,10 @@ $timing-fn: ease-out;
           }
         }
 
+        &.transient {
+          pointer-events: none;
+        }
+
         &.fading-node {
           height: 0; // either finishes or ends at 0
         }
@@ -273,7 +277,7 @@ $timing-fn: ease-out;
       }
 
       &:not(.search-results) {
-        li.node:not(.root) {
+        li.node:not(.root):not(.transient) {
           cursor: move;
 
           &:hover {

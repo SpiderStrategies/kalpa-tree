@@ -17,8 +17,16 @@ test('setup', function (t) {
 })
 
 test('update adjusts node styles', function (t) {
-  var updater = update({prefix: '-webkit-', options: { height: 10 }})
-  var nodes = d3.select('ul.nodes-container').selectAll('li')
+  var updater = update({
+      prefix: '-webkit-',
+      options: {
+        height: 10,
+        accessors: {
+          id: 'id'
+        }
+      }
+    })
+    , nodes = d3.select('ul.nodes-container').selectAll('li')
 
   nodes.call(updater)
 
