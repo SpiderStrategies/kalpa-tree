@@ -16,6 +16,9 @@ test('allows transient nodes', function (t) {
       nodeType: 'metric'
     }, 1003)
 
+
+    t.equal(tree.getTransient().label, 'New transient', 'getTransient returns transient node')
+
     t.deepEqual(tree._layout[tree.options.transientId].parent, tree._layout[1003], 'transient node\'s parent is correct')
     t.equal(tree.el.select('.tree ul li.transient').size(), 1, 'transient node in the dom')
     t.equal(tree.el.select('.tree ul li.transient').datum().id, tree.options.transientId, 'transient id stored')

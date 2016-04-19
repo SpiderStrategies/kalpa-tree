@@ -1042,6 +1042,10 @@ Tree.prototype.addTransient = function (d, parent, idx) {
   return this
 }
 
+Tree.prototype.getTransient = function () {
+  return Tree.prototype.get.call(this, this.options.transientId)
+}
+
 Tree.prototype.editTransient = function (d) {
   var t = merge(d, this.nodes[this.options.transientId])
   t.id = this.options.transientId // Force it the transient id
