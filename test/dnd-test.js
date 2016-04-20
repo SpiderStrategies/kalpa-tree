@@ -25,6 +25,7 @@ function before (next, opts) {
     // Mock d3.event
     d3.event = new Event
     d3.event.sourceEvent = new Event
+    d3.event.sourceEvent.which = 1
     next(tree, dnd)
   })
 }
