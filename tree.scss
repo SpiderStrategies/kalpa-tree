@@ -230,6 +230,7 @@ $timing-fn: ease-out;
 
         &.transient {
           pointer-events: none;
+          overflow: hidden; // prevent scrollbar for opening animation
         }
 
         &.fading-node {
@@ -295,8 +296,8 @@ $timing-fn: ease-out;
         }
       }
 
-      li.node:not(.selected) {
-        // Override opacity set in update.js
+      li.node:not(.transient):not(.selected) {
+        // Override opacity set in update.js for non selected/transient nodes
         opacity: .6 !important;
       }
     }
