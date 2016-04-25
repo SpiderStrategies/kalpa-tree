@@ -1030,16 +1030,7 @@ Tree.prototype.toggle = function (d, opt) {
 Tree.prototype.addTransient = function (d, parent, idx) {
   var t = merge(d)
   t.id = this.options.transientId // Force feed it a fake id
-  var node = Tree.prototype.add.call(this, t, parent, idx)
-
-  // If we added the transient node (meaning we didn't already have a transient node)
-  if (node) {
-    this.node.filter(function (d) {
-               return d.id === node.id
-             })
-             .classed('transient', true)
-  }
-  return this
+  return Tree.prototype.add.call(this, t, parent, idx)
 }
 
 Tree.prototype.getTransient = function () {
@@ -1074,7 +1065,6 @@ Tree.prototype.saveTransient = function (id) {
   }
   this._rebind()
       .call(this.updater)
-      .classed('transient', false)
 }
 
 Tree.prototype.removeTransient = function () {
