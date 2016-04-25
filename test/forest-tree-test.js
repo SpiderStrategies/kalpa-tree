@@ -190,6 +190,7 @@ test('dnd allows a root nodes to change order', function (t) {
 
     d3.event = new Event
     d3.event.sourceEvent = new Event
+    d3.event.sourceEvent.type = 'mouse'
     d3.event.sourceEvent.which = 1
 
     t.equal(tree.root.length, 2, 'two root nodes to start')
@@ -240,6 +241,7 @@ test('dnd allows a node to become a new root', function (t) {
         , data = tree._layout[1003]
       d3.event = new Event
       d3.event.sourceEvent = new Event
+      d3.event.sourceEvent.type = 'mouse'
       d3.event.sourceEvent.which = 1
 
       t.equal(tree.root.length, 2, 'two root nodes to start')
@@ -306,6 +308,7 @@ test('dnd flat forest', function (t) {
         , data = tree._layout[1003]
       d3.event = new Event
       d3.event.sourceEvent = new Event
+      d3.event.sourceEvent.type = 'mouse'
       d3.event.sourceEvent.which = 1
 
       t.equal(tree.root.length, 4, 'four root nodes to start')

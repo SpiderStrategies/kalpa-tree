@@ -1,6 +1,7 @@
 module.exports = function () {
   this.stopPropagation = function () {}
   this.sourceEvent = {
-    stopPropagation: function () {}
+    stopPropagation: function () {},
+    type: 'mouse'
   }
 }
