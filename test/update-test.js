@@ -20,9 +20,20 @@ test('update adjusts node styles', function (t) {
   var updater = update({
       prefix: '-webkit-',
       options: {
+        transientId: -1,
         height: 10,
         accessors: {
           id: 'id'
+        }
+      },
+      el: {
+        select: function () {
+          return {
+            classed: function (clazz, value) {
+              t.equal(clazz, 'has-transient', 'setting has-transient class')
+              t.ok(!value, 'has-transient is false')
+            }
+          }
         }
       }
     })
