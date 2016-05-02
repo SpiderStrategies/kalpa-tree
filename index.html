@@ -150,7 +150,7 @@
       tree.editable()
     }
 
-    http.get('/tree.json', function (res) {
+    http.get('./tree.json', function (res) {
       tree = new Tree({
         stream: res.pipe(JSONStream.parse([true])),
         accessors: {
