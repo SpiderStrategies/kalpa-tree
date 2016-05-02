@@ -1,0 +1,297 @@
+.tree-container {
+  position: relative;
+  background-color: #393c40;
+  width: 100%;
+  height: 100%; }
+  .tree-container .traveling-node {
+    list-style: none;
+    position: absolute;
+    width: 100%;
+    height: 36px;
+    top: 0;
+    left: 0;
+    overflow-x: hidden;
+    -webkit-transition-property: opacity;
+    -moz-transition-property: opacity;
+    transition-property: opacity;
+    -webkit-transition-duration: 300ms;
+    -moz-transition-duration: 300ms;
+    transition-duration: 300ms;
+    -webkit-transition-timing-function: ease-out;
+    -moz-transition-timing-function: ease-out;
+    transition-timing-function: ease-out;
+    background-color: #D9E2E8;
+    width: calc(100% + 13px);
+    cursor: move; }
+    .tree-container .traveling-node .node-contents {
+      padding: 11px 0px 10px;
+      font-size: 13px;
+      line-height: 1;
+      text-align: left;
+      white-space: nowrap; }
+      .tree-container .traveling-node .node-contents svg.icon {
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 2px;
+        width: 12px;
+        height: 11px; }
+      .tree-container .traveling-node .node-contents .label {
+        display: inline-block;
+        vertical-align: middle;
+        margin-left: 8px;
+        color: #ADB8BC;
+        text-shadow: 0 1px 0 rgba(0, 0, 0, 0.23); }
+    .tree-container .traveling-node .label-mask {
+      /* This is used to mask long label names on the nodes */
+      position: absolute;
+      width: 100px;
+      height: 100%;
+      top: 0;
+      right: 0; }
+      .tree-container .traveling-node .label-mask:after {
+        content: "";
+        position: absolute;
+        width: 5px;
+        height: 5px;
+        top: 16px;
+        right: 12px;
+        border-radius: 50%; }
+    .tree-container .traveling-node .node-contents {
+      padding-left: 14px;
+      -webkit-transition-property: -webkit-transform, opacity;
+      -moz-transition-property: -moz-transform, opacity;
+      transition-property: transform, opacity;
+      -webkit-transition-duration: 300ms;
+      -moz-transition-duration: 300ms;
+      transition-duration: 300ms;
+      -webkit-transition-timing-function: ease-out;
+      -moz-transition-timing-function: ease-out;
+      transition-timing-function: ease-out; }
+      .tree-container .traveling-node .node-contents svg.icon {
+        margin-left: 9px; }
+      .tree-container .traveling-node .node-contents .label {
+        color: #2d3135;
+        -webkit-transition-property: color;
+        -moz-transition-property: color;
+        transition-property: color;
+        -webkit-transition-duration: 300ms;
+        -moz-transition-duration: 300ms;
+        transition-duration: 300ms;
+        -webkit-transition-timing-function: ease-out;
+        -moz-transition-timing-function: ease-out;
+        transition-timing-function: ease-out; }
+    .tree-container .traveling-node .label-mask {
+      background-image: -webkit-linear-gradient( left , rgba(57, 60, 64, 0) 0%, #D9E2E8 90%);
+      background-image: linear-gradient(to right, rgba(57, 60, 64, 0) 0%, #D9E2E8 90%); }
+    .tree-container .traveling-node.illegal {
+      opacity: .9 !important; }
+      .tree-container .traveling-node.illegal .node-contents {
+        opacity: .7; }
+        .tree-container .traveling-node.illegal .node-contents .icon {
+          fill: #3a4045; }
+        .tree-container .traveling-node.illegal .node-contents .label {
+          color: #3a4045; }
+      .tree-container .traveling-node.illegal:after {
+        color: #f35132;
+        background: #f35132;
+        box-shadow: 0 0.25em 0 0 #f35132, 0 0.5em 0 0 #f35132; }
+    .tree-container .traveling-node:after {
+      content: "";
+      position: absolute;
+      width: 12px;
+      top: 13px;
+      right: 10px;
+      height: .1em;
+      background: #7fe1f4;
+      box-shadow: 0 0.25em 0 0 #7fe1f4, 0 0.5em 0 0 #7fe1f4;
+      -webkit-transition-property: background, box-shadow, color;
+      -moz-transition-property: background, box-shadow, color;
+      transition-property: background, box-shadow, color;
+      -webkit-transition-duration: 300ms;
+      -moz-transition-duration: 300ms;
+      transition-duration: 300ms;
+      -webkit-transition-timing-function: ease-out;
+      -moz-transition-timing-function: ease-out;
+      transition-timing-function: ease-out; }
+    .tree-container .traveling-node .toggler, .tree-container .traveling-node .indicator:after {
+      display: none; }
+  .tree-container .tree {
+    overflow: auto;
+    overflow-x: hidden;
+    width: 100%;
+    height: 100%;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none; }
+    .tree-container .tree.transitions ul li.node {
+      -webkit-transition-property: -webkit-transform, opacity, height;
+      -moz-transition-property: -moz-transform, opacity, height;
+      transition-property: transform, opacity, height;
+      -webkit-transition-duration: 300ms;
+      -moz-transition-duration: 300ms;
+      transition-duration: 300ms;
+      -webkit-transition-timing-function: ease-out;
+      -moz-transition-timing-function: ease-out;
+      transition-timing-function: ease-out; }
+      .tree-container .tree.transitions ul li.node .node-contents {
+        -webkit-transition-property: -webkit-transform, opacity;
+        -moz-transition-property: -moz-transform, opacity;
+        transition-property: transform, opacity;
+        -webkit-transition-duration: 300ms;
+        -moz-transition-duration: 300ms;
+        transition-duration: 300ms;
+        -webkit-transition-timing-function: ease-out;
+        -moz-transition-timing-function: ease-out;
+        transition-timing-function: ease-out; }
+        .tree-container .tree.transitions ul li.node .node-contents .toggler {
+          -webkit-transition: all 300ms ease-out;
+          -moz-transition: all 300ms ease-out;
+          transition: all 300ms ease-out; }
+    .tree-container .tree:hover li.node:not(.root) .toggler {
+      opacity: 1; }
+    .tree-container .tree ul {
+      list-style-type: none;
+      padding: 0px;
+      margin: 0px;
+      -webkit-transform: translateX(0);
+      -moz-transform: translateX(0);
+      -ms-transform: translateX(0);
+      -o-transform: translateX(0);
+      transform: translateX(0); }
+      .tree-container .tree ul li.node {
+        list-style: none;
+        position: absolute;
+        width: 100%;
+        height: 36px;
+        top: 0;
+        left: 0;
+        overflow-x: hidden;
+        -webkit-transition-property: opacity;
+        -moz-transition-property: opacity;
+        transition-property: opacity;
+        -webkit-transition-duration: 300ms;
+        -moz-transition-duration: 300ms;
+        transition-duration: 300ms;
+        -webkit-transition-timing-function: ease-out;
+        -moz-transition-timing-function: ease-out;
+        transition-timing-function: ease-out;
+        cursor: pointer; }
+        .tree-container .tree ul li.node .node-contents {
+          padding: 11px 0px 10px;
+          font-size: 13px;
+          line-height: 1;
+          text-align: left;
+          white-space: nowrap; }
+          .tree-container .tree ul li.node .node-contents svg.icon {
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 2px;
+            width: 12px;
+            height: 11px; }
+          .tree-container .tree ul li.node .node-contents .label {
+            display: inline-block;
+            vertical-align: middle;
+            margin-left: 8px;
+            color: #ADB8BC;
+            text-shadow: 0 1px 0 rgba(0, 0, 0, 0.23); }
+        .tree-container .tree ul li.node .label-mask {
+          /* This is used to mask long label names on the nodes */
+          position: absolute;
+          width: 100px;
+          height: 100%;
+          top: 0;
+          right: 0; }
+          .tree-container .tree ul li.node .label-mask:after {
+            content: "";
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            top: 16px;
+            right: 12px;
+            border-radius: 50%; }
+        .tree-container .tree ul li.node.transitioning-node {
+          pointer-events: none; }
+        .tree-container .tree ul li.node .node-contents .toggler {
+          display: inline-block;
+          vertical-align: middle;
+          margin-right: 5px;
+          width: 14px;
+          height: 14px;
+          opacity: 0;
+          -webkit-transform: rotate(-90deg);
+          -moz-transform: rotate(-90deg);
+          -ms-transform: rotate(-90deg);
+          -o-transform: rotate(-90deg);
+          transform: rotate(-90deg);
+          -webkit-transform-origin: 7px 7px;
+          -moz-transform-origin: 7px 7px;
+          -ms-transform-origin: 7px 7px;
+          -o-transform-origin: 7px 7px;
+          transform-origin: 7px 7px; }
+          .tree-container .tree ul li.node .node-contents .toggler svg {
+            position: absolute;
+            width: 9px;
+            height: 6px;
+            top: 3px;
+            right: 2px;
+            fill: #818b8f; }
+          .tree-container .tree ul li.node .node-contents .toggler.expanded {
+            -webkit-transform: rotate(0deg);
+            -moz-transform: rotate(0deg);
+            -ms-transform: rotate(0deg);
+            -o-transform: rotate(0deg);
+            transform: rotate(0deg); }
+          .tree-container .tree ul li.node .node-contents .toggler.leaf {
+            visibility: hidden !important; }
+        .tree-container .tree ul li.node .label-mask {
+          background-image: -webkit-linear-gradient( left , rgba(57, 60, 64, 0) 0%, #393c40 90%);
+          background-image: linear-gradient(to right, rgba(57, 60, 64, 0) 0%, #393c40 90%); }
+          .tree-container .tree ul li.node .label-mask.indicator {
+            background-image: -webkit-linear-gradient( left , rgba(57, 60, 64, 0) 0%, #393c40 50%);
+            background-image: linear-gradient(to right, rgba(57, 60, 64, 0) 0%, #393c40 50%); }
+        .tree-container .tree ul li.node.placeholder * {
+          display: none; }
+        .tree-container .tree ul li.node.fading-node {
+          height: 0; }
+        .tree-container .tree ul li.node.selected {
+          background-color: #2d3135;
+          z-index: 1; }
+          .tree-container .tree ul li.node.selected:not(.placeholder):before {
+            content: "";
+            left: 0;
+            position: absolute;
+            width: 3px;
+            height: 100%;
+            background-color: #E1E8EB; }
+          .tree-container .tree ul li.node.selected svg.icon {
+            fill: #e1e8eb; }
+          .tree-container .tree ul li.node.selected .label {
+            color: #E1E8EB; }
+          .tree-container .tree ul li.node.selected .label-mask {
+            background-image: -webkit-linear-gradient( left , rgba(45, 49, 53, 0) 0%, #2d3135 90%);
+            background-image: linear-gradient(to right, rgba(45, 49, 53, 0) 0%, #2d3135 90%); }
+            .tree-container .tree ul li.node.selected .label-mask.indicator {
+              background-image: -webkit-linear-gradient( left , rgba(45, 49, 53, 0) 0%, #2d3135 50%);
+              background-image: linear-gradient(to right, rgba(45, 49, 53, 0) 0%, #2d3135 50%); }
+    .tree-container .tree.editable.dragging li.node.selected.placeholder {
+      background-color: inherit; }
+    .tree-container .tree.editable.dragging li.node .toggler {
+      opacity: 0 !important; }
+    .tree-container .tree.editable:not(.search-results) li.node:not(.root) {
+      cursor: move; }
+      .tree-container .tree.editable:not(.search-results) li.node:not(.root):hover:after {
+        content: "";
+        position: absolute;
+        width: 5px;
+        top: 14px;
+        right: 0;
+        height: .1em;
+        background: #ADB8BC;
+        box-shadow: 0 0.25em 0 0 #ADB8BC, 0 0.5em 0 0 #ADB8BC; }
+    .tree-container .tree.editable li.node:not(.selected) {
+      opacity: .6 !important; }
+    .tree-container .tree.forest-tree .node .node-contents {
+      padding-left: 8px; }
+    .tree-container .tree.search-results .toggler {
+      opacity: 0 !important; }

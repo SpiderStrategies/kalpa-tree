@@ -84,29 +84,11 @@
   <body>
     <div class="coords">
       <div>
-        <label for="height">Height</label>
-        <input type="text" id="height" class="coord">
-      </div>
-      <div>
-        <label for="width">Width</label>
-        <input type="text" id="width" class="coord">
-      </div>
-      <div>
-        <label for="select">Select a node</label>
-        <input type="text" id="select">
-      </div>
-      <div>
-        <button class="patch">Patch the tree</button>
+        <input type="text" id="search" class="coord">
+        <button class="search-btn">Search</button>
       </div>
     </div>
     <div class="tree-pane">
-      <div class="tree-search">
-        <input type="search" placeholder="Find"></input>
-      </div>
-      <div class="tree-toolbar tree-top-toolbar">
-        <button class="add-folder">Add Folder</button>
-        <button class="add-report">Add Report</button>
-      </div>
       <div class="container"></div>
       <div class="tree-toolbar tree-bottom-toolbar">
         <button class="expand-all">Expand All</button>
@@ -138,7 +120,7 @@
     </svg>
   </body>
 </html>
-<script src="./bundle.js"></script>
+<script src="./example-bundle.js"></script>
 <script>
   (function () {
     var Tree = require('tree')
@@ -160,29 +142,15 @@
       flip = !flip
     }
 
-    document.querySelector('.patch').addEventListener('click', function () {
-      http.get('/tree-patch.json', function (res) {
-        tree.patch(res.pipe(JSONStream.parse([true])))
-      })
+    document.querySelector('.search-btn').addEventListener('click', function () {
+      tree.search(document.querySelector('#search').value || null)
     })
 
     bt.querySelector('.state-toggler').onclick = function () {
       tree.editable()
     }
 
-    ;[].forEach.call(document.querySelectorAll('.coord'), function (coord) {
-      coord.addEventListener('blur', function () {
-        container.style[this.id] = this.value  + 'px'
-      })
-    })
-
-    document.querySelector('#select').addEventListener('change', function () {
-      tree.select(this.value)
-    })
-
-    // http.get('/documents.json', function (res) {
-    // http.get('/15-k-nodes.json', function (res) {
-    http.get('/sms-tree.json', function (res) {
+    http.get('/tree.json', function (res) {
       tree = new Tree({
         stream: res.pipe(JSONStream.parse([true])),
         accessors: {

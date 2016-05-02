@@ -20,7 +20,7 @@
     "watchify": "^3.6.1"
   },
   "scripts": {
-    "bundle": "browserify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
+    "bundle": "browserify -r ./index.js:tree -r http -r JSONStream > example-bundle.js -d",
     "css": "node scripts/css.js",
     "postinstall": "npm run css",
     "start": "node example/server.js",
