@@ -24,7 +24,7 @@
     "css": "node scripts/css.js",
     "postinstall": "npm run css",
     "start": "node example/server.js",
-    "test": "browserify -t browserify-css test/* | testling && killall phantomjs &> /dev/null",
+    "test": "browserify -t browserify-css test/* | testling",
     "test-browser": "browserify -t browserify-css test/* | testling -x open && killall phantomjs &> /dev/null",
     "watch": "watchify -r ./index.js:tree -r http -r JSONStream -o example/bundle.js -d"
   },
