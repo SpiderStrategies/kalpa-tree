@@ -394,7 +394,6 @@ Tree.prototype.children = function (obj) {
   })
 }
 
-
 /*
  * Returns a node's siblings
  */
