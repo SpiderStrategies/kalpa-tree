@@ -34,7 +34,7 @@ function before (next, opts) {
 test('fires dnd events', function (t) {
   before(function (tree, dnd) {
     tree.editable()
-    var calls = 0
+    var calls = 100
     tree.on('dndstart', function () {
       calls++
     })
