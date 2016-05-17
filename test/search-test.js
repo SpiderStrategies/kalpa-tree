@@ -91,6 +91,21 @@ test('search for null clears search', function (t) {
   })
 })
 
+test('clearing search does not fire select event', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    tree.on('select', function () {
+      t.fail('should not fire select')
+    })
+    tree.search('M')
+    tree.search(null)
+    tree.remove()
+    t.end()
+  })
+})
+
 test('shows seleceted search result in a collapsed tree', function (t) {
   var s = stream()
     , tree = new Tree({ stream: s }).render()
