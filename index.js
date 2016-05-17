@@ -979,7 +979,8 @@ Tree.prototype.removeNode = function (obj) {
 Tree.prototype.search = function (term) {
   if (term == null) {
     return this.select((this._selected && this._selected.id) || (this.options.forest ? this.root[0].id : this.root.id), {
-      force: this.el.select('.tree').classed('search-results')
+      force: this.el.select('.tree').classed('search-results'),
+      silent: true
     })
   }
 
