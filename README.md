@@ -1,5 +1,7 @@
 ## kalpa-tree
 
+[![Build Status](https://travis-ci.org/SpiderStrategies/kalpa-tree.svg?branch=master)](https://travis-ci.org/SpiderStrategies/kalpa-tree)
+
 Kalpa tree is an implementation of a hierarchical tree. It receives a stream of nodes, each data event on the stream represents a node in the tree.
 The tree is built using d3, and can handle 50K+ nodes easily. It's optimized for performance so it doesn't overload the browser if there's a lot of data.
 
