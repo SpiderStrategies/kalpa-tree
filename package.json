@@ -15,8 +15,9 @@
     "browserify-css": "^0.8.1",
     "lodash": "^2.4.1",
     "request": "^2.36.0",
+    "smokestack": "^3.4.1",
+    "tap-closer": "^1.0.0",
     "tape": "^3.5.0",
-    "testling": "^1.7.1",
     "watchify": "^3.6.1"
   },
   "scripts": {
@@ -24,16 +25,12 @@
     "css": "node scripts/css.js",
     "postinstall": "npm run css",
     "start": "node example/server.js",
-    "test": "browserify -t browserify-css test/* | testling",
-    "test-browser": "browserify -t browserify-css test/* | testling -x open && killall phantomjs &> /dev/null",
+    "test": "browserify -t browserify-css test/* | tap-closer | smokestack",
     "watch": "watchify -r ./index.js:tree -r http -r JSONStream -o example/bundle.js -d"
   },
   "repository": {
     "type": "git",
     "url": "git://github.com/SpiderStrategies/kalpa-tree.git"
-  },
-  "testling": {
-    "files": "test/*.js"
   },
   "author": "Nathan Bowser <nathan.bowser@spiderstrategies.com>",
   "license": "ISC",
