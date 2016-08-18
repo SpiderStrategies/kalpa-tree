@@ -19,9 +19,12 @@ test('setup', function (t) {
 test('update adjusts node styles', function (t) {
   var updater = update({
       prefix: '-webkit-',
+      _onToggle: Function.prototype,
+      nodes: [[]],
       options: {
         transientId: -1,
         height: 10,
+        contents: require('../lib/contents'),
         accessors: {
           id: 'id'
         }
