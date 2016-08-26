@@ -12,7 +12,7 @@ test('allows transient nodes', function (t) {
     tree.expandAll()
 
     t.ok(!tree.el.select('.tree').classed('has-transient'), 'tree does not have has-transient class')
-    tree.addTransient({
+    var _t = tree.addTransient({
       label: 'New transient',
       color: 'green',
       nodeType: 'metric'
@@ -30,6 +30,9 @@ test('allows transient nodes', function (t) {
     })
     t.ok(tree.el.select('.tree').classed('has-transient'), 'tree has has-transient class')
     t.equal(tree.el.select('.tree ul li.transient .label').text(), 'Foobar', 'transient label changed')
+
+    tree.moveTransient(_t, 1058)
+    t.deepEqual(tree._layout[tree.options.transientId].parent, tree._layout[1058], 'transient node\'s has new parent')
 
     tree.removeTransient()
     t.ok(!tree.el.select('.tree').classed('has-transient'), 'tree does not have has-transient class')
