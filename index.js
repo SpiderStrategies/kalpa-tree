@@ -1043,10 +1043,8 @@ Tree.prototype.editTransient = function (d) {
   return Tree.prototype.edit.call(this, t)
 }
 
-Tree.prototype.moveTransient = function (d, to) {
-  var t = merge(d)
-  t.id = this.options.transientId // Force it the transient id
-  return Tree.prototype.move.call(this, t, to)
+Tree.prototype.moveTransient = function (to) {
+  return Tree.prototype.move.call(this, this.getTransient(), to)
 }
 
 /*
