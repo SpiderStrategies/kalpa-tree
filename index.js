@@ -746,7 +746,7 @@ Tree.prototype.add = function (d, parent, idx) {
     this._transitionWrap(this._slide)()
     return d
   } else if (parent) {
-    parent = this._layout[typeof parent === 'object' ? parent.id : parent]
+    parent = this._layout[parent !== null && typeof parent === 'object' ? parent.id : parent]
   } else if (!parent && !this.root) {
     this.root = _d
   } else {
