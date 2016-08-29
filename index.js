@@ -451,7 +451,7 @@ Tree.prototype.move = function (node, to) {
     return
   }
 
-  var _to = this._layout[typeof to === 'object' ? to.id : to]
+  var _to = this._layout[to !== null && typeof to === 'object' ? to.id : to]
 
   if (_to) {
     this._removeFromParent(_node)
