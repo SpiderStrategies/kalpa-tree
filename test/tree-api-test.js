@@ -72,7 +72,7 @@ test('siblings', function (t) {
 test('moves a node', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
-   , el = tree.el.node()
+    , el = tree.el.node()
 
   s.on('end', function () {
     var orgParent = tree._layout[1003].parent
@@ -84,6 +84,24 @@ test('moves a node', function (t) {
       t.equal(orgParent._allChildren.length, orgChildrenLength - 1, 'orginal parent is missing a child')
       t.deepEqual(tree._layout[1003].parent, tree._layout[1025], 'moved node has new parent')
       t.deepEqual(tree._layout[1025]._allChildren[tree._layout[1025]._allChildren.length -1], tree._layout[1003], '1003 was pushed to end of 1025')
+      t.end()
+    })
+  })
+})
+
+test('moves a node with index', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  s.on('end', function () {
+    var orgParent = tree._layout[1003].parent
+      , orgChildrenLength = orgParent._allChildren.length
+
+    tree.move(1003, 1025, 2)
+
+    process.nextTick(function () {
+      t.deepEqual(tree._layout[1025]._allChildren[2], tree._layout[1003], '1003 was set as third child of 1025')
       t.end()
     })
   })

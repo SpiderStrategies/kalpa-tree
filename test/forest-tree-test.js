@@ -175,6 +175,21 @@ test('moves a node to a new root', function (t) {
   })
 })
 
+test('moves a node to a new root at some position', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s, forest: true}).render()
+
+  s.on('end', function () {
+    tree.move(1003, null, 0)
+
+    t.deepEqual(tree.root[0], tree._layout[1003], 'first root node is 1003')
+    tree.move(1004, null, 1)
+    t.deepEqual(tree.root[1], tree._layout[1004], 'second root node is 1004')
+    t.equal(tree.root.length, 4, 'four root nodes')
+    t.end()
+  })
+})
+
 test('dnd allows a root nodes to change order', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
