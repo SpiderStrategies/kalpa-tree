@@ -167,6 +167,9 @@ test('moves a node to a new root', function (t) {
       t.equal(tree.root.length, 3, 'three root nodes')
       t.deepEqual(tree.root[2], tree._layout[1003], 'last root node is 1003')
       t.equal(tree._layout[1002]._allChildren.length, 1, '1002 has one child')
+
+      tree.move(1004, null)
+      t.equal(tree.root.length, 4, 'four root nodes')
       t.end()
     })
   })
