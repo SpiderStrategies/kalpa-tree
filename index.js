@@ -443,8 +443,11 @@ Tree.prototype.previousSibling = function (obj) {
  * Moves a node within the tree
  * If to is missing and the tree is a forest, the node will be moved
  * to a new root node of the forest tree
+ *
+ * If an optional index is received, the node will be inserted at that index within the
+ * `to`'s children.
  */
-Tree.prototype.move = function (node, to) {
+Tree.prototype.move = function (node, to, idx) {
   var _node = this._layout[typeof node === 'object' ? node.id : node]
 
   if (!node) {
@@ -456,11 +459,12 @@ Tree.prototype.move = function (node, to) {
   if (_to) {
     this._removeFromParent(_node)
     delete _to.collapsed
-    ;(_to._allChildren || (_to._allChildren = [])).push(_node)
+    var children = (_to._allChildren || (_to._allChildren = []))
+    children.splice(typeof idx === 'number' ? idx : children.length, 0, _node)
     this._expandAncestors(_to)
   } else if (this.options.forest) {
     this._removeFromParent(_node)
-    this.root.push(_node)
+    this.root.splice(typeof idx === 'number' ? idx : this.root.length, 0, _node)
   }
   this._transitionWrap(this._slide)()
 }
@@ -737,16 +741,11 @@ Tree.prototype.add = function (d, parent, idx) {
     // Forest tree and the new node is a new root
     this.nodes[d.id] = d // Store the real node
     this._layout[_d.id] = _d
-    if (typeof idx === 'number') {
-      this.root.splice(idx, 0, _d)
-    } else {
-      this.root.push(_d)
-    }
-
+    this.root.splice(typeof idx === 'number' ? idx : this.root.length, 0, _d)
     this._transitionWrap(this._slide)()
     return d
   } else if (parent) {
-    parent = this._layout[typeof parent === 'object' ? parent.id : parent]
+    parent = this._layout[parent !== null && typeof parent === 'object' ? parent.id : parent]
   } else if (!parent && !this.root) {
     this.root = _d
   } else {
@@ -1043,8 +1042,8 @@ Tree.prototype.editTransient = function (d) {
   return Tree.prototype.edit.call(this, t)
 }
 
-Tree.prototype.moveTransient = function (to) {
-  return Tree.prototype.move.call(this, this.getTransient(), to)
+Tree.prototype.moveTransient = function (to, idx) {
+  return Tree.prototype.move.call(this, this.getTransient(), to, idx)
 }
 
 /*
