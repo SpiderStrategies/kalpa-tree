@@ -44,19 +44,28 @@ test('render populates data from stream', function (t) {
   })
 })
 
-test('allows node drawing overrides', function (t) {
+test('allows node contents overrides', function (t) {
   var s = stream()
     , tree = new Tree({
     stream: s,
     contents: function (selection) {
-      selection.append('div')
-               .attr('class', 'node-child')
-               .text(function (d) { return 'node-child-' + d.id })
+      selection.each(function (data) {
+        var node = d3.select(this)
+                     .selectAll('.node-child')
+                     .data(function (d) {
+                       return [d]
+                     })
+
+        node.enter()
+            .append('div')
+              .attr('class', 'node-child')
+              .text(function (d) { return 'node-child-' + d.id })
+      })
     }
   }).render()
 
   s.on('end', function () {
-    t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child')[0].innerHTML, '<div class="node-child">node-child-1001</div>', 'node contents overriden')
+    t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child')[0].innerHTML, '<div class="node-child" style="-webkit-transform:translate(0px,0px)">node-child-1001</div>', 'node contents overriden')
     tree.remove()
     t.end()
   })
