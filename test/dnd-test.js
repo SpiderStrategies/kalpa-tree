@@ -45,6 +45,7 @@ test('fires dnd events', function (t) {
       calls++
     })
     dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
+    dnd._dragging = true
     d3.event.y = tree._layout[1004]._y + 20// new y location
     dnd.drag.apply(tree.node[0][3], [tree._layout[1004], 3])
     d3.event.keyCode = 27
@@ -72,9 +73,12 @@ test('dnd dependent on edit mode', function (t) {
     t.ok(!dnd._dragging, 'tree not marked as dragging')
     dnd.start()
     t.ok(!dnd._dragging, 'tree still not marked as dragging')
+    t.notOk(dnd._travelerTimeout, 'traveler timeout not created')
     tree.editable()
     dnd.start({y: 100})
-    t.ok(dnd._dragging, 'tree marked as dragging')
+    t.ok(dnd._travelerTimeout, 'created the traveler timeout, so dnd will be starting')
+    clearTimeout(dnd._travelerTimeout)
+
     dnd._end()
     tree.remove()
     document.querySelector('.container').remove()
@@ -86,9 +90,9 @@ test('dnd prevented if displaying search results', function (t) {
   before(function (tree, dnd) {
     tree.search('M')
     tree.editable()
-    t.ok(!dnd._dragging, 'tree not marked as dragging')
+    t.notOk(dnd._travelerTimeout, 'tree traveler timeout not created (not dragging)')
     dnd.start({y: 100})
-    t.ok(!dnd._dragging, 'tree still not marked as dragging')
+    t.notOk(dnd._travelerTimeout, 'tree traveler timeout still not created (not dragging)')
     dnd._end()
     tree.remove()
     document.querySelector('.container').remove()
@@ -150,6 +154,7 @@ test('creates a traveler on first drag ', function (t) {
   before(function (tree, dnd) {
     tree.editable()
     dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
+    dnd._dragging = true
     t.ok(dnd._travelerTimeout, 'timeout was set')
     d3.event.y = tree._layout[1004]._y + 20// new y location
     dnd.drag.apply(tree.node[0][3], [tree._layout[1004], 3])
@@ -170,6 +175,7 @@ test('drag moves traveler', function (t) {
     tree.editable()
     process.nextTick(function () {
       dnd.start.apply(node, [data, 3])
+      dnd._dragging = true
       t.ok(dnd._travelerTimeout, 'timeout was set')
       d3.event.y = data._y
       dnd.drag.apply(node, [data, 3])
@@ -200,6 +206,7 @@ test('drag changes data', function (t) {
 
     tree.editable()
     dnd.start.apply(node, [data, 3])
+    dnd._dragging = true
     d3.event.y = 290
     dnd.drag.apply(node, [data, 3])
 
@@ -226,6 +233,7 @@ test('escape keypress cancels dnd', function (t) {
 
     tree.editable()
     dnd.start.apply(node, [data, 3])
+    dnd._dragging = true
     d3.event.y = 290
     dnd.drag.apply(node, [data, 3])
 
@@ -259,20 +267,24 @@ test('end cleans up', function (t) {
       escapeCalls++
     }
     dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
-    d3.event.y = tree._layout[1004]._y + 20// new y location
-    keypress()
-    dnd.drag.apply(tree.node[0][3], [tree._layout[1004], 3])
-    t.ok(tree.el.select('.tree').classed('dragging', true), 'tree has dragging class')
-    dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
-    t.ok(tree.el.select('.tree').classed('dragging', true), 'tree not longer has dragging class')
-    keypress()
 
-    t.equal(escapeCalls, 1, 'end removes keydown listener')
-    t.equal(tree.el.select('.traveling-node').size(), 0, 'traveling node is out of the dom')
-    t.ok(!dnd.traveler, 'traveler is null')
-    tree.remove()
-    document.querySelector('.container').remove()
-    t.end()
+    setTimeout(function() {
+      dnd._dragging = true
+      d3.event.y = tree._layout[1004]._y + 20// new y location
+      keypress()
+      dnd.drag.apply(tree.node[0][3], [tree._layout[1004], 3])
+      t.ok(tree.el.select('.tree').classed('dragging', true), 'tree has dragging class')
+      dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
+      t.ok(tree.el.select('.tree').classed('dragging', true), 'tree not longer has dragging class')
+      keypress()
+
+      t.equal(escapeCalls, 1, 'end removes keydown listener')
+      t.equal(tree.el.select('.traveling-node').size(), 0, 'traveling node is out of the dom')
+      t.ok(!dnd.traveler, 'traveler is null')
+      tree.remove()
+      document.querySelector('.container').remove()
+      t.end()
+    }, 400)
   })
 })
 
@@ -287,6 +299,7 @@ test('dnd autoscrolls', function (t) {
 
     process.nextTick(function () {
       dnd.start.apply(node, [data, 3])
+      dnd._dragging = true
       d3.event.y = data._y
       dnd.drag.apply(node, [data, 3])
       // t.equal(tree.el.select('.traveling-node').datum()._y, data._y - tree.options.height / 2, 'traveler _y starts centered on the the src')
@@ -329,6 +342,7 @@ test('disable non-metrics dropped onto metrics', function (t) {
 
     tree.editable()
     dnd.start.apply(node, [data, 3])
+    dnd._dragging = true
     d3.event.y = 290 // This would move 1058 onto 1008 which is a metric
     dnd.drag.apply(node, [data, 3])
 
@@ -354,6 +368,7 @@ test('moves a node below root, when root is detached', function (t) {
       , m2d = tree._layout[1005]
 
     dnd.start.apply(m2, [m2d, 4])
+    dnd._dragging = true
     d3.event.y = 5
     dnd.drag.apply(m2, [m2d, 4])
 
@@ -390,6 +405,7 @@ test('marks traveler as illegal if its too deep', function (t) {
       , m2d = tree._layout[1005]
 
     dnd.start.apply(m2, [m2d, 4])
+    dnd._dragging = true
     d3.event.y = 150
     dnd.drag.apply(m2, [m2d, 4])
 
@@ -402,6 +418,7 @@ test('marks traveler as illegal if its too deep', function (t) {
           , m3d = tree._layout[1006]
 
         dnd.start.apply(m3, [m3d, 5])
+        dnd._dragging = true
         d3.event.y = 190
         dnd.drag.apply(m3, [m3d, 5])
 
@@ -422,6 +439,7 @@ test('marks traveler as illegal if its too deep', function (t) {
               , nonMetricData = tree._layout[1058]
 
             dnd.start.apply(nonMetric, [nonMetricData, 17])
+            dnd._dragging = true
             d3.event.y = 190
             dnd.drag.apply(nonMetric, [nonMetricData, 17])
 
@@ -448,6 +466,7 @@ test('multiple moves with embedded traveler if target node equals the previous n
   before(function (tree, dnd) {
     tree.editable()
     dnd.start.apply(tree.node[0][4], [tree._layout[1005], 4])
+    dnd._dragging = true
 
     var moves = [102,119]
     moves.forEach(function (pos) {
