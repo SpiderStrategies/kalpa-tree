@@ -215,6 +215,7 @@ test('dnd allows a root nodes to change order', function (t) {
 
     tree.editable()
     dnd.start.apply(node, [data, 2])
+    dnd._dragging = true
     d3.event.y = 5
     dnd.drag.apply(node, [data, 2])
 
@@ -228,6 +229,7 @@ test('dnd allows a root nodes to change order', function (t) {
     node = tree.node[0][2]
     data = tree._layout[1002]
     dnd.start.apply(node, [data, 2])
+    dnd._dragging = true
     for (var i = data._y; i >= 0; i--) {
       d3.event.y = i
       dnd.drag.apply(node, [data, 2])
@@ -266,6 +268,7 @@ test('dnd allows a node to become a new root', function (t) {
 
       tree.editable()
       dnd.start.apply(node, [data, 2])
+      dnd._dragging = true
       d3.event.y = 5
       dnd.drag.apply(node, [data, 2])
       t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(0px,0px)', '0px y indentation')
@@ -333,6 +336,8 @@ test('dnd flat forest', function (t) {
 
       tree.editable()
       dnd.start.apply(node, [data, 2])
+      dnd._dragging = true
+
       d3.event.y = 76 // This position would indent 1003 by default
       dnd.drag.apply(node, [data, 2])
       t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(0px,0px)', '0px y indentation')
