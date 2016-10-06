@@ -5,6 +5,7 @@ $timing-fn: ease-out;
 
 @mixin base-node() {
   list-style: none;
+  background-color: #393c40;
   position: absolute;
   width: 100%;
   height: 36px;
@@ -242,7 +243,6 @@ $timing-fn: ease-out;
 
         &.selected {
           background-color: #2d3135;
-          z-index: 1;
 
           &:not(.placeholder):before {
             content: "";
