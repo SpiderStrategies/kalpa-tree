@@ -104,6 +104,10 @@ Tree.prototype.render = function () {
 
   this.el = d3.select(document.createElement('div'))
               .attr('class', 'tree-container')
+              .classed('ie-trident', function () {
+                return navigator.userAgent.indexOf('MSIE') !== -1 ||
+                       navigator.appVersion.indexOf('Trident/') > 0
+              })
 
   this.node = this.el.append('div')
                        .attr('class', 'tree')
