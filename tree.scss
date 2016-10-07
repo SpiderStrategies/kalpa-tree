@@ -313,7 +313,7 @@ $timing-fn: ease-out;
 
     &.search-results {
       .toggler {
-         opacity: 0 !important; // Never show the toggler when displaying search results
+        opacity: 0 !important; // Never show the toggler when displaying search results
       }
     }
   }
