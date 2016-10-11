@@ -75,6 +75,33 @@ test('does not apply indicator class to label-mask by default', function (t) {
   })
 })
 
+test('does not set ie-trident on tree-container in chrome', function (t) {
+  navigator.__defineGetter__('userAgent', function () {
+    return 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'
+  })
+  navigator.__defineGetter__('appVersion', function () {
+    return '5.0 (Macintosh; Intel Mac OS X 10_11_2) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/53.0.2785.143 Safari/537.36'
+  })
+  var tree = new Tree({stream: stream() }).render()
+  t.notOk(tree.el.classed('ie-trident'), 'ie-trident not set on chrome')
+  tree.remove()
+  t.end()
+})
+
+test('sets ie-trident on tree-container in IE11', function (t) {
+  navigator.__defineGetter__('userAgent', function (){
+    return 'Mozilla/5.0 (Windows NT 6.1; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; rv:11.0) like Gecko'
+  })
+  navigator.__defineGetter__('appVersion', function (){
+    return '5.0 (Windows NT 6.1; Trident/7.0; SLCC2; .NET CLR 2.0.50727; .NET CLR 3.5.30729; .NET CLR 3.0.30729; Media Center PC 6.0; .NET4.0C; rv:11.0) like Gecko'
+  })
+
+  var tree = new Tree({stream: stream() }).render()
+  t.ok(tree.el.classed('ie-trident'), 'ie-trident set on IE11')
+  tree.remove()
+  t.end()
+})
+
 test('render populates and hides visible: false nodes', function (t) {
   var map = new Transform( { objectMode: true } )
     , hiddens = [1002, 1070, 1081]
@@ -240,12 +267,18 @@ test('transitioning-node applied to entering nodes', function (t) {
     process.nextTick(function () {
       var node = tree._layout[1002]
       t.ok(!node.children, 'first child has hidden children')
+      var redraw = tree._forceRedraw
+      tree._forceRedraw = function () {
+        t.equal(tree.el.selectAll('li.node.transitioning-node').size(), 5, '5 new nodes have transitioning-node')
+        tree._forceRedraw = redraw
+        tree._forceRedraw()
+        process.nextTick(function () {
+          t.equal(tree.el.selectAll('li.node.transitioning-node').size(), 0, 'transitioning-node has been removed')
+          t.end()
+        })
+
+      }
       tree.node[0][1].click() // click the first child
-      t.equal(tree.el.selectAll('li.node.transitioning-node').size(), 5, '5 new nodes have transitioning-node')
-      setTimeout(function () {
-        t.equal(tree.el.selectAll('li.node.transitioning-node').size(), 0, 'transitioning-node has been removed')
-        t.end()
-      }, 400)
     })
   })
   tree.render()
