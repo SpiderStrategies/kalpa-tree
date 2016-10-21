@@ -225,6 +225,7 @@ $timing-fn: ease-out;
             @include transform(rotate(-90deg));
             @include transform-origin(7px 7px);
             @include transition-duration($delay);
+            @include transition-property(transform);
 
             svg {
               position: absolute;
