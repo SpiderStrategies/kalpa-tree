@@ -324,7 +324,9 @@ $timing-fn: ease-out;
       }
 
       li.node:not(.transient):not(.selected):not(.transitioning-node) {
-        opacity: .6;
+        .node-contents, .label-mask:after {
+          opacity: .6;
+        }
       }
     }
 
