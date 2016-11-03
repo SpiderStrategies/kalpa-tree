@@ -209,6 +209,7 @@ $timing-fn: ease-out;
       li.node {
         @include base-node;
         cursor: pointer;
+        overflow-y: hidden;
 
         &.transitioning-node {
           pointer-events: none;
@@ -218,12 +219,12 @@ $timing-fn: ease-out;
           .toggler {
             display: inline-block;
             vertical-align: middle;
-            margin-right: 5px;
-            width: 14px;
-            height: 14px;
+            width: 22px;
+            height: 22px;
+            margin: -4px 0 0 -2px;
             opacity: 0;
             @include transform(rotate(-90deg));
-            @include transform-origin(7px 7px);
+            @include transform-origin(center center);
             @include transition-duration($delay);
             @include transition-property(transform);
 
@@ -231,8 +232,8 @@ $timing-fn: ease-out;
               position: absolute;
               width: 9px;
               height: 6px;
-              top: 3px;
-              right: 2px;
+              top: 9px;
+              right: 7px;
               fill: #818b8f;
             }
 
