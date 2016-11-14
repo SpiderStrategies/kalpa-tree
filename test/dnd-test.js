@@ -118,7 +118,7 @@ test('start followed by end will clear timeout', function (t) {
     dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
     t.ok(dnd._travelerTimeout, 'timeout exists')
     dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
-    t.ok(dnd._travelerTimeout, 'timeout does not exists')
+    t.notOk(dnd._travelerTimeout, 'timeout does not exist')
     tree.remove()
     document.querySelector('.container').remove()
     t.end()
