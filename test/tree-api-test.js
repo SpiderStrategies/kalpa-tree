@@ -840,3 +840,27 @@ test('click toggler disabled on root', function (t) {
 
   tree.render()
 })
+
+test('sets `tree-overflow` based on scrollable content', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s})
+    , container = document.createElement('div')
+
+  container.style.height = '100px'
+  document.body.appendChild(container)
+  s.on('end', function () {
+    container.appendChild(tree.el.node())
+    t.ok(tree.el.select('.tree').classed('tree-overflow'), 'tree has `tree-overflow`')
+    container.style.height = '2000px'
+    tree.resize()
+    t.notOk(tree.el.select('.tree').classed('tree-overflow'), 'tree does not have `tree-overflow`')
+
+    tree.resize(10000) // exaggerate number of nodes
+    t.ok(tree.el.select('.tree').classed('tree-overflow'), 'tree is marked `tree-overflow` with visibleNodes set')
+    container.remove()
+
+    t.end()
+  })
+
+  tree.render()
+})
