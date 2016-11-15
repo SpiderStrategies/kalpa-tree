@@ -166,6 +166,23 @@ test('root node has a class of root', function (t) {
   })
 })
 
+test('tree drawing adjusts `tree-overflow` based on bound node data', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , container = document.createElement('div')
+
+  container.style.height = '50px'
+
+  document.body.appendChild(container)
+  s.on('end', function () {
+    container.appendChild(tree.el.node())
+    t.ok(tree.el.select('.tree').classed('tree-overflow'), 'tree overflow set')
+    tree.remove()
+    container.remove()
+    t.end()
+  })
+})
+
 test('displays a node as selected on render', function (t) {
   var s = stream()
     , tree = new Tree({

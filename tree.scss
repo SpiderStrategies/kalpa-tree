@@ -73,15 +73,22 @@ $timing-fn: ease-out;
      * So this disables the fade-in effect in IE11, so the translate transformation
      * looks good.
      */
-    .tree.transitions {
-      ul {
-        li.node {
-          &.incoming-node {
-            opacity: 1;
+    .tree {
+      &.tree-overflow {
+        overflow-y: scroll;
+      }
+
+      &.transitions {
+        ul {
+          li.node {
+            &.incoming-node {
+              opacity: 1;
+            }
           }
         }
       }
     }
+
   }
 
   .traveling-node {

@@ -318,7 +318,9 @@ Tree.prototype._join = function (data) {
     }
   }
 
+  this.resize(data.length)
   this.el.select('.tree ul').style('height', height)
+
   this.node = this.node.data(data, function (d) {
                          return d[self.options.accessors.id]
                        })
@@ -376,6 +378,30 @@ Tree.prototype._slide = function (source) {
       })
       .call(this.slideExit, source)
       .call(this.updater)
+}
+
+/*
+ * Sets the `tree-overflow` class on the tree node based on `visibleNodes` length.
+ * `visibleNodes` is optional. If it's not received, we look up how many nodes are visible.
+ * But for performance reasons we allow an incoming argument to control how
+ * many nodes are visible in case this number is already known.
+ *
+ * This doesn't actually resize the tree, it should be fired after the size of the tree container
+ * has been changed.
+ *
+ */
+Tree.prototype.resize = function (visibleNodes) {
+  if (visibleNodes === undefined) {
+    visibleNodes = this.el.selectAll('.tree ul li')
+                          .data().length
+  }
+  var height = this.options.height
+  this.el.select('.tree')
+         .classed('tree-overflow', function () {
+           return this.offsetHeight < visibleNodes * height
+         })
+
+  return this
 }
 
 /*
