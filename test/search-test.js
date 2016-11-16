@@ -1,5 +1,5 @@
 var test = require('tape').test
-  , d3 = require('d3')
+  , d3 = require('d3-selection')
   , Tree = require('../')
   , stream = require('./tree-stream')
   , Transform = require('stream').Transform
@@ -30,8 +30,8 @@ test('search', function (t) {
     t.equal(tree.node.size(), 25, '25 nodes visible')
     t.ok(tree.el.select('.tree').classed('search-results'), 'tree has search-results class')
     t.ok(tree._searchResults, 'tree stored _searchResults data')
-    t.equal(tree.nodes[d3.select(tree.node[0][0]).datum().id].label, 'M1', 'M1 is the first result')
-    tree.select(d3.select(tree.node[0][3]).datum().id)
+    t.equal(tree.nodes[d3.select(tree.node.nodes()[0]).datum().id].label, 'M1', 'M1 is the first result')
+    tree.select(d3.select(tree.node.nodes()[3]).datum().id)
     t.equal(tree.node.size(), 18, '18 nodes visible')
     t.ok(!tree.el.select('.tree').classed('search-results'), 'tree does not have search-results class')
     t.ok(!tree._searchResults, 'tree no longer has _searchResults data')
@@ -117,7 +117,7 @@ test('shows seleceted search result in a collapsed tree', function (t) {
     tree.search('M')
     t.equal(tree.node.size(), 25, '25 nodes visible')
     t.ok(tree.el.select('.tree').classed('search-results'), 'tree showing search-results')
-    tree.node[0][3].click() // Click on M4
+    tree.node.nodes()[3].click() // Click on M4
     t.equal(tree.node.size(), 18, '18 nodes visible') // Not all nodes from previous expandAll
     t.ok(!tree.el.select('.tree').classed('search-results'), 'tree not showing search-results')
     tree.remove()

@@ -1,4 +1,7 @@
-var d3 = require('d3')
+var d3 = require('d3-selection')
+  , timer = require('d3-timer').timer
+  , partialRight = require('./lib/partial-right')
+  , hierarchy = require('d3-hierarchy')
   , EventEmitter = require('events').EventEmitter
   , regexEscape = require('escape-string-regexp')
   , Stream = require('stream').Stream
@@ -10,6 +13,10 @@ var d3 = require('d3')
   , slideExit = require('./lib/slide-exit')
   , update = require('./lib/update')
   , identity = function (v) { return v }
+  , oldD3 = require('d3')
+
+// Mix transitions into d3-selection's prototype
+require('d3-transition')
 
 var merge = function (from, to) {
   to = to || {}
@@ -85,7 +92,7 @@ var Tree = function (options) {
   this.flyExit = flyExit(this)
   this.slideExit = slideExit(this)
 
-  this.tree = d3.layout.tree()
+  this.tree = oldD3.layout.tree()
                        .nodeSize([0, this.options.depth])
                        .children(function (d) {
                          if (d.collapsed) {
@@ -95,6 +102,8 @@ var Tree = function (options) {
                                                                   return self._layout[node.id].visible !== false
                                                                 })
                        })
+  // this.tree = hierarchy.tree()
+  //                      .nodeSize([0, this.options.depth])
 }
 
 util.inherits(Tree, EventEmitter)
@@ -183,7 +192,7 @@ Tree.prototype.render = function () {
  * browser doesn't batch operations
  */
 Tree.prototype._forceRedraw = function () {
-  return this.el[0][0].offsetHeight
+  return this.el.nodes()[0].offsetHeight
 }
 
 /*
@@ -237,21 +246,23 @@ Tree.prototype._transitionWrap = function (fn, animate, force) {
 
 Tree.prototype.adjustViewport = function () {
   if (this._tuned) {
-    var node = this._searchResults ? this._join(this._searchResults) : this._rebind()
-    node.call(this.enter, function (d) {
-          return 'translate(0px,' + d._y + 'px)'
-        })
-        .call(this.updater)
-        .exit()
-        .remove()
+    var self = this
+      , next = function (enter, update, exit) {
+                 enter.call(self.enter, function (d) {
+                   return 'translate(0px,' + d._y + 'px)'
+                 })
+                 update.call(self.updater)
+                 exit.remove()
+               }
+    this._searchResults ? this._join(this._searchResults, next) : this._rebind(next)
   }
 }
 
 Tree.prototype._clearSearch = function () {
   // Any rebind of data removes the search-results class
   this.el.select('.tree')
-           .classed('search-results', false)
-           .on('.search-click', null)
+         .classed('search-results', false)
+         .on('.search-click', null)
 
   this._searchResults = null
 
@@ -261,7 +272,7 @@ Tree.prototype._clearSearch = function () {
 /*
  * Rebinds the data to the selection based on the data model in the tree.
  */
-Tree.prototype._rebind = function () {
+Tree.prototype._rebind = function (next) {
   var data = null
     , self = this
     , mapper = function (d, i) {
@@ -286,13 +297,14 @@ Tree.prototype._rebind = function () {
     data = []
   }
 
-  return this._join(data)
+  return this._join(data, next)
 }
 
 /*
- * Joins the data to the dom seletion
+ * Joins the data to the dom selection, and invokes the `next` callback
+ * passing the enter, update, and exit selections
  */
-Tree.prototype._join = function (data) {
+Tree.prototype._join = function (data, next) {
   var self = this
     , height = 'auto'
     , n = this.el.select('.tree').node()
@@ -321,10 +333,17 @@ Tree.prototype._join = function (data) {
   this.resize(data.length)
   this.el.select('.tree ul').style('height', height)
 
-  this.node = this.node.data(data, function (d) {
-                         return d[self.options.accessors.id]
-                       })
-  return this.node
+  var _node = this.el.select('.tree ul')
+                     .selectAll('li')
+                     .data(data, function (d) {
+                       return d[self.options.accessors.id]
+                     })
+    , enter = _node.enter()
+                   .insert('li')
+    , exit = _node.exit()
+    , update = this.node = enter.merge(_node)
+
+  return next(enter, update, exit)
 }
 
 /*
@@ -333,11 +352,13 @@ Tree.prototype._join = function (data) {
  */
 Tree.prototype._fly = function (source) {
   var visible = this._visibleNodes()
+    , self = this
 
-  this._rebind()
-      .call(this.enter, this._defaultEnterFly.bind(this, visible))
-      .call(this.updater)
-      .call(this.flyExit, source)
+  this._rebind(function (enter, update, exit) {
+    enter.call(self.enter, self._defaultEnterFly.bind(self, visible))
+    update.call(self.updater)
+    exit.call(self.flyExit, source)
+  })
 }
 
 Tree.prototype._defaultEnterFly = function (visible, d) {
@@ -362,22 +383,24 @@ Tree.prototype._defaultEnterFly = function (visible, d) {
  */
 Tree.prototype._slide = function (source) {
   var self = this
-  this._rebind()
-      .call(this.enter, function (d) {
-        // if there's a source, enter at that source's position, otherwise add the node at its position
-        return 'translate(0px,' + (source ? source._y : d._y) + 'px)'
-      }, 'fading-node transition-placeholder')
-      .call(function (selection) {
-        // Remove the fading-node class, now that it's in the dom
-        selection.classed('fading-node', false)
-        // Then remove the transition-placeholder class once the transitions have run
-        d3.timer(function () {
-          selection.classed('transition-placeholder', false)
-          return true // run once
-        }, self.transitionTimeout)
-      })
-      .call(this.slideExit, source)
-      .call(this.updater)
+
+  this._rebind(function (enter, update, exit) {
+    enter.call(self.enter, function (d) {
+            // if there's a source, enter at that source's position, otherwise add the node at its position
+            return 'translate(0px,' + (source ? source._y : d._y) + 'px)'
+          }, 'fading-node transition-placeholder')
+    update.call(function (selection) {
+      // Remove the fading-node class, now that it's in the dom
+      selection.classed('fading-node', false)
+      // Then remove the transition-placeholder class once the transitions have run
+      var t = timer(function () {
+        selection.classed('transition-placeholder', false)
+        t.stop()
+      }, self.transitionTimeout)
+    })
+    exit.call(self.slideExit, source)
+    update.call(self.updater)
+  })
 }
 
 /*
@@ -678,9 +701,9 @@ Tree.prototype._scrollIntoView = function (d, opt) {
       n.scrollTop = d._y
     } else {
       // We're playing animations, wait until they are done
-      d3.timer(function () {
+      var t = timer(function () {
         n.scrollTop = d._y
-        return true
+        t.stop()
       }, this.transitionTimeout)
     }
 
@@ -834,7 +857,7 @@ Tree.prototype._toggleAll = function (fn) {
 }
 
 Tree.prototype._visibleNodes = function () {
-  return this.node[0].reduce(function (p, c) {
+  return this.node.nodes().reduce(function (p, c) {
     var _c = d3.select(c).datum()
     p[_c.id] = _c._y
     return p
@@ -845,21 +868,24 @@ Tree.prototype.expandAll = function () {
   this._toggleAll(function (d) {
     delete d.collapsed
   })
+  var self = this
 
   if (Object.keys(this._layout).length < this.options.maxAnimatable) {
     this._transitionWrap(function () {
       var visible = this._visibleNodes() // Fetch visible nodes before we rebind data
-      this._rebind().call(this.enter, this._defaultEnterFly.bind(null, visible))
-                    .call(this.updater)
+      self._rebind(function (enter, update, exit) {
+        enter.call(self.enter, self._defaultEnterFly.bind(null, visible))
+        update.call(self.updater)
+      })
     })()
   } else {
-    this._rebind()
-        .call(this.enter, function (d) {
-          return 'translate(0px,' + d._y + 'px)'
-        })
-        .call(this.updater)
-        .exit()
-        .remove()
+    self._rebind(function (enter, update, exit) {
+      enter.call(self.enter, function (d) {
+             return 'translate(0px,' + d._y + 'px)'
+           })
+      update.call(self.updater)
+      exit.remove()
+    })
   }
 }
 
@@ -867,31 +893,33 @@ Tree.prototype.collapseAll = function () {
   this._toggleAll(function (d) {
     d.collapsed = true
   })
+  var self = this
 
   if (Object.keys(this._layout).length < this.options.maxAnimatable) {
     this._transitionWrap(function () {
-      this._rebind()
-          .call(this.enter) // Seems odd, but needed in case we're showing a subset of the tree (i.e. search results)
-          .call(this.updater)
-          .call(this.flyExit, null, function (d) {
-            var c = p = d.parent
+      self._rebind(function (enter, update, exit) {
+        enter.call(self.enter) // Seems odd, but needed in case we're showing a subset of the tree (i.e. search results)
+        update.call(self.updater)
+        exit.call(self.flyExit, null, function (d) {
+          var c = p = d.parent
 
-            // Determine our top ancestor
-            while (p.parent) {
-              c = p
-              p = p.parent
-            }
+          // Determine our top ancestor
+          while (p.parent) {
+            c = p
+            p = p.parent
+          }
 
-            // Move this node to the ancestors location
-            return 'translate(0px,' + c._y + 'px)'
-          })
+          // Move this node to the ancestors location
+          return 'translate(0px,' + c._y + 'px)'
+        })
+      })
     })()
   } else {
-    this._rebind()
-        .call(this.enter)
-        .call(this.updater)
-        .exit()
-        .remove()
+    self._rebind(function (enter, update, exit) {
+      enter.call(self.enter)
+      update.call(self.updater)
+      exit.remove()
+    })
   }
 }
 
@@ -999,9 +1027,10 @@ Tree.prototype.removeNode = function (obj) {
 
   // Redraw
   this._transitionWrap(function () {
-    this._rebind()
-        .call(this.updater)
-        .call(this.slideExit, _node)
+    this._rebind(function (enter, update, exit) {
+      update.call(self.updater)
+      exit.call(self.slideExit, _node)
+    })
   })()
 }
 
@@ -1036,12 +1065,12 @@ Tree.prototype.search = function (term) {
                               })
                            }, true)
     this._searchResults = data
-    this._join(data)
-        .call(this.enter)
-        .call(this.updater)
-        .call(function (selection) {
-          selection.exit().remove() // No animations on exit
-        })
+
+    this._join(data, function (enter, update, exit) {
+      enter.call(self.enter)
+      update.call(self.updater)
+      exit.remove() // No animations on exit
+    })
   })()
 }
 
@@ -1081,6 +1110,7 @@ Tree.prototype.moveTransient = function (to, idx) {
  */
 Tree.prototype.saveTransient = function (id) {
   var node = this.nodes[this.options.transientId]
+    , self = this
 
   if (!node) {
     throw new Error('No transient node')
@@ -1096,8 +1126,9 @@ Tree.prototype.saveTransient = function (id) {
     this._layout[id] = l
     delete this._layout[this.options.transientId]
   }
-  this._rebind()
-      .call(this.updater)
+  this._rebind(function (enter, update, exit) {
+    update.call(self.updater)
+  })
 }
 
 Tree.prototype.removeTransient = function () {

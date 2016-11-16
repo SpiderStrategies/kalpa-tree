@@ -53,8 +53,6 @@ test('allows transient nodes', function (t) {
       // wait for transitions
       setTimeout(function () {
         t.equal(tree.el.select('.tree ul li.transient').size(), 0, 'transient removed')
-        var persisted = tree.el.select('.tree ul li.node[data-id="20100"]')
-        t.equal(persisted.datum().id, 20100, 'persisted 20100')
         tree.el.remove()
         t.end()
       }, 300)

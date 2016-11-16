@@ -5,7 +5,11 @@
   "main": "index.js",
   "dependencies": {
     "bourbon": "^4.2.4",
-    "d3": "^3.5.10",
+    "d3-drag": "^1.0.1",
+    "d3-hierarchy": "^1.0.2",
+    "d3-selection": "^1.0.2",
+    "d3-timer": "^1.0.3",
+    "d3-transition": "^1.0.3",
     "escape-string-regexp": "^1.0.3",
     "node-sass": "^3.4.2"
   },
