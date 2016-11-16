@@ -13,7 +13,6 @@ var d3 = require('d3-selection')
   , slideExit = require('./lib/slide-exit')
   , update = require('./lib/update')
   , identity = function (v) { return v }
-  , oldD3 = require('d3')
 
 // Mix transitions into d3-selection's prototype
 require('d3-transition')
