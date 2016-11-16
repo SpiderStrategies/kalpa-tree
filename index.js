@@ -92,18 +92,8 @@ var Tree = function (options) {
   this.flyExit = flyExit(this)
   this.slideExit = slideExit(this)
 
-  this.tree = oldD3.layout.tree()
+  this.tree = hierarchy.tree()
                        .nodeSize([0, this.options.depth])
-                       .children(function (d) {
-                         if (d.collapsed) {
-                           return null
-                         }
-                         return d._allChildren && d._allChildren.filter(function (node) {
-                                                                  return self._layout[node.id].visible !== false
-                                                                })
-                       })
-  // this.tree = hierarchy.tree()
-  //                      .nodeSize([0, this.options.depth])
 }
 
 util.inherits(Tree, EventEmitter)
@@ -275,29 +265,43 @@ Tree.prototype._clearSearch = function () {
 Tree.prototype._rebind = function (next) {
   var data = null
     , self = this
-    , mapper = function (d, i) {
-                 // Store sane copies of x,y that denote our true coords in the tree
-                 d._x = d.y
-                 d._y = i * self.options.height + (i > 0 ? self._rootOffset : 0)
-                 return d
-               }
+    , children = function (d) {
+      // accessor function for each datum
+      if (d.collapsed) {
+        return null
+      }
+      return d._allChildren && d._allChildren.filter(function (node) {
+                                               return self._layout[node.id].visible !== false
+                                             })
+    }
 
   this._clearSearch()
       .el.select('.tree').classed('detached-root', !!this._rootOffset)
 
   if (this.options.forest) {
     data = this.root.reduce(function (p, subTree) {
-                      return p.concat(self.tree.nodes(subTree))
+                      return p.concat(self.tree.nodes(hierarchy.hierarchy(subTree, children)))
                     }, [])
-                    .map(mapper)
   } else if (this.root) {
-    data = this.tree.nodes(this.root)
-                    .map(mapper)
+    data = this.tree(hierarchy.hierarchy(this.root, children))
   } else {
     data = []
   }
 
-  return this._join(data, next)
+  var _data = []
+    , count = 0 // d3v4 eachBefore doesn't send an index
+
+  // This is super lame, but d3 v4 forces this upon us from what I can see
+  // Loop over the descendants in preorder traversal
+  data.eachBefore(function (d) {
+    // Store sane copies of x,y that denote our true coords in the tree
+    d._x = d.y
+    d._y = count * self.options.height + (count > 0 ? self._rootOffset : 0)
+    count++
+    _data.push(d)
+  })
+
+  return this._join(_data, next)
 }
 
 /*
