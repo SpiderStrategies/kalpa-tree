@@ -1,0 +1,10 @@
+The code in this directory is pulled in from d3 3.5.17.
+
+Upgrading to d3 v4 and its new hierarchy node object
+appears to change way too much with how our tree works. So we
+decided to punt upgrading the tree layout code for now.
+
+The code was copied and pasted from files here: https://github.com/d3/d3/blob/v3.5.17/src/
+
+With a minor change, so they can be required (i.e. `module.exports` additions)
+

@@ -19,7 +19,7 @@ var test = require('tape').test
       "label": "The cat's second birthday",
       "parentId": 1002
     }]
-  , d3 = require('d3')
+  , d3 = require('d3-selection')
 
 function stream () {
   var stream = new Readable({objectMode: true})
@@ -45,7 +45,7 @@ test('forest tree render populates multiple roots', function (t) {
     t.equal(Object.keys(tree.nodes).length, nodes.length, 'nodes contains all data')
     t.equal(Object.keys(tree._layout).length, nodes.length, '_layout contains all data')
     t.equal(tree.root.length, 2, 'two root nodes')
-    t.equal(tree.node[0].length, 4, '4 list elements displayed')
+    t.equal(tree.node.nodes().length, 4, '4 list elements displayed')
 
     var rootClz = false
     tree.node.each(function () {
@@ -56,7 +56,7 @@ test('forest tree render populates multiple roots', function (t) {
     t.ok(!rootClz, 'no nodes have root class')
     tree.collapseAll()
     setTimeout(function () {
-      t.equal(tree.node[0].length, 2, '2 list elements displayed after a collapse all')
+      t.equal(tree.node.nodes().length, 2, '2 list elements displayed after a collapse all')
       tree.el.remove()
       t.end()
     }, 400)
@@ -72,7 +72,7 @@ test('allows addition of new root elements', function (t) {
     var totalNodes = Object.keys(tree.nodes).length
     tree.add({label: 'New root node', id: 1010})
     t.equal(tree.root.length, 3, 'three root nodes')
-    t.equal(tree.node[0].length, 3, '3 list elements displayed')
+    t.equal(tree.node.nodes().length, 3, '3 list elements displayed')
     t.equal(Object.keys(tree.nodes).length, totalNodes + 1, 'one more node added to all nodes')
     t.equal(Object.keys(tree.nodes).length, Object.keys(tree._layout).length, '.nodes length equal _layout length ')
     t.end()
@@ -87,7 +87,7 @@ test('allows addition of new root elements at an index', function (t) {
     tree.add({label: 'New root node', id: 1010}, null, 0)
     t.equal(tree.root.length, 3, 'three root nodes')
     t.equal(tree.root[0].id, 1010, 'first root node is the new node')
-    t.equal(tree.node[0][0].querySelector('.label').innerHTML, 'New root node', 'first dom node is the new node')
+    t.equal(tree.node.nodes()[0].querySelector('.label').innerHTML, 'New root node', 'first dom node is the new node')
     t.end()
   })
 })
@@ -203,7 +203,7 @@ test('dnd allows a root nodes to change order', function (t) {
 
   s.on('end', function () {
     tree.select(1003, {animate: false})
-    var node = tree.node[0][2]
+    var node = tree.node.nodes()[2]
       , data = tree._layout[1003]
 
     d3.event = new Event
@@ -226,7 +226,7 @@ test('dnd allows a root nodes to change order', function (t) {
     t.deepEqual(rootOrder, [1003, 1001, 1002], 'root order is 1003, 1001, 1002')
 
     // Now move 1002 to the top
-    node = tree.node[0][2]
+    node = tree.node.nodes()[2]
     data = tree._layout[1002]
     dnd.start.apply(node, [data, 2])
     dnd._dragging = true
@@ -257,7 +257,7 @@ test('dnd allows a node to become a new root', function (t) {
     tree.select(1003, {animate: false})
 
     process.nextTick(function () {
-      var node = tree.node[0][2]
+      var node = tree.node.nodes()[2]
         , data = tree._layout[1003]
       d3.event = new Event
       d3.event.sourceEvent = new Event
@@ -325,7 +325,7 @@ test('dnd flat forest', function (t) {
     tree.select(1003, {animate: false})
 
     process.nextTick(function () {
-      var node = tree.node[0][2]
+      var node = tree.node.nodes()[2]
         , data = tree._layout[1003]
       d3.event = new Event
       d3.event.sourceEvent = new Event

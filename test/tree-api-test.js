@@ -1,5 +1,4 @@
 var test = require('tape').test
-  , d3 = require('d3')
   , Readable = require('stream').Readable
   , Tree = require('../')
   , stream = require('./tree-stream')
@@ -815,7 +814,7 @@ test('click toggler listener', function (t) {
     setTimeout(function () {
       var node = tree._layout[1002]
       t.ok(!node.children, 'first child has hidden children')
-      tree.node[0][1].querySelector('.toggler').click()
+      tree.node.nodes()[1].querySelector('.toggler').click()
       t.ok(node.children, 'first child has children after click event')
       tree.remove()
       t.end()
@@ -832,7 +831,7 @@ test('click toggler disabled on root', function (t) {
     process.nextTick(function () {
       var el = tree.el.node()
       t.ok(tree.get().children, 'root starts with exposed children')
-      tree.node[0][0].querySelector('.toggler').click()
+      tree.node.nodes()[0].querySelector('.toggler').click()
       t.ok(tree.get().children, 'root has exposed children after we tried to toggle')
       t.end()
     })
