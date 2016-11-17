@@ -3,6 +3,7 @@ var http = require('http')
   , url = require('url')
   , hierarchy = require('d3-hierarchy')
   , tree = require('./tree')
+  , d3tree = require('../lib/layout/tree')
   , sass = require('node-sass')
   , request = require('request')
   , spawn = require('child_process').spawn
@@ -37,14 +38,12 @@ http.createServer(function (req, res) {
   } else if (path == '/15-k-nodes.json') {
     return fs.createReadStream(__dirname + '/15-k-nodes.json').pipe(res)
   } else if (path == '/tree.json') {
-    var hr = hierarchy.tree()
-      , root = hr(hierarchy.hierarchy(tree(5)))
-      , result = JSON.stringify(hr(root).descendants().map(function (n) {
-        var d = n.data
-        d.parentId = n.parent && n.parent.data.id
-        delete d.children
-        return d
-      }))
+    res.end(JSON.stringify(d3tree().nodes(tree(_url.query.depth || 5)).map(function (n) {
+      n.parentId = n.parent && n.parent.id
+      delete n.children
+      delete n.parent
+      return n
+    })))
     res.end(result)
   } else {
     res.writeHead(404, {'Content-Type': 'text/plain'})

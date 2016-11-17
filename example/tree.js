@@ -17,7 +17,7 @@ module.exports = function (depth) {
         color: colors[id % 3]
       }
 
-      node.children = subLevels === 0 ? null : generateChildren(numChildren, subLevels - 1)
+      node.children = subLevels === 0 ? [] : generateChildren(numChildren, subLevels - 1)
 
       nodes.push(node)
     })
