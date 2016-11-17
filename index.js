@@ -339,7 +339,7 @@ Tree.prototype._join = function (data, next) {
   var _node = this.el.select('.tree ul')
                      .selectAll('li')
                      .data(data, function (d) {
-                       return d[self.options.accessors.id]
+                       return d.data[self.options.accessors.id]
                      })
     , enter = _node.enter()
                    .insert('li')
