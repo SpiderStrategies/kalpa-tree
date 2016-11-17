@@ -1,5 +1,5 @@
 var test = require('tape').test
-  , d3 = require('d3')
+  , d3 = require('d3-selection')
   , Tree = require('../')
   , Transform = require('stream').Transform
   , Readable = require('stream').Readable
@@ -44,19 +44,28 @@ test('render populates data from stream', function (t) {
   })
 })
 
-test('allows node drawing overrides', function (t) {
+test('allows node contents overrides', function (t) {
   var s = stream()
     , tree = new Tree({
     stream: s,
     contents: function (selection) {
-      selection.append('div')
-               .attr('class', 'node-child')
-               .text(function (d) { return 'node-child-' + d.id })
+      selection.each(function (data) {
+        var node = d3.select(this)
+                     .selectAll('.node-child')
+                     .data(function (d) {
+                       return [d]
+                     })
+
+        node.enter()
+            .append('div')
+              .attr('class', 'node-child')
+              .text(function (d) { return 'node-child-' + d.id })
+      })
     }
   }).render()
 
   s.on('end', function () {
-    t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child')[0].innerHTML, '<div class="node-child">node-child-1001</div>', 'node contents overriden')
+    t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child')[0].innerHTML, '<div class="node-child" style="-webkit-transform:translate(0px,0px)">node-child-1001</div>', 'node contents overriden')
     tree.remove()
     t.end()
   })
@@ -155,7 +164,7 @@ test('root node has a class of root', function (t) {
     , tree = new Tree({stream: s}).render()
 
   s.on('end', function () {
-    t.ok(d3.select(tree.node[0][0]).classed('root'), 'root node has root class')
+    t.ok(d3.select(tree.node.nodes()[0]).classed('root'), 'root node has root class')
     tree.node.each(function (d, i) {
       if (i !== 0) {
         t.ok(!d3.select(this).classed('root'), 'non root nodes do not have root class')
@@ -249,7 +258,6 @@ test('rebind stores private fields', function (t) {
   s.on('end', function () {
     // Once the tree has rendered, the class should have been removed
     tree.node.data().forEach(function (d, i) {
-      t.equal(d._x, d.y, '_x is equal to original y')
       t.equal(d._y, i * tree.options.height, '_y is equal to index * height')
     })
 
@@ -295,7 +303,7 @@ test('transitioning-node applied to entering nodes', function (t) {
         })
 
       }
-      tree.node[0][1].click() // click the first child
+      tree.node.nodes()[1].click() // click the first child
     })
   })
   tree.render()

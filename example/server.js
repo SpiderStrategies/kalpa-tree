@@ -1,8 +1,6 @@
 var http = require('http')
   , fs = require('fs')
   , url = require('url')
-  , d3 = require('d3')
-  , tree = require('./tree')
   , sass = require('node-sass')
   , request = require('request')
   , spawn = require('child_process').spawn
@@ -36,13 +34,6 @@ http.createServer(function (req, res) {
     return fs.createReadStream(__dirname + '/tree.json').pipe(res)
   } else if (path == '/15-k-nodes.json') {
     return fs.createReadStream(__dirname + '/15-k-nodes.json').pipe(res)
-  } else if (path == '/tree.json') {
-    res.end(JSON.stringify(d3.layout.tree().nodes(tree(_url.query.depth || 5)).map(function (n) {
-      n.parentId = n.parent && n.parent.id
-      delete n.children
-      delete n.parent
-      return n
-    })))
   } else {
     res.writeHead(404, {'Content-Type': 'text/plain'})
     res.write('Not found')
