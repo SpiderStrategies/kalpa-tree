@@ -192,7 +192,8 @@ $timing-fn: ease-out;
             @include transition-timing-function($timing-fn);
 
             .toggler {
-              @include transition(all $delay $timing-fn);
+              @include transition-property(transform);
+              @include transition-duration($delay);
             }
           }
         }
@@ -232,8 +233,6 @@ $timing-fn: ease-out;
             opacity: 0;
             @include transform(rotate(-90deg));
             @include transform-origin(center center);
-            @include transition-duration($delay);
-            @include transition-property(transform);
 
             svg {
               position: absolute;
