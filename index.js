@@ -267,30 +267,12 @@ Tree.prototype._clearSearch = function () {
  * Rebinds the data to the selection based on the data model in the tree.
  */
 Tree.prototype._rebind = function (next) {
-  var data = null
-    , self = this
-
   this._clearSearch()
-      .el.select('.tree').classed('detached-root', !!this._rootOffset)
+      .el
+      .select('.tree')
+      .classed('detached-root', !!this._rootOffset)
 
-  if (this.options.forest) {
-    data = this.root.reduce(function (p, subTree, i) {
-                      return p.concat(self.layout(subTree))
-                    }, [])
-                    .map(function (d, i) {
-                      // Reset the _y for forest trees
-                      // TODO We could improve the layout so it builds the correct structure by
-                      // default for forest trees, isntead of generating a bunch of subtrees.
-                      d._y = i * self.options.height
-                      return d
-                    })
-  } else if (this.root) {
-    data = this.layout(this.root)
-  } else {
-    data = []
-  }
-
-  return this._join(data, next)
+  return this._join(this.layout(this.root), next)
 }
 
 /*
