@@ -4,7 +4,6 @@ var test = require('tape').test
   , Tree = require('../')
   , stream = require('./tree-stream')
   , util = require('util')
-  , style = require
 
 function _container () {
   var container = document.createElement('div')
