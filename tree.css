@@ -3,9 +3,21 @@
   background-color: #393c40;
   width: 100%;
   height: 100%; }
+  .tree-container.ie-trident {
+    /*
+     * In IE11 (oldest IE version supported by the tree), there's a bug
+     * and incoming nodes don't transition properly if the opacity isn't 1.
+     * So this disables the fade-in effect in IE11, so the translate transformation
+     * looks good.
+     */ }
+    .tree-container.ie-trident .tree.tree-overflow {
+      overflow-y: scroll; }
+    .tree-container.ie-trident .tree.transitions ul li.node.incoming-node {
+      opacity: 1; }
   .tree-container .traveling-node {
     list-style: none;
     position: absolute;
+    opacity: 1;
     width: 100%;
     height: 36px;
     top: 0;
@@ -84,7 +96,7 @@
       background-image: -webkit-linear-gradient( left , rgba(57, 60, 64, 0) 0%, #D9E2E8 90%);
       background-image: linear-gradient(to right, rgba(57, 60, 64, 0) 0%, #D9E2E8 90%); }
     .tree-container .traveling-node.illegal {
-      opacity: .9 !important; }
+      opacity: .9; }
       .tree-container .traveling-node.illegal .node-contents {
         opacity: .7; }
         .tree-container .traveling-node.illegal .node-contents .icon {
@@ -135,6 +147,8 @@
       -webkit-transition-timing-function: ease-out;
       -moz-transition-timing-function: ease-out;
       transition-timing-function: ease-out; }
+      .tree-container .tree.transitions ul li.node.transitioning-node {
+        opacity: 0; }
       .tree-container .tree.transitions ul li.node .node-contents {
         -webkit-transition-property: -webkit-transform, opacity;
         -moz-transition-property: -moz-transform, opacity;
@@ -146,9 +160,12 @@
         -moz-transition-timing-function: ease-out;
         transition-timing-function: ease-out; }
         .tree-container .tree.transitions ul li.node .node-contents .toggler {
-          -webkit-transition: all 300ms ease-out;
-          -moz-transition: all 300ms ease-out;
-          transition: all 300ms ease-out; }
+          -webkit-transition-property: -webkit-transform;
+          -moz-transition-property: -moz-transform;
+          transition-property: transform;
+          -webkit-transition-duration: 300ms;
+          -moz-transition-duration: 300ms;
+          transition-duration: 300ms; }
     .tree-container .tree:hover li.node:not(.root) .toggler {
       opacity: 1; }
     .tree-container .tree ul {
@@ -163,6 +180,7 @@
       .tree-container .tree ul li.node {
         list-style: none;
         position: absolute;
+        opacity: 1;
         width: 100%;
         height: 36px;
         top: 0;
@@ -177,7 +195,8 @@
         -webkit-transition-timing-function: ease-out;
         -moz-transition-timing-function: ease-out;
         transition-timing-function: ease-out;
-        cursor: pointer; }
+        cursor: pointer;
+        overflow-y: hidden; }
         .tree-container .tree ul li.node .node-contents {
           padding: 11px 0px 10px;
           font-size: 13px;
@@ -216,29 +235,26 @@
         .tree-container .tree ul li.node .node-contents .toggler {
           display: inline-block;
           vertical-align: middle;
-          margin-right: 5px;
-          width: 14px;
-          height: 14px;
+          width: 22px;
+          height: 22px;
+          margin: -4px 0 0 -2px;
           opacity: 0;
           -webkit-transform: rotate(-90deg);
           -moz-transform: rotate(-90deg);
           -ms-transform: rotate(-90deg);
           -o-transform: rotate(-90deg);
           transform: rotate(-90deg);
-          -webkit-transform-origin: 7px 7px;
-          -moz-transform-origin: 7px 7px;
-          -ms-transform-origin: 7px 7px;
-          -o-transform-origin: 7px 7px;
-          transform-origin: 7px 7px;
-          -webkit-transition-duration: 300ms;
-          -moz-transition-duration: 300ms;
-          transition-duration: 300ms; }
+          -webkit-transform-origin: center center;
+          -moz-transform-origin: center center;
+          -ms-transform-origin: center center;
+          -o-transform-origin: center center;
+          transform-origin: center center; }
           .tree-container .tree ul li.node .node-contents .toggler svg {
             position: absolute;
             width: 9px;
             height: 6px;
-            top: 3px;
-            right: 2px;
+            top: 9px;
+            right: 7px;
             fill: #818b8f; }
           .tree-container .tree ul li.node .node-contents .toggler.expanded {
             -webkit-transform: rotate(0deg);
@@ -296,8 +312,8 @@
         height: .1em;
         background: #ADB8BC;
         box-shadow: 0 0.25em 0 0 #ADB8BC, 0 0.5em 0 0 #ADB8BC; }
-    .tree-container .tree.editable li.node:not(.transient):not(.selected) {
-      opacity: .6 !important; }
+    .tree-container .tree.editable li.node:not(.transient):not(.selected):not(.transitioning-node) .node-contents, .tree-container .tree.editable li.node:not(.transient):not(.selected):not(.transitioning-node) .label-mask:after {
+      opacity: .6; }
     .tree-container .tree.forest-tree .node .node-contents {
       padding-left: 8px; }
     .tree-container .tree.search-results .toggler {
