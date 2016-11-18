@@ -1,6 +1,5 @@
 var test = require('tape').test
   , css = require('./../dist/tree.css')
-  , d3 = require('d3')
   , Transform = require('stream').Transform
   , Tree = require('../')
   , stream = require('./tree-stream')

@@ -4,7 +4,7 @@ var test = require('tape').test
   , stream = require('./tree-stream')
   , Dnd = require('../lib/dnd')
   , Event = require('./_event')
-  , d3 = require('d3')
+  , d3 = require('d3-selection')
 
 function before (next, opts) {
   opts = opts || {
@@ -44,10 +44,10 @@ test('fires dnd events', function (t) {
     tree.on('dndstop', function () {
       calls++
     })
-    dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
+    dnd.start.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     dnd._dragging = true
     d3.event.y = tree._layout[1004]._y + 20// new y location
-    dnd.drag.apply(tree.node[0][3], [tree._layout[1004], 3])
+    dnd.drag.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     d3.event.keyCode = 27
     dnd._escape()
     tree.remove()
@@ -115,9 +115,9 @@ test('cannot move root', function (t) {
 test('start followed by end will clear timeout', function (t) {
   before(function (tree, dnd) {
     tree.editable()
-    dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
+    dnd.start.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     t.ok(dnd._travelerTimeout, 'timeout exists')
-    dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
+    dnd.end.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     t.notOk(dnd._travelerTimeout, 'timeout does not exist')
     tree.remove()
     document.querySelector('.container').remove()
@@ -128,10 +128,10 @@ test('start followed by end will clear timeout', function (t) {
 test('creates a traveler after timeout', function (t) {
   before(function (tree, dnd) {
     tree.editable()
-    dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
+    dnd.start.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     setTimeout(function () {
       var traveler = tree.el.select('.traveling-node')
-        , src = d3.select(tree.node[0][3])
+        , src = d3.select(tree.node.nodes()[3])
       t.ok(traveler.size(), 1, 'traveling node exists as a sibling')
       t.ok(src.classed('placeholder'), 'original node is denoted as placeholder')
       t.equal(traveler.attr('style'), 'transform: translate(0px, 108px);', 'traveler uses original node position')
@@ -142,7 +142,7 @@ test('creates a traveler after timeout', function (t) {
       t.equal(travelerData._initialParent, 1003, 'stores initial parent on the traveler')
       t.deepEqual(travelerData._source, tree._layout[1004], 'stores source node on the travler')
       t.deepEqual(travelerData.embedded, false, 'embedded is false by default')
-      dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
+      dnd.end.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
       tree.remove()
       document.querySelector('.container').remove()
       t.end()
@@ -153,15 +153,15 @@ test('creates a traveler after timeout', function (t) {
 test('creates a traveler on first drag ', function (t) {
   before(function (tree, dnd) {
     tree.editable()
-    dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
+    dnd.start.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     dnd._dragging = true
     t.ok(dnd._travelerTimeout, 'timeout was set')
     d3.event.y = tree._layout[1004]._y + 20// new y location
-    dnd.drag.apply(tree.node[0][3], [tree._layout[1004], 3])
+    dnd.drag.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     t.ok(tree.el.select('.tree').classed('dragging', true), 'tree has dragging class')
     t.ok(!dnd._travelerTimeout, 'timeout was cleared')
     t.ok(tree.el.select('.traveling-node').size(), 1, 'traveling node exists as a sibling')
-    dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
+    dnd.end.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     tree.remove()
     document.querySelector('.container').remove()
     t.end()
@@ -170,7 +170,7 @@ test('creates a traveler on first drag ', function (t) {
 
 test('drag moves traveler', function (t) {
   before(function (tree, dnd) {
-    var node = tree.node[0][3]
+    var node = tree.node.nodes()[3]
       , data = tree._layout[1004]
     tree.editable()
     process.nextTick(function () {
@@ -201,7 +201,7 @@ test('drag moves traveler', function (t) {
 
 test('drag changes data', function (t) {
   before(function (tree, dnd) {
-    var node = tree.node[0][3]
+    var node = tree.node.nodes()[3]
       , data = tree._layout[1004]
 
     tree.editable()
@@ -226,7 +226,7 @@ test('drag changes data', function (t) {
 
 test('escape keypress cancels dnd', function (t) {
   before(function (tree, dnd) {
-    var node = tree.node[0][3]
+    var node = tree.node.nodes()[3]
       , data = tree._layout[1004]
       , originalParent = data.parent.id
       , originalIndex = data.parent._allChildren.indexOf(data)
@@ -266,15 +266,15 @@ test('end cleans up', function (t) {
     dnd._escape = function () {
       escapeCalls++
     }
-    dnd.start.apply(tree.node[0][3], [tree._layout[1004], 3])
+    dnd.start.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
 
     setTimeout(function() {
       dnd._dragging = true
       d3.event.y = tree._layout[1004]._y + 20// new y location
       keypress()
-      dnd.drag.apply(tree.node[0][3], [tree._layout[1004], 3])
+      dnd.drag.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
       t.ok(tree.el.select('.tree').classed('dragging', true), 'tree has dragging class')
-      dnd.end.apply(tree.node[0][3], [tree._layout[1004], 3])
+      dnd.end.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
       t.ok(tree.el.select('.tree').classed('dragging', true), 'tree not longer has dragging class')
       keypress()
 
@@ -292,7 +292,7 @@ test('dnd autoscrolls', function (t) {
   before(function (tree, dnd) {
     document.querySelector('.container').style.height = '250px'
 
-    var node = tree.node[0][3]
+    var node = tree.node.nodes()[3]
       , data = tree._layout[1004]
     tree.editable()
     tree.expandAll()
@@ -325,7 +325,7 @@ test('dnd autoscrolls', function (t) {
 
 test('disable non-metrics dropped onto metrics', function (t) {
   before(function (tree, dnd) {
-    var node = tree.node[0][3]
+    var node = tree.node.nodes()[3]
       , data = tree._layout[1058]
 
     tree.options.droppable = function (d, parent) {
@@ -364,7 +364,7 @@ test('moves a node below root, when root is detached', function (t) {
 
     tree.editable()
     // Move 1005 under 1004
-    var m2 = tree.node[0][4]
+    var m2 = tree.node.nodes()[4]
       , m2d = tree._layout[1005]
 
     dnd.start.apply(m2, [m2d, 4])
@@ -401,7 +401,7 @@ test('marks traveler as illegal if its too deep', function (t) {
 
     tree.editable()
     // Move 1005 under 1004
-    var m2 = tree.node[0][4]
+    var m2 = tree.node.nodes()[4]
       , m2d = tree._layout[1005]
 
     dnd.start.apply(m2, [m2d, 4])
@@ -414,7 +414,7 @@ test('marks traveler as illegal if its too deep', function (t) {
 
       process.nextTick(function () {
         // Now move 1006 under 1005
-        var m3 = tree.node[0][5]
+        var m3 = tree.node.nodes()[5]
           , m3d = tree._layout[1006]
 
         dnd.start.apply(m3, [m3d, 5])
@@ -435,7 +435,7 @@ test('marks traveler as illegal if its too deep', function (t) {
           // Grab a non metric (i.e. 1058) and try to throw it under M3
           process.nextTick(function () {
             // Now move 1006 under 1005
-            var nonMetric = tree.node[0][17]
+            var nonMetric = tree.node.nodes()[17]
               , nonMetricData = tree._layout[1058]
 
             dnd.start.apply(nonMetric, [nonMetricData, 17])
@@ -465,13 +465,13 @@ test('multiple moves with embedded traveler if target node equals the previous n
   // See issue #252
   before(function (tree, dnd) {
     tree.editable()
-    dnd.start.apply(tree.node[0][4], [tree._layout[1005], 4])
+    dnd.start.apply(tree.node.nodes()[4], [tree._layout[1005], 4])
     dnd._dragging = true
 
     var moves = [102,119]
     moves.forEach(function (pos) {
       d3.event.y = pos
-      dnd.drag.apply(tree.node[0][4], [tree._layout[1005], 4])
+      dnd.drag.apply(tree.node.nodes()[4], [tree._layout[1005], 4])
     })
 
     // now it should be embedded
