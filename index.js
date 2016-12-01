@@ -1,4 +1,6 @@
 var d3 = require('d3-selection')
+  , DnD = require('./lib/dnd')
+  , drag = require('d3-drag').drag
   , timer = require('d3-timer').timer
   , EventEmitter = require('events').EventEmitter
   , regexEscape = require('escape-string-regexp')
@@ -89,6 +91,13 @@ var Tree = function (options) {
   this.enter = enter(this)
   this.flyExit = flyExit(this)
   this.slideExit = slideExit(this)
+
+  var dnd = new DnD(this)
+    , listener = drag()
+  listener.on('start', dnd.start)
+          .on('drag', dnd.drag)
+          .on('end', dnd.end)
+  this.dnd = listener
 
   this.layout = layout(this.options.depth, this.options.height, this._rootOffset, function (d) {
                   if (d.collapsed) {
@@ -815,7 +824,17 @@ Tree.prototype.isEditable = function () {
  */
 Tree.prototype.editable = function () {
   var t = this.el.select('.tree')
-  t.classed('editable', !t.classed('editable'))
+    , _editable = !t.classed('editable')
+    , nodes = this.el.select('.tree ul')
+                     .selectAll('li')
+
+  t.classed('editable', _editable)
+
+  if (_editable) {
+    nodes.call(this.dnd) // Apply the dnd listener if we're in edit mode
+  } else {
+    nodes.on('.drag', null) // Clear all dnd listeners
+  }
 }
 
 /*
