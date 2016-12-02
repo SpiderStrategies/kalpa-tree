@@ -315,7 +315,8 @@ Tree.prototype._join = function (data, next) {
   }
 
   this.resize(data.length)
-  this.el.select('.tree ul').style('height', height)
+  this.el.select('.tree ul')
+           .style('height', height)
 
   var _node = this.el.select('.tree ul')
                      .selectAll('li')
@@ -326,6 +327,12 @@ Tree.prototype._join = function (data, next) {
                    .insert('li')
     , exit = _node.exit()
     , update = this.node = enter.merge(_node)
+
+  if (this.el.select('.tree').classed('editable')) {
+    update.call(this.dnd) // Apply the dnd listener if we're in edit mode
+  } else {
+    update.on('.drag', null) // Clear all dnd listeners
+  }
 
   return next(enter, update, exit)
 }
@@ -823,18 +830,9 @@ Tree.prototype.isEditable = function () {
  * Toggles the tree's editable state
  */
 Tree.prototype.editable = function () {
-  var t = this.el.select('.tree')
-    , _editable = !t.classed('editable')
-    , nodes = this.el.select('.tree ul')
-                     .selectAll('li')
-
-  t.classed('editable', _editable)
-
-  if (_editable) {
-    nodes.call(this.dnd) // Apply the dnd listener if we're in edit mode
-  } else {
-    nodes.on('.drag', null) // Clear all dnd listeners
-  }
+  var tree = this.el.select('.tree')
+  tree.classed('editable', !tree.classed('editable'))
+  this._join(this.layout(this.root), Function.prototype)
 }
 
 /*
