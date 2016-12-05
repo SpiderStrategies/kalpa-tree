@@ -1050,11 +1050,11 @@ Tree.prototype.search = function (term) {
     this.el.select('.tree').classed('search-results', true)
                            .classed('detached-root', false)
                            .on('click.search-click', function () {
-                              // Capture the click event at the tree level, and collapse all nodes
-                              // before the actual node is selected
-                              self._toggleAll(function (d) {
-                                d.collapsed = true
-                              })
+                             // Capture the click event at the tree level, and collapse all nodes
+                             // before the actual node is selected
+                             self._toggleAll(function (d) {
+                               d.collapsed = true
+                             })
                            }, true)
     this._searchResults = data
 
