@@ -67,28 +67,11 @@ $timing-fn: ease-out;
   height: 100%;
 
   &.ie-trident {
-    /*
-     * In IE11 (oldest IE version supported by the tree), there's a bug
-     * and incoming nodes don't transition properly if the opacity isn't 1.
-     * So this disables the fade-in effect in IE11, so the translate transformation
-     * looks good.
-     */
     .tree {
       &.tree-overflow {
         overflow-y: scroll;
       }
-
-      &.transitions {
-        ul {
-          li.node {
-            &.incoming-node {
-              opacity: 1;
-            }
-          }
-        }
-      }
     }
-
   }
 
   .traveling-node {
@@ -180,7 +163,17 @@ $timing-fn: ease-out;
       ul {
         li.node {
           &.transitioning-node {
+            // Transitioning nodes have an opacity of 0, because if they are incoming nodes, they start at 0
+            // and if they are outgoing nodes, they end up at 0.
             opacity: 0;
+
+            &:not(.outgoing-node) {
+              // For incoming-nodes (i.e. not marked as outgoing-node), ignore transitioning the opacity. Once
+              // the transitioning-node class is removed (right after a browser reflow), the transition-property
+              // will pick up from the `li.node` styling, so opacity will transition.
+              // This fixes a bizarre IE11 bug that will break the entire transition
+              @include transition-property(height, transform);
+            }
           }
 
           @include transition-property(transform, opacity, height);
@@ -333,6 +326,8 @@ $timing-fn: ease-out;
       li.node:not(.transient):not(.selected):not(.transitioning-node) {
         .node-contents, .label-mask:after {
           opacity: .6;
+          // Prevent IE11 from breaking due to another opacity transition bug
+          @include transition(none);
         }
       }
     }
