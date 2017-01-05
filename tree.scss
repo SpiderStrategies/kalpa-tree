@@ -88,6 +88,7 @@ $timing-fn: ease-out;
     background-color: #D9E2E8;
     width: calc(#{"100% + 13px"});
     cursor: move;
+    overflow-x: hidden;
 
     .node-contents {
       padding-left: 14px;
