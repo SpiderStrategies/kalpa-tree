@@ -257,7 +257,12 @@ $timing-fn: ease-out;
           }
         }
 
-        &.placeholder {
+        &.placeholder, &.transition-placeholder {
+          &.transition-placeholder {
+            // This is for transition placeholder nodes popping in or out
+            background-color: #2d3135 !important;
+          }
+
           * {
             display: none;
           }
