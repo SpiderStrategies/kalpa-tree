@@ -134,7 +134,7 @@ test('creates a traveler after timeout', function (t) {
         , src = d3.select(tree.node.nodes()[3])
       t.ok(traveler.size(), 1, 'traveling node exists as a sibling')
       t.ok(src.classed('placeholder'), 'original node is denoted as placeholder')
-      t.equal(traveler.attr('style'), 'transform: translate(0px, 108px);', 'traveler uses original node position')
+      t.equal(traveler.attr('style'), 'transform: translate3d(0px, 108px, 0px);', 'traveler uses original node position')
       t.equal(traveler.select('.node-contents').attr('style'), src.select('.node-contents').attr('style'), 'node-contents share style')
       t.equal(traveler.select('.node-contents .label').text(), src.select('.node-contents .label').text(), 'labels match')
 
@@ -183,14 +183,14 @@ test('drag moves traveler', function (t) {
       d3.event.y = data._y + 200// new y location
       dnd.drag.apply(node, [data, 3])
       t.ok(tree.el.select('.traveling-node').datum()._y > data._y, 'traveler _y moved down')
-      var _translate = /translate\((.*)\)/.exec(tree.el.select('.traveling-node').attr('style'))[0]
-      t.equal(_translate, 'translate(0px, 290px)', 'transform changed')
-      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(60px,0px)', '60px y indentation')
+      var _translate = /translate3d\((.*)\)/.exec(tree.el.select('.traveling-node').attr('style'))[0]
+      t.equal(_translate, 'translate3d(0px, 290px, 0px)', 'transform changed')
+      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate3d(60px,0px,0px)', '60px y indentation')
       d3.event.y = 290 // move the node up a little
       dnd.drag.apply(node, [data, 3])
 
       // now it should be embedded
-      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(80px,0px)', '80px y indentation')
+      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate3d(80px,0px,0px)', '80px y indentation')
       dnd.end.apply(node, [data, 3])
       tree.remove()
       document.querySelector('.container').remove()
@@ -311,8 +311,8 @@ test('dnd autoscrolls', function (t) {
       setTimeout(function () {
         // By the time this fired, the autoScroll should have increased
         t.ok(tree.el.select('.tree').node().scrollTop > 100, 'tree scrolled down')
-        var _translate = /translate\((.*)\)/.exec(tree.el.select('.traveling-node').attr('style'))[0]
-        t.equal(_translate, 'translate(0px, 214px)', 'traveling node moved down')
+        var _translate = /translate3d\((.*)\)/.exec(tree.el.select('.traveling-node').attr('style'))[0]
+        t.equal(_translate, 'translate3d(0px, 214px, 0px)', 'traveling node moved down')
         dnd.end.apply(node, [data, 3])
         tree.remove()
         document.querySelector('.container').remove()

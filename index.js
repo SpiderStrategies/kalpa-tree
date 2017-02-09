@@ -252,7 +252,7 @@ Tree.prototype.adjustViewport = function () {
     var self = this
       , next = function (enter, update, exit) {
                  enter.call(self.enter, function (d) {
-                   return 'translate(0px,' + d._y + 'px)'
+                   return 'translate3d(0px,' + d._y + 'px,0px)'
                  })
                  update.call(self.updater)
                  exit.remove()
@@ -363,7 +363,7 @@ Tree.prototype._defaultEnterFly = function (visible, d) {
     return p(node.parent)
   })(d.parent)
 
-  return 'translate(0px,' + y + 'px)'
+  return 'translate3d(0px,' + y + 'px,0px)'
 }
 
 /*
@@ -378,7 +378,7 @@ Tree.prototype._slide = function (source) {
   this._rebind(function (enter, update, exit) {
     enter.call(self.enter, function (d) {
             // if there's a source, enter at that source's position, otherwise add the node at its position
-            return 'translate(0px,' + (source ? source._y : d._y) + 'px)'
+            return 'translate3d(0px,' + (source ? source._y : d._y) + 'px,0px)'
           }, 'fading-node transition-placeholder')
     update.call(function (selection) {
       // Remove the fading-node class, now that it's in the dom
@@ -873,7 +873,7 @@ Tree.prototype.expandAll = function () {
   } else {
     self._rebind(function (enter, update, exit) {
       enter.call(self.enter, function (d) {
-             return 'translate(0px,' + d._y + 'px)'
+             return 'translate3d(0px,' + d._y + 'px,0px)'
            })
       update.call(self.updater)
       exit.remove()
@@ -902,7 +902,7 @@ Tree.prototype.collapseAll = function () {
           }
 
           // Move this node to the ancestors location
-          return 'translate(0px,' + c._y + 'px)'
+          return 'translate3d(0px,' + c._y + 'px,0px)'
         })
       })
     })()
