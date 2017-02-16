@@ -797,6 +797,14 @@ Tree.prototype.add = function (d, parent, idx) {
     return
   }
 
+  if (parent && parent.selected) {
+    // The parent is selected, we want to expand its children (#259)
+    delete parent.collapsed
+    // Show the children immediately
+    this._fly()
+    this._forceRedraw()
+  }
+
   _d.parent = parent
   this.nodes[d.id] = d
   this._layout[_d.id] = _d
@@ -808,11 +816,6 @@ Tree.prototype.add = function (d, parent, idx) {
       parent._allChildren = []
     }
     parent._allChildren.push(_d)
-  }
-
-  if (parent && parent.selected) {
-    // The parent is selected, we want to expand its children (#259)
-    delete parent.collapsed
   }
 
   this._transitionWrap(this._slide)()

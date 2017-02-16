@@ -636,18 +636,24 @@ test('add node toggles tree nodes if parent is selected', function (t) {
     t.ok(!tree._layout[1003].children, 'selected node is not expanded so it does not have children')
     t.equal(el.querySelectorAll('.tree ul li.node').length, 8, '8 nodes visible')
 
+    var redraw = tree._forceRedraw
+    tree._forceRedraw = function () {
+      // Intercept this call to verify the parent is expanded
+      t.ok(tree._layout[1003].children, 'parent is now expanded')
+      t.equal(el.querySelectorAll('.tree ul li.node').length, 18, '18 nodes visible')
+      tree._forceRedraw = redraw // for next time
+
+      process.nextTick(function () {
+        t.equal(el.querySelectorAll('.tree ul li.node').length, 19, '19 nodes visible')
+        t.end()
+      })
+    }
     var d = tree.add({
       id: 3020,
       label: 'Newest node sibling',
       color: 'green',
       nodeType: 'metric'
     }, 1003)
-
-    process.nextTick(function () {
-      t.ok(tree._layout[1003].children, 'parent is now expanded')
-      t.equal(el.querySelectorAll('.tree ul li.node').length, 19, '19 nodes visible')
-      t.end()
-    })
 
   })
 })
