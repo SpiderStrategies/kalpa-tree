@@ -62,6 +62,10 @@ new Tree({
   maxAnimatable: 100, // Disable css animations if a node has children greater than this amount
   indicator: false, // show indicator light nodes on the right
   forest: false, // Indicates whether this tree can have multiple root nodes
+  movable: function (d) { // control if a node can be moved
+    // `d` is the node
+    return true
+  },
   droppable: function (d, parent) {
     // `d` is the node being moved
     // `parent` is its new parent. May be undefined if node is being moved to root in a forest tree
