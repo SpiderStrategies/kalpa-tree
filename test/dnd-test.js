@@ -323,6 +323,25 @@ test('dnd autoscrolls', function (t) {
   })
 })
 
+test('`movable` allows control to prevent if a node can be dnd\d', function (t) {
+  before(function (tree, dnd) {
+    var node = tree.node.nodes()[3]
+      , data = tree._layout[1058]
+
+    tree.options.movable = function (d, parent) {
+      return d.nodeType !== 'metric'
+    }
+
+    tree.editable()
+
+    t.equal(tree.el.selectAll('.node').size(), 18, '18 nodes')
+    t.equal(tree.el.selectAll('.node.movable').size(), 8, '8 movable nodes')
+    tree.remove()
+    document.querySelector('.container').remove()
+    t.end()
+  })
+})
+
 test('disable non-metrics dropped onto metrics', function (t) {
   before(function (tree, dnd) {
     var node = tree.node.nodes()[3]

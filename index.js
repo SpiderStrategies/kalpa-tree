@@ -36,6 +36,10 @@ var defaults = function () {
     maxAnimatable: 100, // Disable animations if a node has children greater than this amount
     indicator: false, // show indicator light nodes on the right
     forest: false, // Indicates whether this tree can have multiple root nodes
+    movable: function (d) {
+      // `d` is the node
+      return true
+    },
     droppable: function (d, parent) {
       // `d` is the node being moved
       // `parent` is its new parent. May be undefined if node is being moved to root in a forest tree
@@ -329,9 +333,14 @@ Tree.prototype._join = function (data, next) {
     , update = this.node = enter.merge(_node)
 
   if (this.el.select('.tree').classed('editable')) {
-    update.call(this.dnd) // Apply the dnd listener if we're in edit mode
+    update.filter(function (d) {
+            return self.options.movable.call(self, self.nodes[d.id])
+          })
+          .classed('movable', true)
+          .call(this.dnd) // Apply the dnd listener to all movable nodes if we're in edit mode
   } else {
     update.on('.drag', null) // Clear all dnd listeners
+          .classed('movable', false)
   }
 
   return next(enter, update, exit)

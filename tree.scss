@@ -318,7 +318,7 @@ $timing-fn: ease-out;
       }
 
       &:not(.search-results) {
-        li.node:not(.root):not(.transient) {
+        li.node.movable:not(.root):not(.transient) {
           cursor: move;
 
           &:hover {
