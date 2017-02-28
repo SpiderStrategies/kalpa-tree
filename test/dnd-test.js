@@ -324,11 +324,14 @@ test('dnd autoscrolls', function (t) {
 })
 
 test('`movable` allows control to prevent if a node can be dnd\d', function (t) {
+  t.plan(3)
   before(function (tree, dnd) {
     var node = tree.node.nodes()[3]
       , data = tree._layout[1058]
+      , that = null
 
     tree.options.movable = function (d, parent) {
+      that = this // save to test later
       return d.nodeType !== 'metric'
     }
 
@@ -336,6 +339,8 @@ test('`movable` allows control to prevent if a node can be dnd\d', function (t) 
 
     t.equal(tree.el.selectAll('.node').size(), 18, '18 nodes')
     t.equal(tree.el.selectAll('.node.movable').size(), 8, '8 movable nodes')
+    t.equal(that, tree, 'movable `this` (our that) is bound to the tree')
+
     tree.remove()
     document.querySelector('.container').remove()
     t.end()
@@ -346,8 +351,10 @@ test('disable non-metrics dropped onto metrics', function (t) {
   before(function (tree, dnd) {
     var node = tree.node.nodes()[3]
       , data = tree._layout[1058]
+      , that = null
 
     tree.options.droppable = function (d, parent) {
+      that = this
       if (d.nodeType === 'metric') {
         // Metrics can go anywhere
         return true
@@ -365,6 +372,7 @@ test('disable non-metrics dropped onto metrics', function (t) {
     d3.event.y = 290 // This would move 1058 onto 1008 which is a metric
     dnd.drag.apply(node, [data, 3])
 
+    t.equal(that, tree, 'droppable this is the tree')
     t.equal(data._x, tree._layout[1008]._x, '1058 is a sibling of 1008')
 
     tree.once('move', function (n, newParent, previousParent, newIndex, previousIndex) {

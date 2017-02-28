@@ -38,12 +38,13 @@ var defaults = function () {
     forest: false, // Indicates whether this tree can have multiple root nodes
     movable: function (d) {
       // `d` is the node
+      // `this` is a reference to the tree
       return true
     },
     droppable: function (d, parent) {
       // `d` is the node being moved
       // `parent` is its new parent. May be undefined if node is being moved to root in a forest tree
-
+      // `this` is a reference to the tree
       return true // By default, any node can be dropped on any other node
     },
     contents: require('./lib/contents'),
