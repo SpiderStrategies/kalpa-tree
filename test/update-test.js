@@ -24,6 +24,9 @@ test('update adjusts node styles', function (t) {
       options: {
         transientId: -1,
         height: 10,
+        label: function () {
+          // filler
+        },
         contents: require('../lib/contents'),
         accessors: {
           id: 'id'

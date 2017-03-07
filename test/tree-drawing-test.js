@@ -44,6 +44,30 @@ test('render populates data from stream', function (t) {
   })
 })
 
+test('allow label element overrides', function (t) {
+  t.plan(3)
+  var s = stream()
+    , that = null
+    , tree = new Tree({
+    stream: s,
+    label: function (selection) {
+      that = this
+      selection.html(function (d) {
+                 return 'Foo<span>Bar</span>'
+               })
+               .classed('quux', true)
+    }
+  }).render()
+
+  s.on('end', function () {
+    t.equal(tree, that, 'tree label `this` is bound to the tree')
+    t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child .label')[0].innerHTML, 'Foo<span>Bar</span>', 'label override sets html')
+    t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child .label.quux').length, 1, 'label override sets class')
+    tree.remove()
+    t.end()
+  })
+})
+
 test('allows node contents overrides', function (t) {
   var s = stream()
     , tree = new Tree({
