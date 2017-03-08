@@ -47,6 +47,14 @@ var defaults = function () {
       // `this` is a reference to the tree
       return true // By default, any node can be dropped on any other node
     },
+    label: function (selection) {
+      // This call be used to override how the label is drawn using the default
+      // `contents`
+      var tree = this
+      selection.text(function (d) {
+        return tree.nodes[d.id][tree.options.accessors.label]
+      })
+    },
     contents: require('./lib/contents'),
     performanceThreshold: 1000, // If the node data count exceeds this threshold, the tree goes into performance mode
     accessors: {
