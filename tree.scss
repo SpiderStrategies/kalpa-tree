@@ -317,7 +317,7 @@ $timing-fn: ease-out;
         }
       }
 
-      &:not(.search-results) {
+      &:not(.filtered-results) {
         li.node.movable:not(.root):not(.transient) {
           cursor: move;
 
@@ -351,9 +351,9 @@ $timing-fn: ease-out;
       }
     }
 
-    &.search-results {
+    &.filtered-results {
       .toggler {
-        opacity: 0 !important; // Never show the toggler when displaying search results
+        opacity: 0 !important; // Never show the toggler when displaying filtered results
       }
     }
   }

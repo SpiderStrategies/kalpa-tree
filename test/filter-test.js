@@ -4,17 +4,33 @@ var test = require('tape').test
   , stream = require('./tree-stream')
   , Transform = require('stream').Transform
 
-test('search call is noop if not displaying search results', function (t) {
+test('filter call is noop if not displaying filter results', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
   s.on('end', function () {
     tree.select(1058)
     t.equal(tree.node.size(), 8, '8 initial nodes')
-    tree.search()
-    t.equal(tree.node.size(), 8, '8 nodes displayed after search for null')
-    tree.search()
+    tree.filter()
+    t.equal(tree.node.size(), 8, '8 nodes displayed after filter for null')
+    tree.filter()
     t.equal(tree.node.size(), 8, '8 nodes displayed because it should not toggle')
+    tree.remove()
+    t.end()
+  })
+})
+
+test('filter function shows by nodeType', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  s.on('end', function () {
+    tree.select(1058)
+    t.equal(tree.node.size(), 8, '8 initial nodes')
+    tree.filter(function (d) {
+      return d.nodeType === 'metric'
+    })
+    t.equal(tree.node.size(), 24, '24 metric nodes')
     tree.remove()
     t.end()
   })
@@ -28,13 +44,13 @@ test('search', function (t) {
     t.equal(tree.node.size(), 3, '3 initial nodes')
     tree.search('M')
     t.equal(tree.node.size(), 25, '25 nodes visible')
-    t.ok(tree.el.select('.tree').classed('search-results'), 'tree has search-results class')
-    t.ok(tree._searchResults, 'tree stored _searchResults data')
+    t.ok(tree.el.select('.tree').classed('filtered-results'), 'tree has filtered-results class')
+    t.ok(tree._filteredResults, 'tree stored _filteredResults data')
     t.equal(tree.nodes[d3.select(tree.node.nodes()[0]).datum().id].label, 'M1', 'M1 is the first result')
     tree.select(d3.select(tree.node.nodes()[3]).datum().id)
     t.equal(tree.node.size(), 18, '18 nodes visible')
-    t.ok(!tree.el.select('.tree').classed('search-results'), 'tree does not have search-results class')
-    t.ok(!tree._searchResults, 'tree no longer has _searchResults data')
+    t.ok(!tree.el.select('.tree').classed('filtered-results'), 'tree does not have filtered-results class')
+    t.ok(!tree._filteredResults, 'tree no longer has _filteredResults data')
     tree.remove()
     t.end()
   })
@@ -84,7 +100,7 @@ test('search for null clears search', function (t) {
     tree.search('M')
     t.equal(tree.node.size(), 25, '25 nodes visible')
     tree.search(null)
-    t.ok(!tree.el.select('.tree').classed('search-results'), 'tree does not have search-results class')
+    t.ok(!tree.el.select('.tree').classed('filtered-results'), 'tree does not have filtered-results class')
     t.equal(tree.node.size(), 3, '3 nodes visible')
     tree.remove()
     t.end()
@@ -116,10 +132,10 @@ test('shows seleceted search result in a collapsed tree', function (t) {
     tree.expandAll()
     tree.search('M')
     t.equal(tree.node.size(), 25, '25 nodes visible')
-    t.ok(tree.el.select('.tree').classed('search-results'), 'tree showing search-results')
+    t.ok(tree.el.select('.tree').classed('filtered-results'), 'tree showing filtered-results')
     tree.node.nodes()[3].click() // Click on M4
     t.equal(tree.node.size(), 18, '18 nodes visible') // Not all nodes from previous expandAll
-    t.ok(!tree.el.select('.tree').classed('search-results'), 'tree not showing search-results')
+    t.ok(!tree.el.select('.tree').classed('filtered-results'), 'tree not showing filtered-results')
     tree.remove()
     t.end()
   })
