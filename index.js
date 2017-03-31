@@ -270,17 +270,17 @@ Tree.prototype.adjustViewport = function () {
                  update.call(self.updater)
                  exit.remove()
                }
-    this._searchResults ? this._join(this._searchResults, next) : this._rebind(next)
+    this._filteredResults ? this._join(this._filteredResults, next) : this._rebind(next)
   }
 }
 
-Tree.prototype._clearSearch = function () {
-  // Any rebind of data removes the search-results class
+Tree.prototype._clearFilter = function () {
+  // Any rebind of data removes the filtered-results class
   this.el.select('.tree')
-         .classed('search-results', false)
-         .on('.search-click', null)
+         .classed('filtered-results', false)
+         .on('.filtered-click', null)
 
-  this._searchResults = null
+  this._filteredResults = null
 
   return this
 }
@@ -289,7 +289,7 @@ Tree.prototype._clearSearch = function () {
  * Rebinds the data to the selection based on the data model in the tree.
  */
 Tree.prototype._rebind = function (next) {
-  this._clearSearch()
+  this._clearFilter()
       .el
       .select('.tree')
       .classed('detached-root', !!this._rootOffset)
@@ -911,7 +911,7 @@ Tree.prototype.collapseAll = function () {
   if (Object.keys(this._layout).length < this.options.maxAnimatable) {
     this._transitionWrap(function () {
       self._rebind(function (enter, update, exit) {
-        enter.call(self.enter) // Seems odd, but needed in case we're showing a subset of the tree (i.e. search results)
+        enter.call(self.enter) // Seems odd, but needed in case we're showing a subset of the tree (i.e. filtered results)
         update.call(self.updater)
         exit.call(self.flyExit, null, function (d) {
           var c = p = d.parent
@@ -1047,37 +1047,40 @@ Tree.prototype.removeNode = function (obj) {
   })()
 }
 
-Tree.prototype.search = function (term) {
-  if (term == null) {
+/*
+ * Filter nodes in the tree. Passing in null clears the filtered tree
+ */
+Tree.prototype.filter = function (fn) {
+  if (fn == null) {
     return this.select((this._selected && this._selected.id) || (this.options.forest ? this.root[0].id : this.root.id), {
-      force: this.el.select('.tree').classed('search-results'),
+      force: this.el.select('.tree').classed('filtered-results'),
       silent: true
     })
   }
 
-  var re = new RegExp(regexEscape(term), 'ig')
-    , self = this
-    , data = Object.keys(this.nodes).filter(function (k) {
-               re.lastIndex = 0
-               return re.test(self.nodes[k][self.options.accessors.label]) && self.nodes[k].visible !== false
-             }).map(function (key, i) {
-               var _d = self._layout[key]
-               _d._x = 0
-               _d._y = i * self.options.height
-               return _d
-             })
+  var self = this
+    , data = Object.keys(this.nodes)
+                   .filter(function (k) {
+                     return fn.call(self, self.nodes[k])
+                   })
+                   .map(function (key, i) {
+                     var _d = self._layout[key]
+                     _d._x = 0
+                     _d._y = i * self.options.height
+                     return _d
+                   })
 
   this._transitionWrap(function () {
-    this.el.select('.tree').classed('search-results', true)
+    this.el.select('.tree').classed('filtered-results', true)
                            .classed('detached-root', false)
-                           .on('click.search-click', function () {
+                           .on('click.filtered-click', function () {
                              // Capture the click event at the tree level, and collapse all nodes
                              // before the actual node is selected
                              self._toggleAll(function (d) {
                                d.collapsed = true
                              })
                            }, true)
-    this._searchResults = data
+    this._filteredResults = data
 
     this._join(data, function (enter, update, exit) {
       enter.call(self.enter)
@@ -1085,6 +1088,20 @@ Tree.prototype.search = function (term) {
       exit.remove() // No animations on exit
     })
   })()
+}
+
+/*
+ * Search will filter tree nodes based on the label accessor matching
+ * the incoming term.
+ */
+Tree.prototype.search = function (term) {
+  var re = term && new RegExp(regexEscape(term) || '', 'ig')
+    , self = this
+
+  this.filter(term && function (node) {
+    re.lastIndex = 0
+    return re.test(node[self.options.accessors.label]) && node.visible !== false
+  })
 }
 
 /*

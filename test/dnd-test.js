@@ -86,7 +86,7 @@ test('dnd dependent on edit mode', function (t) {
   })
 })
 
-test('dnd prevented if displaying search results', function (t) {
+test('dnd prevented if displaying filtered results', function (t) {
   before(function (tree, dnd) {
     tree.search('M')
     tree.editable()
