@@ -1095,11 +1095,10 @@ Tree.prototype.filter = function (fn) {
  * the incoming term.
  */
 Tree.prototype.search = function (term) {
-  var re = term && new RegExp(regexEscape(term) || '', 'ig')
+  var re = term && new RegExp(regexEscape(term) || '', 'i')
     , self = this
 
   this.filter(term && function (node) {
-    re.lastIndex = 0
     return re.test(node[self.options.accessors.label]) && node.visible !== false
   })
 }
