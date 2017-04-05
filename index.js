@@ -1099,7 +1099,6 @@ Tree.prototype.search = function (term) {
     , self = this
 
   this.filter(term && function (node) {
-    re.lastIndex = 0
     return re.test(node[self.options.accessors.label]) && node.visible !== false
   })
 }
