@@ -25,7 +25,7 @@ $timing-fn: ease-out;
   @include transition-timing-function($timing-fn);
 
   .node-contents {
-    padding: 11px 0px 10px;
+    padding: 10px 0px 8px;
     font-size: 13px;
     line-height: 1; // automatically the same as font size
     text-align: left;
@@ -42,7 +42,7 @@ $timing-fn: ease-out;
     .label {
       display: inline-block;
       vertical-align: middle;
-      margin-left: 8px;
+      margin-left: 10px;
       color: #ADB8BC;
       text-shadow: 0 1px 0 rgba(0, 0, 0, 0.23);
     }
@@ -91,14 +91,14 @@ $timing-fn: ease-out;
     overflow-x: hidden;
 
     .node-contents {
-      padding-left: 14px;
+      padding: 11px 0px 11px 14px; 
       @include transition-property(transform, opacity);
       @include transition-duration($delay);
       @include transition-timing-function($timing-fn);
 
       // Align with non traveling icons
       svg.icon {
-        margin-left: 9px;
+        margin-left: 8px;
       }
 
       .label {
@@ -240,7 +240,7 @@ $timing-fn: ease-out;
               width: 9px;
               height: 6px;
               top: 9px;
-              right: 7px;
+              right: 8px;
               fill: #818b8f;
             }
 
@@ -326,7 +326,7 @@ $timing-fn: ease-out;
               content: "";
               position: absolute;
               width: 5px;
-              top: 14px;
+              top: 13px;
               right: 0;
               height: .1em;
               background: #ADB8BC;
