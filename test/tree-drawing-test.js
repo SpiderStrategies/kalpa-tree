@@ -372,3 +372,50 @@ test('sets icon class on svg', function (t) {
     t.end()
   })
 })
+
+test('slow stream with api call before end', function (t) {
+  var stream = require('stream').Readable({objectMode: true})
+    , data = [{
+        id: 1001,
+        label: 'Huge Scorecard',
+        color: 'red',
+        nodeType: 'root'
+      }, {
+        id: 1002,
+        label: 'P1',
+        parentId: 1001,
+        color: 'red',
+        nodeType: 'perspective'
+      }, {
+        id: 1058,
+        label: 'P2',
+        parentId: 1001,
+        color: 'green',
+        nodeType: 'perspective'
+      }]
+    , i = 0
+
+  stream._read = function () {
+     if (data[i]) {
+      setTimeout(function () {
+        stream.push(data[i++])
+      }, 10)
+      return
+    }
+    stream.push(null)
+  }
+
+  var tree = new Tree({stream: stream}).render()
+
+  tree.on('node', function () {
+    if (i === 2) {
+      // after root, on 2nd node, mark it editable
+      tree.editable()
+    }
+  })
+
+  stream.on('end', function () {
+    t.equal(tree.el.selectAll('.tree ul li.node').size(), 3, 'three nodes in tree')
+    t.end()
+  })
+})
