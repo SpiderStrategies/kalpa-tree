@@ -852,8 +852,13 @@ Tree.prototype.isEditable = function () {
  */
 Tree.prototype.editable = function () {
   var tree = this.el.select('.tree')
+    , self = this
   tree.classed('editable', !tree.classed('editable'))
-  this._join(this.layout(this.root), Function.prototype)
+  this._join(this.layout(this.root), function (enter) {
+    // if any nodes entered on this call, make sure they are drawn in case
+    // editable is fired before the end event fires
+    enter.call(self.enter)
+  })
 }
 
 /*
