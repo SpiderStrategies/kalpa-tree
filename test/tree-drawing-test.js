@@ -373,6 +373,56 @@ test('sets icon class on svg', function (t) {
   })
 })
 
+test('sets toggler class based on node state', function (t) {
+  var stream = new Readable({objectMode: true})
+    , data = [{
+      id: 1001,
+      label: 'Huge Scorecard',
+      color: 'red',
+      nodeType: 'root'
+    }, {
+      id: 1002,
+      label: 'P1',
+      parentId: 1001,
+      color: 'red',
+      nodeType: 'perspective'
+    }, {
+      id: 1058,
+      label: 'P2',
+      parentId: 1001,
+      color: 'green',
+      nodeType: 'perspective'
+    }, {
+      id: 1098,
+      label: 'O1',
+      parentId: 1058,
+      visible: false,
+      color: 'green',
+      nodeType: 'objective'
+    }]
+
+  stream._read = function () {
+    stream.push(data.shift() || null)
+  }
+
+  var tree = new Tree({stream: stream}).render()
+
+  stream.on('end', function () {
+    // var li =
+    t.ok(tree.el.selectAll('.tree ul li:nth-child(1) .toggler').classed('expanded'), 'root toggler is marked expanded')
+    t.ok(tree.el.selectAll('.tree ul li:nth-child(2) .toggler').classed('leaf'), 'P1 toggler is marked as leaf')
+    t.ok(tree.el.selectAll('.tree ul li:nth-child(3) .toggler').classed('leaf'), 'P2 toggler is marked as leaf')
+
+    tree.edit({
+      id: 1098,
+      visible: true
+    })
+
+    t.ok(tree.el.selectAll('.tree ul li:nth-child(3) .toggler').classed('collapsed'), 'P2 toggler is marked as collapsed')
+    t.end()
+  })
+})
+
 test('slow stream with api call before end', function (t) {
   var stream = require('stream').Readable({objectMode: true})
     , data = [{
