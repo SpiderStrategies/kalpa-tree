@@ -1,6 +1,6 @@
 {
   "name": "kalpa-tree",
-  "version": "2.9.3",
+  "version": "2.9.4",
   "description": "An efficient hierarchical tree for the dom",
   "main": "index.js",
   "dependencies": {
