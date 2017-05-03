@@ -313,8 +313,7 @@ test('dnd flat forest', function (t) {
       stream: stream,
       forest: true,
       droppable: function (node, parent) {
-        // return true
-        return !parent
+        return !parent // Only alow dropping onto root nodes
       }
     }).render()
     , dnd = new Dnd(tree)

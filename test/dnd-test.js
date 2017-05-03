@@ -412,6 +412,31 @@ test('moves a node below root, when root is detached', function (t) {
   })
 })
 
+test('allows a traveler to be illegal near the root node', function (t) {
+  before(function (tree, dnd) {
+    tree.options.droppable = function () {
+      return false
+    }
+
+    tree.editable()
+
+    var m2 = tree.node.nodes()[4]
+      , m2d = tree._layout[1005]
+
+    dnd.start.apply(m2, [m2d, 4])
+    dnd._dragging = true
+    d3.event.y = -50
+    dnd.drag.apply(m2, [m2d, 4])
+
+    t.ok(dnd.traveler.datum().illegal, 'traveler is illegal')
+    t.ok(dnd.traveler.classed('illegal'), 'traveler has illegal classname')
+
+    tree.remove()
+    document.querySelector('.container').remove()
+    t.end()
+  })
+})
+
 test('marks traveler as illegal if its too deep', function (t) {
   before(function (tree, dnd) {
     tree.options.droppable = function (d, parent) {
