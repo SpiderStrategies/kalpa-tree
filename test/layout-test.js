@@ -55,6 +55,36 @@ test('generates a forest tree', function (t) {
   t.end()
 })
 
+test('generates a forest tree with hidden roots', function (t) {
+  var forest = [{
+      id: 1,
+      children: [{
+        id: 2,
+        children: [{id: 3}, {id: 4}]
+      }, {
+        id: 5
+      }]
+    }, {
+      id: 6,
+      visible: false
+    }, {
+      id: 7,
+      visible: false,
+      children: [{
+        id: 8
+      }]
+    }
+  ]
+
+  var l = layout(20, 40, 0, function (d) {
+            return d.children
+          })
+    , nodes = l(forest)
+
+  t.equal(nodes.length, 5, '5 nodes in tree')
+  t.end()
+})
+
 test('generates an empty tree', function (t) {
   var l = layout()
   t.plan(1)
