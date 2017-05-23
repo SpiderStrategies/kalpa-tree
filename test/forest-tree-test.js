@@ -2,6 +2,7 @@ var test = require('tape').test
   , Tree = require('../')
   , css = require('./../dist/tree.css')
   , Readable = require('stream').Readable
+  , Transform = require('stream').Transform
   , Dnd = require('../lib/dnd')
   , Event = require('./_event')
   , nodes = [{
@@ -360,5 +361,27 @@ test('dnd flat forest', function (t) {
       })
       dnd.end.apply(node, [data, 2])
     })
+  })
+})
+
+test('hides visible: false root nodes', function (t) {
+  var map = new Transform( { objectMode: true } )
+    , hiddens = [1002]
+
+  map._transform = function (obj, encoding, done) {
+    if (hiddens.indexOf(obj.id) !== -1) {
+      obj.visible = false
+    }
+    this.push(obj)
+    done()
+  }
+
+  var s = stream().pipe(map)
+    , tree = new Tree({stream: s, forest: true}).render()
+
+  s.on('end', function (d) {
+    t.equal(tree.root.length, 2, 'two root nodes')
+    t.equal(tree.node.size(), 1, '1 node visible')
+    t.end()
   })
 })
