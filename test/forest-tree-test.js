@@ -239,6 +239,7 @@ test('dnd allows a root nodes to change order', function (t) {
     var newOrder = tree.root.map(function (node) { return node.id })
     t.deepEqual(newOrder, [1002, 1003, 1001 ], 'new root order is 1002, 1003, 1001')
     tree.remove()
+    container.remove()
     t.end()
   })
 })
@@ -285,6 +286,7 @@ test('dnd allows a node to become a new root', function (t) {
         t.deepEqual(tree.root[0], data, 'new first root is the node moved')
 
         tree.remove()
+        container.remove()
         t.end()
       })
       dnd.end.apply(node, [data, 2])
@@ -357,6 +359,7 @@ test('dnd flat forest', function (t) {
         t.deepEqual(tree.root[1], data, 'node moved is at index 1 of root nodes')
 
         tree.remove()
+        container.remove()
         t.end()
       })
       dnd.end.apply(node, [data, 2])
