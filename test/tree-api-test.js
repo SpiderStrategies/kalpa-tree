@@ -1,6 +1,7 @@
 var test = require('tape').test
   , Readable = require('stream').Readable
   , Tree = require('../')
+  , css = require('./../dist/tree.css')
   , stream = require('./tree-stream')
   , data = require('./tree.json')
 
@@ -157,21 +158,33 @@ test('selects a node', function (t) {
 })
 
 test('select a node adds transitions by default', function (t) {
+  t.plan(3)
+
   var s = stream()
-    , tree = new Tree({stream: s}).render()
+    , container = document.createElement('div')
+    , tree = new Tree({stream: s})
+    , fly = tree._fly
+
+  container.className = 'container'
+  container.style.height = '700px'
+  document.body.appendChild(container)
+  container.appendChild(tree.render().el.node())
 
   s.on('end', function () {
     t.ok(!tree.el.select('.tree').classed('transitions'), 'tree el does not have transitions by default')
-    var toggler = tree.toggle
-    tree.toggle = function () {
-      toggler.apply(tree, arguments)
+
+    tree.on('rendered', function () {
+      t.ok(!tree.el.select('.tree').classed('transition'), 'tree transitions class not there after toggle')
+      tree.el.remove()
+      container.remove()
+      t.end()
+    })
+
+    tree._fly = function () {
       t.ok(tree.el.select('.tree').classed('transitions'), 'tree has transitions class applied')
-      process.nextTick(function () {
-        t.ok(!tree.el.select('.tree').classed('transition'), 'tree transitions class not there after toggle')
-        tree.el.remove()
-        t.end()
-      })
+      fly.apply(tree, arguments)
     }
+
     tree.select(1002)
   })
 })

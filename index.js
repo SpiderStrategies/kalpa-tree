@@ -248,12 +248,18 @@ Tree.prototype._transitionWrap = function (fn, animate, force) {
       self.el.select('.tree').classed('transitions', true)
     }
 
-    var result = fn.apply(self, arguments)
     if (animate) {
-      self.el.selectAll('.node')
-               .on('transitionend', function () {
-                 self.el.select('.tree').classed('transitions', false)
-               })
+      setTimeout(function () {
+        self.el.select('.tree').classed('transitions', false)
+        self.emit('rendered')
+      }, self.transitionTimeout)
+    }
+
+    var result = fn.apply(self, arguments)
+
+    if (!animate) {
+      // Fire right away once we're done updating the dom
+      self.emit('rendered')
     }
 
     return result
