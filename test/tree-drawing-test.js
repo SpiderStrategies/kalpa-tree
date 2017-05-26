@@ -333,21 +333,25 @@ test('transitioning-node applied to entering nodes', function (t) {
   tree.render()
 })
 
-test('disables animations if opts.maxAnimatable is exceeded', function (t) {
+test('disables transitions animation if opts.maxAnimatable is exceeded', function (t) {
+  t.plan(3)
   var s = stream()
     , tree = new Tree({stream: s, maxAnimatable: 3}).render()
 
   s.on('end', function () {
     var toggler = tree.toggle
+
+    tree.on('rendered', function () {
+      t.ok(!tree.el.select('.tree').classed('transitions'), 'tree does not have transitions class after toggle')
+      tree.remove()
+      t.end()
+    })
+
     tree.toggle = function () {
       t.ok(!tree.el.select('.tree').classed('transitions'), 'tree does not have transitions class applied')
       toggler.apply(tree, arguments)
-      process.nextTick(function () {
-        t.ok(!tree.el.select('.tree').classed('transitions'), 'tree does not have transitions class after toggle')
-        tree.remove()
-        t.end()
-      })
     }
+
     t.ok(!tree._layout[1003].children, 10, '1003 hidden nodes')
     tree.select(1002)
   })
