@@ -50,8 +50,8 @@ test('update adjusts node styles', function (t) {
   nodes.each(function (d, i) {
     var node = d3.select(this)
     t.equal(node.style('opacity'), '1', 'opacity set to 1')
-    t.equal(node.style('-webkit-transform'), 'matrix(1, 0, 0, 1, 0, ' + (i * 10) + ')', 'transform y based on index height')
-    t.equal(node.select('.node-contents').style('-webkit-transform'), 'matrix(1, 0, 0, 1, ' + (d.y) + ', 0)', 'node contents x transform based on original y')
+    t.equal(node.style('-webkit-transform'), 'translate3d(0px, ' + (i * 10) + 'px, 0px)', 'transform y based on index height')
+    t.equal(node.select('.node-contents').style('-webkit-transform'), 'translate3d(' + (i + 1) + 'px, 0px, 0px)', 'node contents x transform based on original y')
   })
   t.end()
 })
