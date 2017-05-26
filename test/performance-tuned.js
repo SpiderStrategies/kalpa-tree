@@ -60,10 +60,7 @@ test('tree is in performance mode', function (t) {
     t.equal(tree.el.select('.tree ul li.node[data-id="104000"]').size(), 1, '104000 is in the dom')
     t.equal(tree.el.select('.tree').node().scrollTop, 144108, 'scroll top adjusted')
 
-    // Remove the style since the browser is a global nightmare
-    document.querySelector('head style').remove()
     container.remove()
-
     t.end()
   })
 })
