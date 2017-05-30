@@ -756,7 +756,7 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
     this.toggle(d, opt)
   } else {
     // We're not showing or hiding nodes, it will just be an update
-    this._fly(d)
+    this._transitionWrap(this._fly, opt.animate)(d)
   }
 
   // Adjust selected properties
