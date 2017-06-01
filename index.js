@@ -250,16 +250,10 @@ Tree.prototype._transitionWrap = function (fn, animate, force) {
     if (animate) {
       setTimeout(function () {
         self.el.select('.tree').classed('transitions', false)
-        self.emit('rendered')
       }, self.transitionTimeout)
     }
 
     var result = fn.apply(self, arguments)
-
-    if (!animate) {
-      // Fire right away once we're done updating the dom
-      self.emit('rendered')
-    }
 
     return result
   }
@@ -710,13 +704,14 @@ Tree.prototype._scrollIntoView = function (d, opt) {
 
   if (d._y < n.scrollTop || d._y > n.offsetHeight + n.scrollTop) {
     // Now scroll the node into view
-    if (opt.animate === false || this._tuned) {
-      n.scrollTop = d._y
-    } else {
-      // We're playing animations, wait until they are done
+
+    if (this.el.select('.tree').classed('transitions')) {
+      // We're in the process of transitioning the tree, wait until they are done, then scroll
       setTimeout(function () {
         n.scrollTop = d._y
       }, this.transitionTimeout)
+    } else {
+      n.scrollTop = d._y
     }
 
     if (this._tuned) {
@@ -775,6 +770,10 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
 
   if (!opt.silent) {
     this.emit('select', this.nodes[d.id])
+
+    setTimeout(function () {
+      this.emit('selected')
+    }.bind(this), this.el.select('.tree').classed('transitions') ? this.transitionTimeout : 0)
   }
 }
 
