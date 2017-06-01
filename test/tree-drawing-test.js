@@ -341,7 +341,7 @@ test('disables transitions animation if opts.maxAnimatable is exceeded', functio
   s.on('end', function () {
     var toggler = tree.toggle
 
-    tree.on('rendered', function () {
+    tree.on('selected', function () {
       t.ok(!tree.el.select('.tree').classed('transitions'), 'tree does not have transitions class after toggle')
       tree.remove()
       t.end()

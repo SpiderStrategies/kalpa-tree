@@ -173,7 +173,7 @@ test('select a node adds transitions by default', function (t) {
   s.on('end', function () {
     t.ok(!tree.el.select('.tree').classed('transitions'), 'tree el does not have transitions by default')
 
-    tree.on('rendered', function () {
+    tree.on('selected', function () {
       t.ok(!tree.el.select('.tree').classed('transition'), 'tree transitions class not there after toggle')
       tree.el.remove()
       container.remove()
