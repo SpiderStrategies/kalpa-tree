@@ -1,7 +1,6 @@
 var d3 = require('d3-selection')
   , DnD = require('./lib/dnd')
   , drag = require('d3-drag').drag
-  , timer = require('d3-timer').timer
   , EventEmitter = require('events').EventEmitter
   , regexEscape = require('escape-string-regexp')
   , Stream = require('stream').Stream
@@ -408,9 +407,8 @@ Tree.prototype._slide = function (source) {
       // Remove the fading-node class, now that it's in the dom
       selection.classed('fading-node', false)
       // Then remove the transition-placeholder class once the transitions have run
-      var t = timer(function () {
+      setTimeout(function () {
         selection.classed('transition-placeholder', false)
-        t.stop()
       }, self.transitionTimeout)
     })
     exit.call(self.slideExit, source)
@@ -716,9 +714,8 @@ Tree.prototype._scrollIntoView = function (d, opt) {
       n.scrollTop = d._y
     } else {
       // We're playing animations, wait until they are done
-      var t = timer(function () {
+      setTimeout(function () {
         n.scrollTop = d._y
-        t.stop()
       }, this.transitionTimeout)
     }
 
