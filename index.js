@@ -135,6 +135,7 @@ Tree.prototype.render = function () {
 
   this.node = this.el.append('div')
                        .attr('class', 'tree')
+                       .classed('editable', this.options.editable) // In case trees are initialized with `editable: true`
                        .on('scroll', function () {
                          var scroll = self.el.select('.tree').node().scrollTop
                          if (!self._scrollTop) {

@@ -95,6 +95,21 @@ test('allows node contents overrides', function (t) {
   })
 })
 
+test('tree can be editable on initial render based on options', function (t) {
+  var s = stream()
+    , tree = new Tree({
+      stream: s,
+      editable: true
+    }).render()
+
+  s.on('end', function () {
+    t.ok(tree.el.node().querySelector('.tree.editable'), 'tree is marked as editable')
+    t.ok(tree.isEditable(), 'the tree is editable according to its api')
+    tree.remove()
+    t.end()
+  })
+})
+
 test('does not apply indicator class to label-mask by default', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
