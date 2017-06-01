@@ -250,16 +250,10 @@ Tree.prototype._transitionWrap = function (fn, animate, force) {
     if (animate) {
       setTimeout(function () {
         self.el.select('.tree').classed('transitions', false)
-        self.emit('rendered')
       }, self.transitionTimeout)
     }
 
     var result = fn.apply(self, arguments)
-
-    if (!animate) {
-      // Fire right away once we're done updating the dom
-      self.emit('rendered')
-    }
 
     return result
   }
@@ -776,6 +770,10 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
 
   if (!opt.silent) {
     this.emit('select', this.nodes[d.id])
+
+    setTimeout(function () {
+      this.emit('selected')
+    }.bind(this), this.el.select('.tree').classed('transitions') ? this.transitionTimeout : 0)
   }
 }
 
