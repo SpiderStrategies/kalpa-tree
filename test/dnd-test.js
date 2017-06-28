@@ -437,6 +437,39 @@ test('allows a traveler to be illegal near the root node', function (t) {
   })
 })
 
+test('marks traveler as illegal if dropping onto a transient node', function (t) {
+  t.plan(1)
+  before(function (tree, dnd) {
+    tree.editable()
+
+    var _t = tree.addTransient({
+      label: 'New transient',
+      color: 'green',
+      nodeType: 'metric'
+    }, 1003)
+
+    tree.options.droppable = function () {
+      // This will only be called once, because the first time the illegal check fires, it will return true bc
+      // we're dropping onto a transient node
+      t.pass('droppable called')
+      return true
+    }
+
+    var m2 = tree.node.nodes()[10]
+      , m2d = tree._layout[1013]
+
+    dnd.start.apply(m2, [m2d, 10])
+    dnd._dragging = true
+    d3.event.y = 475
+    dnd.drag.apply(m2, [m2d, 10])
+    dnd.end.apply(m2, [m2d, 4])
+
+    tree.remove()
+    document.querySelector('.container').remove()
+    t.end()
+  })
+})
+
 test('marks traveler as illegal if its too deep', function (t) {
   before(function (tree, dnd) {
     tree.options.droppable = function (d, parent) {
