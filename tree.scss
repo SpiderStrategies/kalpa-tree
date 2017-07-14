@@ -1,7 +1,18 @@
-@import "bourbon";
-
 $delay: 300ms;
 $timing-fn: ease-out;
+
+@mixin prefix($property, $value, $prefixes: ()) {
+   @each $prefix in $prefixes {
+    #{'-' + $prefix + '-' + $property}: $value;
+  }
+
+  #{$property}: $value;
+}
+
+@mixin gradientBackground($startColor, $stopColor) {
+  background-image: -webkit-linear-gradient(left, $startColor, $stopColor);
+  background-image: linear-gradient(to right, $startColor, $stopColor);
+}
 
 @mixin base-node() {
   list-style: none;
@@ -20,9 +31,9 @@ $timing-fn: ease-out;
    */
   overflow: visible;
 
-  @include transition-property(opacity);
-  @include transition-duration($delay);
-  @include transition-timing-function($timing-fn);
+  transition-property: opacity;
+  transition-duration: $delay;
+  transition-timing-function: $timing-fn;
 
   .node-contents {
     padding: 10px 0px 8px;
@@ -91,10 +102,10 @@ $timing-fn: ease-out;
     overflow-x: hidden;
 
     .node-contents {
-      padding: 11px 0px 11px 14px; 
-      @include transition-property(transform, opacity);
-      @include transition-duration($delay);
-      @include transition-timing-function($timing-fn);
+      padding: 11px 0px 11px 14px;
+      transition-property: transform, opacity;
+      transition-duration: $delay;
+      transition-timing-function: $timing-fn;
 
       // Align with non traveling icons
       svg.icon {
@@ -103,14 +114,14 @@ $timing-fn: ease-out;
 
       .label {
         color: #2d3135;
-        @include transition-property(color);
-        @include transition-duration($delay);
-        @include transition-timing-function($timing-fn);
+        transition-property: color;
+        transition-duration: $delay;
+        transition-timing-function: $timing-fn;
       }
     }
 
     .label-mask {
-      @include background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #D9E2E8 90%));
+      @include gradientBackground(rgba(57, 60, 64, 0) 0%, #D9E2E8 90%);
     }
 
     &.illegal {
@@ -145,9 +156,9 @@ $timing-fn: ease-out;
       background: #7fe1f4;
       box-shadow: 0 0.25em 0 0 #7fe1f4, 0 0.5em 0 0 #7fe1f4;
 
-      @include transition-property(background, box-shadow, color);
-      @include transition-duration($delay);
-      @include transition-timing-function($timing-fn);
+      transition-property: background, box-shadow, color;
+      transition-duration: $delay;
+      transition-timing-function: $timing-fn;
     }
 
     .toggler, .indicator:after {
@@ -163,7 +174,7 @@ $timing-fn: ease-out;
     width: 100%;
     height: 100%;
 
-    @include user-select(none);
+    @include prefix(user-select, none, webkit moz ms);
 
     // Most tree functions that modify the dom send a callback into transitionWrap where has some magic
     // to determine whether or not we actually want transitions. It's in charge of adding the .transitions
@@ -181,21 +192,21 @@ $timing-fn: ease-out;
               // the transitioning-node class is removed (right after a browser reflow), the transition-property
               // will pick up from the `li.node` styling, so opacity will transition.
               // This fixes a bizarre IE11 bug that will break the entire transition
-              @include transition-property(height, transform);
+              transition-property: height, transform;
             }
           }
 
-          @include transition-property(transform, opacity, height);
-          @include transition-duration($delay);
-          @include transition-timing-function($timing-fn);
+          transition-property: transform, opacity, height;
+          transition-duration: $delay;
+          transition-timing-function: $timing-fn;
           .node-contents {
-            @include transition-property(transform, opacity);
-            @include transition-duration($delay);
-            @include transition-timing-function($timing-fn);
+            transition-property: transform, opacity;
+            transition-duration: $delay;
+            transition-timing-function: $timing-fn;
 
             .toggler {
-              @include transition-property(transform);
-              @include transition-duration($delay);
+              transition-property: transform;
+              transition-duration: $delay;
             }
           }
         }
@@ -214,7 +225,7 @@ $timing-fn: ease-out;
       list-style-type: none;
       padding: 0px;
       margin: 0px;
-      @include transform(translateX(0)); // Specify 0 transform, otherwise we get overflow on nodes
+      transform: translateX(0); // Specify 0 transform, otherwise we get overflow on nodes
 
       li.node {
         @include base-node;
@@ -232,8 +243,8 @@ $timing-fn: ease-out;
             height: 22px;
             margin: -4px 0 0 -2px;
             opacity: 0;
-            @include transform(rotate(-90deg));
-            @include transform-origin(center center);
+            transform: rotate(-90deg);
+            transform-origin: center center;
 
             svg {
               position: absolute;
@@ -244,16 +255,18 @@ $timing-fn: ease-out;
               fill: #818b8f;
             }
 
-            &.expanded { @include transform(rotate(0deg)); }
+            &.expanded {
+              transform: rotate(0deg);
+            }
             &.leaf { visibility: hidden !important; }
           }
         }
 
         .label-mask {
-          @include background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 90%));
+          @include gradientBackground(rgba(57,60,64,0) 0%, #393c40 90%);
 
           &.indicator {
-            @include background-image(linear-gradient(to right, rgba(57,60,64,0) 0%, #393c40 50%));
+            @include gradientBackground(rgba(57,60,64,0) 0%, #393c40 50%);
           }
         }
 
@@ -293,12 +306,14 @@ $timing-fn: ease-out;
           svg.icon {
             fill: #e1e8eb;
           }
-          .label { color: #E1E8EB; }
+          .label {
+            color: #e1e8eb;
+          }
           .label-mask {
-            @include background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 90%));
+            @include gradientBackground(rgba(45,49,53,0) 0%, #2d3135 90%);
 
             &.indicator {
-              @include background-image(linear-gradient(to right, rgba(45,49,53,0) 0%, #2d3135 50%));
+              @include gradientBackground(rgba(45,49,53,0) 0%, #2d3135 50%);
             }
           }
         }
@@ -340,7 +355,7 @@ $timing-fn: ease-out;
         .node-contents, .label-mask:after {
           opacity: .6;
           // Prevent IE11 from breaking due to another opacity transition bug
-          @include transition(none);
+          transition: none;
         }
       }
     }
