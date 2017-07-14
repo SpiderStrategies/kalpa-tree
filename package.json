@@ -4,7 +4,6 @@
   "description": "An efficient hierarchical tree for the dom",
   "main": "index.js",
   "dependencies": {
-    "bourbon": "^4.2.4",
     "d3-drag": "^1.0.1",
     "d3-selection": "^1.0.2",
     "d3-transition": "^1.0.3",
@@ -23,7 +22,7 @@
   },
   "scripts": {
     "bundle": "browserify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
-    "css": "node scripts/css.js",
+    "css": "node-sass tree.scss > dist/tree.css",
     "postinstall": "npm run css",
     "start": "node example/server.js",
     "test": "browserify -t browserify-css test/* | double-tap smokestack",

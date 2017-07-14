@@ -13,8 +13,7 @@ http.createServer(function (req, res) {
     return fs.createReadStream(__dirname + '/index.html').pipe(res)
   } else if (path == '/tree.css') {
     sass.render({
-        file: './tree.scss',
-        includePaths: ['./node_modules/bourbon/app/assets/stylesheets/' ]
+        file: './tree.scss'
       }, function (err, result) {
       res.writeHead(200, { 'Content-Type': 'text/css' })
         res.end(result.css)
