@@ -102,11 +102,7 @@
     </div>
     <div class="tree-pane">
       <div class="tree-search">
-        <input type="search" placeholder="Find"></input>
-      </div>
-      <div class="tree-toolbar tree-top-toolbar">
-        <button class="add-folder">Add Folder</button>
-        <button class="add-report">Add Report</button>
+        <input id="search" type="search" placeholder="Find"></input>
       </div>
       <div class="container"></div>
       <div class="tree-toolbar tree-bottom-toolbar">
@@ -165,6 +161,10 @@
       http.get('/tree-patch.json', function (res) {
         tree.patch(res.pipe(JSONStream.parse([true])))
       })
+    })
+
+    document.querySelector('#search').addEventListener('keyup', function () {
+      tree.search(this.value)
     })
 
     bt.querySelector('.state-toggler').onclick = function () {
