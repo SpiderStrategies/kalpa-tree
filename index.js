@@ -1103,12 +1103,15 @@ Tree.prototype.filter = function (fn) {
  * the incoming term.
  */
 Tree.prototype.search = function (term) {
-  var re = term && new RegExp(regexEscape(term) || '', 'i')
-    , self = this
+  if (!term) {
+    return this.filter(null) // clear it if term is falsy
+  }
 
-  this.filter(term && function (node) {
-    return re.test(node[self.options.accessors.label]) && node.visible !== false
-  })
+  var re = new RegExp(regexEscape(term) || '', 'i')
+    , self = this
+  this.filter(function (node) {
+        return re.test(node[self.options.accessors.label]) && node.visible !== false
+      })
 }
 
 /*
