@@ -354,8 +354,6 @@ $timing-fn: ease-out;
       li.node:not(.transient):not(.selected):not(.transitioning-node) {
         .node-contents, .label-mask:after {
           opacity: .6;
-          // Prevent IE11 from breaking due to another opacity transition bug
-          transition: none;
         }
       }
     }
