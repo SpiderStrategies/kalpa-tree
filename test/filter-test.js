@@ -1,8 +1,17 @@
 var test = require('tape').test
   , d3 = require('d3-selection')
+  , css = require('./../dist/tree.css')
   , Tree = require('../')
   , stream = require('./tree-stream')
   , Transform = require('stream').Transform
+
+function container () {
+  var container = document.createElement('div')
+  container.className = 'container'
+  container.style.height = '700px'
+  document.body.appendChild(container)
+  return container
+}
 
 test('filter call is noop if not displaying filter results', function (t) {
   var s = stream()
@@ -23,6 +32,9 @@ test('filter call is noop if not displaying filter results', function (t) {
 test('filter function shows by nodeType', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
+    , c = container()
+
+  c.appendChild(tree.el.node())
 
   s.on('end', function () {
     tree.select(1058)
@@ -32,6 +44,7 @@ test('filter function shows by nodeType', function (t) {
     })
     t.equal(tree.node.size(), 24, '24 metric nodes')
     tree.remove()
+    c.remove()
     t.end()
   })
 })
@@ -39,6 +52,9 @@ test('filter function shows by nodeType', function (t) {
 test('search', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
+    , c = container()
+
+  c.appendChild(tree.el.node())
 
   s.on('end', function () {
     t.equal(tree.node.size(), 3, '3 initial nodes')
@@ -52,6 +68,7 @@ test('search', function (t) {
     t.ok(!tree.el.select('.tree').classed('filtered-results'), 'tree does not have filtered-results class')
     t.ok(!tree._filteredResults, 'tree no longer has _filteredResults data')
     tree.remove()
+    c.remove()
     t.end()
   })
 })
@@ -94,6 +111,9 @@ test('search ignores `visible: false` nodes', function (t) {
 test('search for null clears search', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
+    , c = container()
+
+  c.appendChild(tree.el.node())
 
   s.on('end', function () {
     t.equal(tree.node.size(), 3, '3 initial nodes')
@@ -103,6 +123,7 @@ test('search for null clears search', function (t) {
     t.ok(!tree.el.select('.tree').classed('filtered-results'), 'tree does not have filtered-results class')
     t.equal(tree.node.size(), 3, '3 nodes visible')
     tree.remove()
+    c.remove()
     t.end()
   })
 })
@@ -122,7 +143,7 @@ test('clearing search does not fire select event', function (t) {
   })
 })
 
-test('shows seleceted search result in a collapsed tree', function (t) {
+test('shows selected search result in a collapsed tree', function (t) {
   var s = stream()
     , tree = new Tree({ stream: s }).render()
 
