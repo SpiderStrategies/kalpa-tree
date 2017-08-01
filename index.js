@@ -1089,11 +1089,14 @@ Tree.prototype.filter = function (fn) {
                              })
                            }, true)
     this._filteredResults = data
-
+    var performanceThreshold = this.options.performanceThreshold // Store the default option
+    this.options.performanceThreshold = 0 // Overwrite so we force performance tuning while showing search results
+                                          // since users might type quickly, overloading the browser as we update the dom nodes
     this._join(data, function (enter, update, exit) {
       enter.call(self.enter)
       update.call(self.updater)
       exit.remove() // No animations on exit
+      self.options.performanceThreshold = performanceThreshold // reset the performance threshold to the original
     })
   })()
 }

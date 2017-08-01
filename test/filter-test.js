@@ -8,7 +8,7 @@ var test = require('tape').test
 function container () {
   var container = document.createElement('div')
   container.className = 'container'
-  container.style.height = '700px'
+  container.style.height = '10000px'
   document.body.appendChild(container)
   return container
 }
@@ -146,8 +146,9 @@ test('clearing search does not fire select event', function (t) {
 test('shows selected search result in a collapsed tree', function (t) {
   var s = stream()
     , tree = new Tree({ stream: s }).render()
+    , c = container()
 
-  document.body.appendChild(tree.el.node()) // Add to the dom so the click handlers work
+  c.appendChild(tree.el.node())
 
   s.on('end', function () {
     tree.expandAll()
@@ -183,5 +184,26 @@ test('ignores rootHeight overrides while showing results', function (t) {
       tree.remove()
       t.end()
     }, 400)
+  })
+})
+
+test('forces tree into performance mode when filtering', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , c = container()
+  c.style.height = '100px'
+  c.appendChild(tree.el.node())
+
+  s.on('end', function () {
+    tree.select(1058)
+    t.equal(tree.node.size(), 8, '8 initial nodes') // Not in performance mode, so all nodes will be there
+    tree.filter(function (d) {
+      return d.nodeType === 'metric'
+    })
+    t.equal(tree.node.size(), 5, '5 metric nodes')
+    t.ok(tree.options.performanceThreshold, 1000, 'resets performanceThreshold to default')
+    tree.remove()
+    c.remove()
+    t.end()
   })
 })
