@@ -43,6 +43,24 @@ tree.on('move', function (node, newParent, previousParent, newIndex, prevIndex) 
 })
 ```
 
+Listen for the start of dnd
+```
+tree.on('dndstart', function (movingNode, travelingNode, movingNodeBoundData) {
+  // movingNode -> The DOM node the user clicked and is trying to move
+  // travelingNode -> The DOM node created by the tree which can actually be moved
+  // movingNodeBoundData -> Data bound to the movingNode
+})
+```
+
+Hook for when dnd has finished
+```
+tree.on('dndstop', function (movingNode, travelingNode, movingNodeBoundData) {
+  // movingNode -> The DOM node the user clicked and is trying to move
+  // travelingNode -> The DOM node created by the tree which can actually be moved
+  // movingNodeBoundData -> Data bound to the movingNode
+})
+```
+
 Listen to tree `select` events
 ```
 tree.on('select', function (node) {
