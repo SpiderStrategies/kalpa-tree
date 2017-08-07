@@ -35,13 +35,19 @@ test('fires dnd events', function (t) {
   before(function (tree, dnd) {
     tree.editable()
     var calls = 0
-    tree.on('dndstart', function () {
+    tree.on('dndstart', function (node, traveler, data) {
+      t.deepEqual(node, tree.node.nodes()[3], 'dndstart receives moving node')
+      t.deepEqual(traveler, dnd.traveler.node(), 'dndstart receives the traveling node')
+      t.deepEqual(data, tree._layout[1004], 'dndstart receives moving node data')
       calls++
     })
     tree.on('dndcancel', function () {
       calls++
     })
-    tree.on('dndstop', function () {
+    tree.on('dndstop', function (node, traveler, data) {
+      t.deepEqual(node, tree.node.nodes()[3], 'dndstop receives moving node')
+      t.deepEqual(traveler, dnd.traveler.node(), 'dndstop receives the traveling node')
+      t.deepEqual(data, tree._layout[1004], 'dndstop receives moving node data')
       calls++
     })
     dnd.start.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
@@ -49,7 +55,7 @@ test('fires dnd events', function (t) {
     d3.event.y = tree._layout[1004]._y + 20// new y location
     dnd.drag.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     d3.event.keyCode = 27
-    dnd._escape()
+    dnd._escape(tree.node.nodes()[3])
     tree.remove()
     document.querySelector('.container').remove()
     t.equal(calls, 3, 'all 3 events fired')
