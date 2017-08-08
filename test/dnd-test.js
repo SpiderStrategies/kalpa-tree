@@ -35,19 +35,22 @@ test('fires dnd events', function (t) {
   before(function (tree, dnd) {
     tree.editable()
     var calls = 0
-    tree.on('dndstart', function (node, traveler, data) {
-      t.deepEqual(node, tree.node.nodes()[3], 'dndstart receives moving node')
-      t.deepEqual(traveler, dnd.traveler.node(), 'dndstart receives the traveling node')
-      t.deepEqual(data, tree._layout[1004], 'dndstart receives moving node data')
+
+    tree.on('dndstart', function (eventData) {
+      t.deepEqual(eventData.el, tree.node.nodes()[3], 'dndstart eventData contains moving dom node')
+      t.deepEqual(eventData.traveler, dnd.traveler.node(), 'dndstart eventData contains the traveling node')
+      t.deepEqual(eventData.layout, tree._layout[1004], 'dndstart eventData contains moving node data')
+      t.deepEqual(eventData.data, tree.nodes[1004], 'dndstart eventData contains the bound node data')
       calls++
     })
     tree.on('dndcancel', function () {
       calls++
     })
     tree.on('dndstop', function (node, traveler, data) {
-      t.deepEqual(node, tree.node.nodes()[3], 'dndstop receives moving node')
-      t.deepEqual(traveler, dnd.traveler.node(), 'dndstop receives the traveling node')
-      t.deepEqual(data, tree._layout[1004], 'dndstop receives moving node data')
+      t.deepEqual(eventData.el, tree.node.nodes()[3], 'dndstop eventData contains moving dom node')
+      t.deepEqual(eventData.traveler, dnd.traveler.node(), 'dndstop eventData contains the traveling node')
+      t.deepEqual(eventData.layout, tree._layout[1004], 'dndstop eventData contains moving node data')
+      t.deepEqual(eventData.data, tree.nodes[1004], 'dndstop eventData contains the bound node data')
       calls++
     })
     dnd.start.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
