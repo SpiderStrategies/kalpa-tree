@@ -45,19 +45,21 @@ tree.on('move', function (node, newParent, previousParent, newIndex, prevIndex) 
 
 Listen for the start of dnd
 ```
-tree.on('dndstart', function (movingNode, travelingNode, movingNodeBoundData) {
-  // movingNode -> The DOM node the user clicked and is trying to move
-  // travelingNode -> The DOM node created by the tree which can actually be moved
-  // movingNodeBoundData -> Data bound to the movingNode
+tree.on('dndstart', function (eventData) {
+  // eventData.el -> The DOM node the user is moving
+  // eventData.traveler -> The DOM traveling node created by the tree which can actually be moved
+  // eventData.layout -> Layout data describing the moving node
+  // eventData.data -> Data bound to this tree node
 })
 ```
 
 Hook for when dnd has finished
 ```
-tree.on('dndstop', function (movingNode, travelingNode, movingNodeBoundData) {
-  // movingNode -> The DOM node the user clicked and is trying to move
-  // travelingNode -> The DOM node created by the tree which can actually be moved
-  // movingNodeBoundData -> Data bound to the movingNode
+tree.on('dndstop', function (eventData) {
+  // eventData.el -> The DOM node the user is moving
+  // eventData.traveler -> The DOM traveling node created by the tree which can actually be moved
+  // eventData.layout -> Layout data describing the moving node
+  // eventData.data -> Data bound to this tree node
 })
 ```
 
