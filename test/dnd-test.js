@@ -32,26 +32,27 @@ function before (next, opts) {
 }
 
 test('fires dnd events', function (t) {
+  t.plan(11)
   before(function (tree, dnd) {
     tree.editable()
     var calls = 0
 
     tree.on('dndstart', function (eventData) {
+      t.pass('dndstart fired')
       t.deepEqual(eventData.el, tree.node.nodes()[3], 'dndstart eventData contains moving dom node')
       t.deepEqual(eventData.traveler, dnd.traveler.node(), 'dndstart eventData contains the traveling node')
       t.deepEqual(eventData.layout, tree._layout[1004], 'dndstart eventData contains moving node data')
       t.deepEqual(eventData.data, tree.nodes[1004], 'dndstart eventData contains the bound node data')
-      calls++
     })
     tree.on('dndcancel', function () {
-      calls++
+      t.pass('dndcancel fired')
     })
-    tree.on('dndstop', function (node, traveler, data) {
+    tree.on('dndstop', function (eventData) {
+      t.pass('dndstop fired')
       t.deepEqual(eventData.el, tree.node.nodes()[3], 'dndstop eventData contains moving dom node')
       t.deepEqual(eventData.traveler, dnd.traveler.node(), 'dndstop eventData contains the traveling node')
       t.deepEqual(eventData.layout, tree._layout[1004], 'dndstop eventData contains moving node data')
       t.deepEqual(eventData.data, tree.nodes[1004], 'dndstop eventData contains the bound node data')
-      calls++
     })
     dnd.start.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     dnd._dragging = true
@@ -61,7 +62,6 @@ test('fires dnd events', function (t) {
     dnd._escape(tree.node.nodes()[3])
     tree.remove()
     document.querySelector('.container').remove()
-    t.equal(calls, 3, 'all 3 events fired')
     t.end()
   })
 })
