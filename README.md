@@ -53,6 +53,15 @@ tree.on('dndstart', function (eventData) {
 })
 ```
 
+Listen for changes when the dnd traveling node moves (basically mouse movements which are swallowed by d3-drag)
+```
+tree.on('dndmove', function (eventData) {
+  // eventData.traveler -> The DOM traveling node created by the tree which can actually be moved
+  // eventData.layout -> Layout data describing the moving node
+  // eventData.data -> Data bound to this tree node
+})
+```
+
 Hook for when dnd has finished
 ```
 tree.on('dndstop', function (eventData) {

@@ -32,7 +32,7 @@ function before (next, opts) {
 }
 
 test('fires dnd events', function (t) {
-  t.plan(11)
+  t.plan(15)
   before(function (tree, dnd) {
     tree.editable()
     var calls = 0
@@ -43,6 +43,12 @@ test('fires dnd events', function (t) {
       t.deepEqual(eventData.traveler, dnd.traveler.node(), 'dndstart eventData contains the traveling node')
       t.deepEqual(eventData.layout, tree._layout[1004], 'dndstart eventData contains moving node data')
       t.deepEqual(eventData.data, tree.nodes[1004], 'dndstart eventData contains the bound node data')
+    })
+    tree.on('dndmove', function (eventData) {
+      t.pass('dndmove fired')
+      t.deepEqual(eventData.traveler, dnd.traveler.node(), 'dndmove eventData contains the traveling node')
+      t.deepEqual(eventData.layout, tree._layout[1004], 'dndmove eventData contains moving node data')
+      t.deepEqual(eventData.data, tree.nodes[1004], 'dndmove eventData contains the bound node data')
     })
     tree.on('dndcancel', function () {
       t.pass('dndcancel fired')
