@@ -387,7 +387,7 @@ test('sets icon class on svg', function (t) {
   var tree = new Tree({stream: stream}).render()
 
   stream.on('end', function () {
-    t.equal(tree.el.select('.tree ul li.node:first-child svg.icon').attr('class'), 'icon red root', 'svg icon classes set')
+    t.equal(tree.el.select('.tree ul li.node:first-child svg.icon').attr('class'), 'icon red icon-root', 'svg icon classes set')
     t.end()
   })
 })
