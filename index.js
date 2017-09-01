@@ -723,10 +723,6 @@ Tree.prototype._scrollIntoView = function (d, opt) {
 }
 
 Tree.prototype._onSelect = function (d, i, j, opt) {
-  if (d3.event && d3.event.defaultPrevented) {
-    return  // click events were suppressed by dnd (presumably)
-  }
-
   opt = opt || {}
 
   // determines if we should toggle the node. We don't toggle if it's the root node
