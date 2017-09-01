@@ -8,7 +8,8 @@ var test = require('tape').test
 
 function before (next, opts) {
   opts = opts || {
-    stream: stream()
+    stream: stream(),
+    dndDelay: 0 // Don't delay tests by default
   }
 
   var tree = new Tree(opts).render()
@@ -80,6 +81,37 @@ test('drag does not work if start is not called', function (t) {
     tree.remove()
     document.querySelector('.container').remove()
     t.end()
+  })
+})
+
+test('dndDelay option prevents dnd if mousedown + mouseup fires too quickly', function (t) {
+  before(function (tree, dnd) {
+    var node = tree.node.nodes()[3]
+      , data = tree._layout[1004]
+      , originalParent = data.parent.id
+      , originalIndex = data.parent._allChildren.indexOf(data)
+
+    tree.editable()
+    dnd.start.apply(node, [data, 3])
+
+    d3.event.y = 290
+
+    dnd.drag.apply(node, [data, 3])
+
+    tree.on('move', function () {
+      t.fail('move should not have been called')
+    })
+
+    dnd.end.apply(node, [data, 3])
+
+    t.equal(data.parent.id, originalParent, 'original parent equal new parent')
+    t.equal(data.parent._allChildren.indexOf(data), originalIndex, 'original index equal new index')
+
+    tree.remove()
+    document.querySelector('.container').remove()
+    t.end()
+  }, {
+    stream: stream()
   })
 })
 
@@ -423,7 +455,8 @@ test('moves a node below root, when root is detached', function (t) {
     dnd.end.apply(m2, [m2d, 4])
   }, {
     stream: stream(),
-    rootHeight: 36
+    rootHeight: 36,
+    dndDelay: 0
   })
 })
 

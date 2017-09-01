@@ -35,6 +35,7 @@ var defaults = function () {
     maxAnimatable: 100, // Disable animations if a node has children greater than this amount
     indicator: false, // show indicator light nodes on the right
     forest: false, // Indicates whether this tree can have multiple root nodes
+    dndDelay: 250, // Time between a mousedown/mouseup event before we allow a dnd move to fire
     movable: function (d) {
       // `d` is the node
       // `this` is a reference to the tree
