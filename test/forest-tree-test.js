@@ -193,7 +193,7 @@ test('moves a node to a new root at some position', function (t) {
 
 test('dnd allows a root nodes to change order', function (t) {
   var s = stream()
-    , tree = new Tree({stream: s, forest: true}).render()
+    , tree = new Tree({stream: s, forest: true, dndDelay: 0}).render()
     , dnd = new Dnd(tree)
     , container = document.createElement('div')
 
@@ -246,7 +246,7 @@ test('dnd allows a root nodes to change order', function (t) {
 
 test('dnd allows a node to become a new root', function (t) {
   var s = stream()
-    , tree = new Tree({stream: s, forest: true}).render()
+    , tree = new Tree({stream: s, forest: true, dndDelay: 0}).render()
     , dnd = new Dnd(tree)
     , container = document.createElement('div')
 
@@ -317,7 +317,8 @@ test('dnd flat forest', function (t) {
       forest: true,
       droppable: function (node, parent) {
         return !parent // Only alow dropping onto root nodes
-      }
+      },
+      dndDelay: 0
     }).render()
     , dnd = new Dnd(tree)
 

@@ -35,6 +35,7 @@ var defaults = function () {
     maxAnimatable: 100, // Disable animations if a node has children greater than this amount
     indicator: false, // show indicator light nodes on the right
     forest: false, // Indicates whether this tree can have multiple root nodes
+    dndDelay: 250, // Time between a mousedown/mouseup event before we allow a dnd move to fire
     movable: function (d) {
       // `d` is the node
       // `this` is a reference to the tree
@@ -723,10 +724,6 @@ Tree.prototype._scrollIntoView = function (d, opt) {
 }
 
 Tree.prototype._onSelect = function (d, i, j, opt) {
-  if (d3.event && d3.event.defaultPrevented) {
-    return  // click events were suppressed by dnd (presumably)
-  }
-
   opt = opt || {}
 
   // determines if we should toggle the node. We don't toggle if it's the root node
