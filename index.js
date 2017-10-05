@@ -333,7 +333,7 @@ Tree.prototype._join = function (data, next) {
            .style('height', height)
 
   var _node = this.el.select('.tree ul')
-                     .selectAll('li')
+                     .selectAll('li:not(.outgoing-node)') // Ignore outgoing nodes, because they are about to be removed from the DOM.
                      .data(data, function (d) {
                        return d[self.options.accessors.id]
                      })
