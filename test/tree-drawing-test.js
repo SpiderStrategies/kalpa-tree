@@ -442,6 +442,27 @@ test('sets toggler class based on node state', function (t) {
   })
 })
 
+test('double click toggle does not break with transitioning nodes', function (t) {
+  // See #404
+  var s = stream()
+    , tree = new Tree({stream: s})
+
+  s.on('end', function () {
+    tree.expandAll()
+    process.nextTick(function () {
+      t.equal(tree.el.selectAll('li.node').size(), 37, 'all nodes initially visible')
+      tree.node.nodes()[1].querySelector('.toggler').click()
+      tree.node.nodes()[1].querySelector('.toggler').click()
+      setTimeout(function () {
+        t.equal(tree.el.selectAll('li.node').size(), 37, 'all nodes visible after two fast clicks on the first node')
+        t.end()
+      }, 500)
+
+    })
+  })
+  tree.render()
+})
+
 test('slow stream with api call before end', function (t) {
   var stream = require('stream').Readable({objectMode: true})
     , data = [{
