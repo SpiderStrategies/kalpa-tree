@@ -1114,15 +1114,34 @@ Tree.prototype.search = function (term) {
       })
 }
 
+Tree.prototype._toggle = function (d, collapsed, opt) {
+  var _d = this._layout[d.id]
+  opt = opt || {}
+  _d.collapsed = collapsed
+  this._transitionWrap(this._fly, opt.animate)(_d)
+}
+
 /*
  * Used to toggle the node's children. If they are visible this will hide them, and
  * if they are hidden, this will show them.
  */
 Tree.prototype.toggle = function (d, opt) {
   var _d = this._layout[d.id]
-  opt = opt || {}
-  _d.collapsed = !_d.collapsed
-  this._transitionWrap(this._fly, opt.animate)(_d)
+  return this._toggle(d, !_d.collapsed, opt)
+}
+
+/*
+ * Expand a node's children
+ */
+Tree.prototype.expand = function (d, opt) {
+  return this._toggle(d, false, opt)
+}
+
+/*
+ * Collapse a node's children
+ */
+Tree.prototype.collapse = function (d, opt) {
+  return this._toggle(d, true, opt)
 }
 
 Tree.prototype.addTransient = function (d, parent, idx) {
