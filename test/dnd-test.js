@@ -394,6 +394,38 @@ test('`movable` allows control to prevent if a node can be dnd\d', function (t) 
   })
 })
 
+test('restores tree if dropped illegally', function (t) {
+  before(function (tree, dnd) {
+    var node = tree.node.nodes()[3]
+      , data = tree._layout[1058]
+      , that = null
+
+    tree.options.droppable = function (d, parent) {
+      return false
+    }
+
+    t.equal(data._x, tree._layout[1058]._x, '1058 is a sibling of 1008')
+
+    tree.editable()
+    dnd.start.apply(node, [data, 3])
+    dnd._dragging = true
+    d3.event.y = 290
+    dnd.drag.apply(node, [data, 3])
+    dnd.end.apply(node, [data, 3])
+
+    t.equal(data._x, tree._layout[1058]._x, '1058 is still a sibling of 1008')
+
+    tree.once('move', function (n, newParent, previousParent, newIndex, previousIndex) {
+      t.fail('should not fire move')
+    })
+
+    tree.remove()
+    document.querySelector('.container').remove()
+    t.end()
+
+  })
+})
+
 test('disable non-metrics dropped onto metrics', function (t) {
   before(function (tree, dnd) {
     var node = tree.node.nodes()[3]
