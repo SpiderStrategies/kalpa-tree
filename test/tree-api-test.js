@@ -382,6 +382,35 @@ test('editable', function (t) {
   })
 })
 
+test('expand', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  s.on('end', function () {
+    var d = tree.get(1002)
+    tree.expand(d) // 1002 is the first child of root
+    t.ok(tree._layout[1002].children, 'node should have children')
+    t.ok(!tree._layout[1002]._children, 'node should not have hidden children')
+    t.equal(el.querySelectorAll('.tree ul li').length, 8, 'root + children + first child expanded')
+    t.end()
+  })
+})
+
+test('collapse', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  s.on('end', function () {
+    var d = tree.get(1002)
+    tree.collapse(d) // 1002 is the first child of root
+    t.ok(!tree._layout[1002].children, 'node should not have children')
+    t.equal(el.querySelectorAll('.tree ul li').length, 3, 'root + children + first child expanded')
+    t.end()
+  })
+})
+
 test('expand all', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
