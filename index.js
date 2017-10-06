@@ -25,6 +25,10 @@ var merge = function (from, to) {
   return to
 }
 
+var getObject = function (store, obj) {
+  return store[obj && typeof obj === 'object' ? obj.id : obj]
+}
+
 var defaults = function () {
   return {
     transientId: -1, // Node's that are `placeholders` are not part of the tree yet.
@@ -440,7 +444,7 @@ Tree.prototype.resize = function (visibleNodes) {
  * Returns the parent node.
  */
 Tree.prototype.parent = function (obj) {
-  var parent = this._layout[typeof obj === 'object' ? obj.id : obj].parent
+  var parent = getObject(this._layout, obj).parent
   return parent && this.nodes[parent.id]
 }
 
@@ -448,7 +452,7 @@ Tree.prototype.parent = function (obj) {
  * Returns a node's children. This includes all visible and invisible children
  */
 Tree.prototype.children = function (obj) {
-  var node = this._layout[typeof obj === 'object' ? obj.id : obj]
+  var node = getObject(this._layout, obj)
     , self = this
 
   return (node._allChildren || []).map(function (n) {
@@ -460,7 +464,7 @@ Tree.prototype.children = function (obj) {
  * Returns a node's siblings
  */
 Tree.prototype._siblings = function (obj) {
-  var node = this._layout[typeof obj === 'object' ? obj.id : obj]
+  var node = getObject(this._layout, obj)
     , children = node.parent ? node.parent._allChildren : this.options.forest ? this.root : []
 
   return children
@@ -471,7 +475,7 @@ Tree.prototype._siblings = function (obj) {
  * its index within those siblings
  */
 Tree.prototype._indexOf = function (obj) {
-  var node = this._layout[typeof obj === 'object' ? obj.id : obj]
+  var node = getObject(this._layout, obj)
     , siblings = this._siblings(obj)
 
   return siblings.indexOf(node)
@@ -510,8 +514,7 @@ Tree.prototype.previousSibling = function (obj) {
  * `to`'s children.
  */
 Tree.prototype.move = function (node, to, idx) {
-  var _node = this._layout[typeof node === 'object' ? node.id : node]
-
+  var _node = getObject(this._layout, node)
   if (!node) {
     return
   }
@@ -551,8 +554,7 @@ Tree.prototype._descendants = function (node, prop) {
  * to a new root node of the forest tree.
  */
 Tree.prototype.copy = function (node, to, transformer) {
-  var _node = this._layout[typeof node === 'object' ? node.id : node]
-
+  var _node = getObject(this._layout, node)
   if (!_node) {
     return
   }
@@ -564,7 +566,7 @@ Tree.prototype.copy = function (node, to, transformer) {
 
   // We need a clone of the node and the layout
   var self = this
-    , _to = this._layout[to && typeof to === 'object' ? to.id : to]
+    , _to = getObject(this._layout, to)
 
   this._descendants(_node)
       .map(function (node) {
@@ -1016,7 +1018,7 @@ Tree.prototype._removeFromParent = function (node) {
  * Removes a node from the tree. obj can be the node id or the node itself
  */
 Tree.prototype.removeNode = function (obj) {
-  var node = this.nodes[typeof obj === 'object' ? obj.id : obj]
+  var node = getObject(this.nodes, obj)
 
   if (!node) {
     return
@@ -1115,7 +1117,7 @@ Tree.prototype.search = function (term) {
 }
 
 Tree.prototype._toggle = function (d, collapsed, opt) {
-  var _d = this._layout[d.id]
+  var _d = getObject(this._layout, d)
   opt = opt || {}
   _d.collapsed = collapsed
   this._transitionWrap(this._fly, opt.animate)(_d)
@@ -1126,7 +1128,7 @@ Tree.prototype._toggle = function (d, collapsed, opt) {
  * if they are hidden, this will show them.
  */
 Tree.prototype.toggle = function (d, opt) {
-  var _d = this._layout[d.id]
+  var _d = getObject(this._layout, d)
   return this._toggle(d, !_d.collapsed, opt)
 }
 
