@@ -911,3 +911,15 @@ test('sets `tree-overflow` based on scrollable content', function (t) {
 
   tree.render()
 })
+
+test('emits `rebind` event when rebinding data', function (t) {
+  t.plan(2)
+  var s = stream()
+    , tree = new Tree({stream: s})
+
+  tree.on('rebind', function (data) {
+    t.ok(data, 'rebind called')
+  })
+
+  tree.render()
+})
