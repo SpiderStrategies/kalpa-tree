@@ -299,7 +299,9 @@ Tree.prototype._rebind = function (next) {
       .select('.tree')
       .classed('detached-root', !!this._rootOffset)
 
-  return this._join(this.layout(this.root), next)
+  var data = this.layout(this.root)
+  this.emit('rebind', data) // Trigger an event indicating the tree data changed
+  return this._join(data, next)
 }
 
 /*
