@@ -60,6 +60,8 @@ var defaults = function () {
       })
     },
     contents: require('./lib/contents'),
+    indentableSelector: ':first-child', // The element within the `.node` which will be used for showing tree indentations
+                                        // Only need to update if using different `contents`
     performanceThreshold: 1000, // If the node data count exceeds this threshold, the tree goes into performance mode
     accessors: {
       id: 'id',

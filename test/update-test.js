@@ -27,6 +27,7 @@ test('update adjusts node styles', function (t) {
         label: function () {
           // filler
         },
+        indentableSelector: ':first-child',
         contents: require('../lib/contents'),
         accessors: {
           id: 'id'
