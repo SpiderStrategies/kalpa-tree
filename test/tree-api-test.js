@@ -454,6 +454,21 @@ test('expand all disables animations if there are too many nodes', function (t) 
   tree.render()
 })
 
+test('collapseTo', function (t) {
+  var s = stream()
+    , tree = new Tree({stream:s, maxAnimatable: 0}).render()
+    , el = tree.el.node()
+
+  s.on('end', function () {
+    tree.expandAll()
+    tree.collapseTo(3)
+    t.equal(el.querySelectorAll('.tree ul li').length, 37, 'root + its children + grandchildren should be visible')
+    tree.el.remove()
+    t.end()
+  })
+
+})
+
 test('collapse all', function (t) {
   var tree = new Tree({stream: stream()}).render()
     , el = tree.el.node()
