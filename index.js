@@ -913,9 +913,11 @@ Tree.prototype.expandAll = function () {
   }
 }
 
-Tree.prototype.collapseAll = function () {
+Tree.prototype.collapseTo = function (depth) {
   this._toggleAll(function (d) {
-    d.collapsed = true
+    if (d.depth >= depth) {
+      d.collapsed = true
+    }
   })
   var self = this
 
@@ -945,6 +947,10 @@ Tree.prototype.collapseAll = function () {
       exit.remove()
     })
   }
+}
+
+Tree.prototype.collapseAll = function () {
+  return this.collapseTo(Number.NEGATIVE_INFINITY)
 }
 
 /*
