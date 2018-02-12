@@ -180,6 +180,7 @@ test('creates a traveler after timeout', function (t) {
       var traveler = tree.el.select('.traveling-node')
         , src = d3.select(tree.node.nodes()[3])
       t.ok(traveler.size(), 1, 'traveling node exists as a sibling')
+      t.ok(traveler.classed('selected'), 'traveler node is marked `selected`')
       t.ok(src.classed('placeholder'), 'original node is denoted as placeholder')
       t.equal(traveler.attr('style'), 'transform: translate3d(0px, 108px, 0px);', 'traveler uses original node position')
       t.equal(traveler.select('.node-contents').attr('style'), src.select('.node-contents').attr('style'), 'node-contents share style')
