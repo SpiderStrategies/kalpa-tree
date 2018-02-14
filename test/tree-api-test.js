@@ -78,12 +78,34 @@ test('moves a node', function (t) {
     var orgParent = tree._layout[1003].parent
       , orgChildrenLength = orgParent._allChildren.length
 
+    t.notOk(tree._layout[1003].parent.children, 'new parent is not expanded')
     tree.move(1003, 1025)
+    process.nextTick(function () {
+      t.equal(orgParent._allChildren.length, orgChildrenLength - 1, 'orginal parent is missing a child')
+      t.deepEqual(tree._layout[1003].parent, tree._layout[1025], 'moved node has new parent')
+      t.equal(tree._layout[1003].parent.children.length, 5, 'new parent is expanded')
+      t.deepEqual(tree._layout[1025]._allChildren[tree._layout[1025]._allChildren.length -1], tree._layout[1003], '1003 was pushed to end of 1025')
+      t.end()
+    })
+  })
+})
+
+test('moves a node without showing new layout', function (t) {
+   var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  s.on('end', function () {
+    var orgParent = tree._layout[1003].parent
+      , orgChildrenLength = orgParent._allChildren.length
+
+    t.notOk(tree._layout[1003].parent.children, 'new parent is not expanded')
+    tree.move(1003, 1025, null, false)
 
     process.nextTick(function () {
       t.equal(orgParent._allChildren.length, orgChildrenLength - 1, 'orginal parent is missing a child')
       t.deepEqual(tree._layout[1003].parent, tree._layout[1025], 'moved node has new parent')
-      t.deepEqual(tree._layout[1025]._allChildren[tree._layout[1025]._allChildren.length -1], tree._layout[1003], '1003 was pushed to end of 1025')
+      t.notOk(tree._layout[1003].parent.children, 'new parent is still not expanded')
       t.end()
     })
   })

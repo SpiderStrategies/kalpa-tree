@@ -517,7 +517,7 @@ Tree.prototype.previousSibling = function (obj) {
  * If an optional index is received, the node will be inserted at that index within the
  * `to`'s children.
  */
-Tree.prototype.move = function (node, to, idx) {
+Tree.prototype.move = function (node, to, idx, expandAncestors = true) {
   var _node = getObject(this._layout, node)
   if (!node) {
     return
@@ -530,7 +530,10 @@ Tree.prototype.move = function (node, to, idx) {
     delete _to.collapsed
     var children = (_to._allChildren || (_to._allChildren = []))
     children.splice(typeof idx === 'number' ? idx : children.length, 0, _node)
-    this._expandAncestors(_to)
+    _node.parent = _to
+    if (expandAncestors) {
+      this._expandAncestors(_to)
+    }
   } else if (this.options.forest) {
     this._removeFromParent(_node)
     this.root.splice(typeof idx === 'number' ? idx : this.root.length, 0, _node)
@@ -557,7 +560,7 @@ Tree.prototype._descendants = function (node, prop) {
  * If to is missing and the tree is a forest, the node will be copied
  * to a new root node of the forest tree.
  */
-Tree.prototype.copy = function (node, to, transformer) {
+Tree.prototype.copy = function (node, to, transformer, expandAncestors = true) {
   var _node = getObject(this._layout, node)
   if (!_node) {
     return
@@ -592,7 +595,11 @@ Tree.prototype.copy = function (node, to, transformer) {
           // Top node in the subtree (node that is being copied)
           if (_to) {
             ;(_to._allChildren || (_to._allChildren = [])).push(d)
-            self._expandAncestors(_to)
+
+            if (expandAncestors) {
+              self._expandAncestors(_to)
+            }
+
             _to.collapsed = false
           } else if (self.options.forest) {
             self.root.push(d)
