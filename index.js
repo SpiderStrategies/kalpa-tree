@@ -361,6 +361,11 @@ Tree.prototype._join = function (data, next) {
           .classed('movable', false)
   }
 
+  // Make sure the highest node in the tree is denoted in case styling needs to be changed on that node.
+  update.classed('kalpa-top-node', function (d) {
+    return d._y === 0
+  })
+
   return next(enter, update, exit)
 }
 

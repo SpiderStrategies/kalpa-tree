@@ -214,6 +214,22 @@ test('root node has a class of root', function (t) {
   })
 })
 
+test('top tree node has denoted class', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , container = document.createElement('div')
+
+  document.body.appendChild(container)
+
+  s.on('end', function () {
+    t.ok(tree.el.select('.tree li.node[data-id="1001"]').classed('kalpa-top-node'), 'root node (top) has `kalpa-top-node` class')
+    t.equal(tree.el.selectAll('.tree li.node.kalpa-top-node').size(), 1, 'only one kalpa-top-node')
+    tree.remove()
+    container.remove()
+    t.end()
+  })
+})
+
 test('tree drawing adjusts `tree-overflow` based on bound node data', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
