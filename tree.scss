@@ -169,6 +169,8 @@ $timing-fn: ease-out;
   .tree {
     overflow: auto;
     overflow-x: hidden;
+    transform: translateZ(0); // Each node has a translate3D for positioning, so safari creates a z-index stack which puts the node in front of the scrollbar container
+                              // This forces the scrollbars to be on top of the nodes. See https://github.com/SpiderStrategies/Scoreboard/issues/17021
     -webkit-overflow-scrolling: touch;
 
     width: 100%;
