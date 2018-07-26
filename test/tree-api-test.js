@@ -761,6 +761,37 @@ test('edits a node', function (t) {
   })
 })
 
+test('edit changes class name on a node', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  s.on('end', function () {
+    t.notOk(el.querySelectorAll('.tree ul li.node.foo').length, 'No nodes with class name of `foo`')
+    tree.edit({
+      id: 1001,
+      className: 'foo',
+    })
+
+    t.equal(el.querySelector('.tree ul li.node.foo .label').innerHTML, 'Huge Scorecard', '1001 has classname of foo')
+
+    tree.edit({
+      id: 1001,
+      className: 'foo bar',
+    })
+
+    t.equal(el.querySelector('.tree ul li.node.foo.bar .label').innerHTML, 'Huge Scorecard', '1001 has classnames of foo and bar')
+
+    tree.edit({
+      id: 1001
+    })
+
+    t.notOk(el.querySelectorAll('.tree ul li.node.foo').length, 'No nodes with class name of `foo`')
+
+    t.end()
+  })
+})
+
 test('edit the tree by array of changes', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, indicator: true}).render()
