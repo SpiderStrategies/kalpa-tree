@@ -95,6 +95,32 @@ test('allows node contents overrides', function (t) {
   })
 })
 
+test('allows additional class names to be set on the node', function (t) {
+  var map = new Transform( { objectMode: true } )
+
+  map._transform = function(obj, encoding, done) {
+    if (obj.id === 1001) {
+      obj.className = 'foo'
+    }
+    this.push(obj)
+    done()
+  }
+
+  var s = stream().pipe(map)
+    , tree = new Tree({
+      stream: s
+    }).render()
+
+  s.on('end', function () {
+    var foo = tree.el.node().querySelector('.tree li.node.foo')
+
+    t.equal(tree.el.node().querySelectorAll('.tree li.node.foo').length, 1, '1 node with class name of `foo`')
+    t.equal(foo.dataset.id, '1001', 'node 1001 has class foo')
+    tree.remove()
+    t.end()
+  })
+})
+
 test('tree can be editable on initial render based on options', function (t) {
   var s = stream()
     , tree = new Tree({
