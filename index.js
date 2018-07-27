@@ -453,7 +453,11 @@ Tree.prototype.resize = function (visibleNodes) {
  * Returns the parent node.
  */
 Tree.prototype.parent = function (obj) {
-  var parent = getObject(this._layout, obj).parent
+  var node = getObject(this._layout, obj)
+  if (!node) {
+    return null
+  }
+  var parent = node.parent
   return parent && this.nodes[parent.id]
 }
 
