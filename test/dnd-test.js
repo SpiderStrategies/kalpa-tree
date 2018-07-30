@@ -175,12 +175,18 @@ test('start followed by end will clear timeout', function (t) {
 test('creates a traveler after timeout', function (t) {
   before(function (tree, dnd) {
     tree.editable()
+
+    // Give 1004 an extra classname so we can test if the traveler inherits that class
+    tree.edit({id: 1004, className: 'foo'})
+
     dnd.start.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     setTimeout(function () {
       var traveler = tree.el.select('.traveling-node')
         , src = d3.select(tree.node.nodes()[3])
+
       t.ok(traveler.size(), 1, 'traveling node exists as a sibling')
       t.ok(traveler.classed('selected'), 'traveler node is marked `selected`')
+      t.ok(traveler.classed('foo'), 'placeholder inherits src node classnames')
       t.ok(src.classed('placeholder'), 'original node is denoted as placeholder')
       t.equal(traveler.attr('style'), 'transform: translate3d(0px, 108px, 0px);', 'traveler uses original node position')
       t.equal(traveler.select('.node-contents').attr('style'), src.select('.node-contents').attr('style'), 'node-contents share style')
