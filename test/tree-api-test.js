@@ -788,7 +788,37 @@ test('edit changes class name on a node', function (t) {
 
     t.notOk(el.querySelectorAll('.tree ul li.node.foo').length, 'No nodes with class name of `foo`')
 
-    t.end()
+    // Give 1001 a class name
+    tree.edit({
+      id: 1001,
+      className: 'foobar',
+    })
+
+    t.equal(el.querySelector('.tree ul li.node.foobar .label').innerHTML, 'Huge Scorecard', '1001 has classname of foobar')
+
+    // check stream updates
+    var editStream = new Readable({objectMode: true})
+      , i = 1002
+
+    editStream._read = function () {
+      var id = i++
+      if (id < 1004) {
+        return editStream.push({id: id, label: 'Patched ' + id })
+      }
+      editStream.push(null)
+    }
+
+    editStream.on('end', function () {
+      // The tree waits for the `end` event to draw. Allow that draw to take place, then inspect DOM
+      process.nextTick(function () {
+        t.equal(el.querySelector('.tree ul li.node.foobar .label').innerHTML, 'Huge Scorecard', '1001 still has classname of foobar')
+        t.equal(tree.get(1003).label, 'Patched 1003', '1003 patched')
+        tree.remove()
+        t.end()
+      })
+    })
+    tree.edit(editStream)
+
   })
 })
 
