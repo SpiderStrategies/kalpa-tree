@@ -332,6 +332,8 @@ Tree.prototype._join = function (data, next) {
                   return inside
                 })
     if (this._tuned) {
+      // Make sure the tree isn't animating
+      this.el.select('.tree').classed('transitions', false)
       height = last._y + this.options.height + this._rootOffset + 'px'
     }
   }
