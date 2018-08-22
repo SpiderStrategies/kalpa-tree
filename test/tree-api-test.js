@@ -592,6 +592,31 @@ test('removes root', function (t) {
   tree.render()
 })
 
+test('removeNode calls `enter` when the tree is performance tuned', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s, performanceThreshold: 0})
+    , container = document.createElement('div')
+
+  container.style.height = '50px'
+  document.body.appendChild(container)
+
+  s.on('end', function () {
+    container.appendChild(tree.el.node())
+    process.nextTick(function () {
+      tree.expandAll()
+      tree.removeNode(1003)
+
+      setTimeout(function () {
+        t.equal(tree.el.node().querySelectorAll('li.node').length, 4, '4 li.node in tree')
+        tree.remove()
+        container.remove()
+        t.end()
+      }, 400)
+    })
+  })
+  tree.render()
+})
+
 test('adds a new root', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})

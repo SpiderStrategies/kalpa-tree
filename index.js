@@ -1086,6 +1086,11 @@ Tree.prototype.removeNode = function (obj) {
   // Redraw
   this._transitionWrap(function () {
     this._rebind(function (enter, update, exit) {
+      if (self._tuned) {
+        // If we're tuned we may have entering nodes because they weren't previously in the DOM, but they are now since they are "moving up".
+        // We don't need to call enter most of the time because the nodes are already in the DOM
+        enter.call(self.enter)
+      }
       update.call(self.updater)
       exit.call(self.slideExit, _node)
     })
