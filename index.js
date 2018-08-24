@@ -728,6 +728,11 @@ Tree.prototype._scrollIntoView = function (d, opt) {
   // check if we need to scroll this element into view
   var n = this.el.select('.tree').node()
 
+  if (!d) {
+    // Defensive exit early if we don't have a node so we don't blow up
+    return
+  }
+
   if (d._y < n.scrollTop || d._y > n.offsetHeight + n.scrollTop) {
     // Now scroll the node into view
 
