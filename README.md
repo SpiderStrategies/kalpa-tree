@@ -90,7 +90,7 @@ new Tree({
   rootHeight: 36, // root node height can be overridden
   maxAnimatable: 100, // Disable css animations if a node has children greater than this amount
   indicator: false, // show indicator light nodes on the right
-  forest: false, // Indicates whether this tree can have multiple root nodes
+  forest: false, // Must be `true` if the tree has multiple root nodes (for example, a list)
   movable: function (d) { // control if a node can be moved
     // `d` is the node
     // `this` is a reference to the tree
