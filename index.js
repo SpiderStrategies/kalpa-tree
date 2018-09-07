@@ -480,9 +480,12 @@ Tree.prototype.children = function (obj) {
  */
 Tree.prototype._siblings = function (obj) {
   var node = getObject(this._layout, obj)
-    , children = node.parent ? node.parent._allChildren : this.options.forest ? this.root : []
 
-  return children
+  if (!node) {
+    return
+  }
+
+  return node.parent ? node.parent._allChildren : this.options.forest ? this.root : []
 }
 
 /*
@@ -500,6 +503,10 @@ Tree.prototype._indexOf = function (obj) {
  * Returns a node's next sibling
  */
 Tree.prototype.nextSibling = function (obj) {
+  if (!obj) {
+    return
+  }
+
   var idx = this._indexOf(obj)
 
   if (idx !== -1) {
