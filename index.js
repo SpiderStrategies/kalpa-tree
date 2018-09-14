@@ -496,6 +496,10 @@ Tree.prototype._indexOf = function (obj) {
   var node = getObject(this._layout, obj)
     , siblings = this._siblings(obj)
 
+  if (!siblings) {
+    return
+  }
+
   return siblings.indexOf(node)
 }
 
@@ -508,6 +512,10 @@ Tree.prototype.nextSibling = function (obj) {
   }
 
   var idx = this._indexOf(obj)
+
+  if (idx == null) {
+    return
+  }
 
   if (idx !== -1) {
     var n = this._siblings(obj)[idx + 1]
