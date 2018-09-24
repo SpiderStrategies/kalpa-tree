@@ -859,8 +859,8 @@ Tree.prototype.add = function (d, parent, idx) {
     return
   }
 
-  if (parent && parent.selected) {
-    // The parent is selected, we want to expand its children (#259)
+  if (parent && parent.selected && parent.collapsed) {
+    // The parent is selected and collapsed, we want to expand its children (#259)
     delete parent.collapsed
     // Show the children immediately
     this._fly()
