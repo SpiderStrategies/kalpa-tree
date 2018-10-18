@@ -938,6 +938,10 @@ Tree.prototype.expandAll = function () {
       self._rebind(function (enter, update, exit) {
         enter.call(self.enter, self._defaultEnterFly.bind(null, visible))
         update.call(self.updater)
+        if (self._tuned) {
+          // If we're tuned, expanding all might force new nodes into the viewport and the old nodes need to be removed from the dom
+          exit.remove()
+        }
       })
     })()
   } else {
