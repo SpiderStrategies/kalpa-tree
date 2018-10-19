@@ -1003,19 +1003,27 @@ Tree.prototype.collapseAll = function () {
 /*
  * Makes modifications to tree node(s). Can update a single node, an array of patch
  * changes, or a stream that emits data events with the node and the changes
+ *
+ * @param [options.patch=true] If false is passed attributes that were removed on obj will be removed from the tree model also.
  */
-Tree.prototype.edit = function (obj) {
+Tree.prototype.edit = function (obj, opts) {
+  opts = opts || {}
+
+  if (typeof opts.patch === 'undefined') {
+    opts.patch = true
+  }
+
   if (typeof obj === 'object' && obj.id && this.nodes[obj.id]) {
-    this._edit(obj)
+    this._edit(obj, opts)
     this._transitionWrap(this._slide)(this._layout[obj.id])
   } else if (Array.isArray(obj)) {
-    obj.forEach(this._edit.bind(this))
+    obj.forEach(d => this._edit(d, opts))
     this._transitionWrap(this._slide)()
   } else if (typeof obj.on === 'function' ) {
     // Assume it's a stream.
     var self = this
     obj.on('data', function (d) {
-         self._edit(d)
+         self._edit(d, opts)
        })
        .on('end', function () {
          self._transitionWrap(self._slide)()
@@ -1027,12 +1035,13 @@ Tree.prototype.edit = function (obj) {
  * Merges properties from obj into the data object in the tree with the same id
  * as obj
  */
-Tree.prototype._edit = function (obj) {
+Tree.prototype._edit = function (obj, opts) {
   var d = this.nodes[obj.id]
     , _d = this._layout[obj.id]
 
   if (d) {
-    d = merge(obj, d)
+    d = opts.patch ? merge(obj, d) : obj
+    this.nodes[obj.id] = d
 
     // merge doesn't remove properties, but the extra class name could have been removed, so
     // make sure it's updated
