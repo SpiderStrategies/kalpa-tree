@@ -64,3 +64,21 @@ test('tree is in performance mode', function (t) {
     t.end()
   })
 })
+
+test('collapsing a large tuned tree scrolls the nodes into view', function (t) {
+  var s = stream().pipe(new Extender({objectMode: true}))
+    , container = _container()
+    , tree = new Tree({stream: s}).render()
+
+  container.appendChild(tree.el.node())
+  s.on('end', function () {
+    tree.expandAll()
+    tree.el.select('.tree').node().scrollTop = 10
+
+    tree.collapseAll()
+    t.equal(tree.el.select('.tree').node().scrollTop, 0, 'scrolled to 0')
+
+    container.remove()
+    t.end()
+  })
+})

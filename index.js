@@ -745,6 +745,7 @@ Tree.prototype._scrollIntoView = function (d, opt) {
 
   if (!d) {
     // Defensive exit early if we don't have a node so we don't blow up
+    n.scrollTop = 0
     return
   }
 
@@ -987,6 +988,10 @@ Tree.prototype.collapseTo = function (depth) {
       enter.call(self.enter)
       update.call(self.updater)
       exit.remove()
+
+      // If we just collapsed a big tree, make sure we adjust the scrollTop so the nodes are in view.
+      // See https://github.com/SpiderStrategies/Scoreboard/issues/20332
+      self._scrollIntoView(self._selected)
     })
   }
 }
