@@ -762,7 +762,7 @@ test('add node toggles tree nodes if parent is selected', function (t) {
   })
 })
 
-test('edits a node', function (t) {
+test('edits a node (patch=true - default)', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
@@ -781,6 +781,31 @@ test('edits a node', function (t) {
 
     process.nextTick(function () {
       t.equal(el.querySelector('.tree ul li:nth-child(1) .label').innerHTML, 'New label for root', 'dom label changed')
+      t.end()
+    })
+  })
+})
+
+test('edits a node with patch=false', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  s.on('end', function () {
+    tree.edit({
+      id: 1001,
+      type: 'foo',
+      color: 'green'
+    }, {patch: false})
+
+    var d = tree.get(1001)
+    t.notOk(d.label, 'label removed')
+    t.notOk(d.nodeType, 'nodetype no longer set')
+    t.equal(d.color, 'green', 'color changed')
+    t.equal(d.type, 'foo', 'type set')
+
+    process.nextTick(function () {
+      t.equal(el.querySelector('.tree ul li:nth-child(1) .label').innerHTML, '', 'dom label changed to unset value ')
       t.end()
     })
   })
