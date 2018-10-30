@@ -1017,7 +1017,8 @@ Tree.prototype.edit = function (obj, opts) {
     this._edit(obj, opts)
     this._transitionWrap(this._slide)(this._layout[obj.id])
   } else if (Array.isArray(obj)) {
-    obj.forEach(d => this._edit(d, opts))
+    Object.keys(obj).forEach(key => this._edit(obj[key], opts)) // Loop over the keys rather than `obj.forEach`, b/c the incoming array could have a massive index,
+                                                                // which makes obj.forEach super slow.
     this._transitionWrap(this._slide)()
   } else if (typeof obj.on === 'function' ) {
     // Assume it's a stream.
