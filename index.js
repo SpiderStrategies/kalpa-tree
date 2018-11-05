@@ -153,7 +153,7 @@ Tree.prototype.render = function () {
                            self.adjustViewport()
                            self._scrollTop = scroll
                          }
-                       })
+                       }, { passive: true }) // We'll adjust viewport after the browser has finished its native scrolling
                        .classed('forest-tree', this.options.forest)
                        .append('ul')
                          .selectAll('li.node')
