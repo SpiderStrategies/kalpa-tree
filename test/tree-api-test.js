@@ -1061,7 +1061,7 @@ test('sets `tree-overflow` based on scrollable content', function (t) {
 })
 
 test('emits `rebind` event when rebinding data', function (t) {
-  t.plan(2)
+  t.plan(4)
   var s = stream()
     , tree = new Tree({stream: s})
 
