@@ -1142,7 +1142,17 @@ Tree.prototype.removeNode = function (obj) {
  */
 Tree.prototype.filter = function (fn) {
   if (fn == null) {
-    return this.select((this._selected && this._selected.id) || (this.options.forest ? this.root[0].id : this.root.id), {
+    let selected = this._selected // default to the previously selected node
+    if (!selected) {
+      // Previously didn't have a selected node, so we'll select the root node
+      if (this.options.forest) {
+        // Top of the forest if it has nodes
+        selected = this.root.length ? this.root[0] : null
+      } else {
+        selected = this.root
+      }
+    }
+    return this.select(selected && selected.id, {
       force: this.el.select('.tree').classed('filtered-results'),
       silent: true
     })

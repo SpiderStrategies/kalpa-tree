@@ -4,6 +4,7 @@ var test = require('tape').test
   , Tree = require('../')
   , stream = require('./tree-stream')
   , Transform = require('stream').Transform
+  , PassThrough = require('stream').PassThrough
 
 function container () {
   var container = document.createElement('div')
@@ -126,6 +127,13 @@ test('search for null clears search', function (t) {
     c.remove()
     t.end()
   })
+})
+
+test('empty forest null search', function (t) {
+  let tree = new Tree({stream: new PassThrough, forest: true}).render()
+  tree.search(null)
+  t.ok(!tree.el.select('.tree').classed('filtered-results'), 'tree does not have filtered-results class')
+  t.end()
 })
 
 test('clearing search does not fire select event', function (t) {
