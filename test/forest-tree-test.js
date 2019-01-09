@@ -273,7 +273,7 @@ test('dnd allows a node to become a new root', function (t) {
       dnd._dragging = true
       d3.event.y = 5
       dnd.drag.apply(node, [data, 2])
-      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate3d(0px,0px,0px)', '0px y indentation')
+      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(0px,0px)', '0px y indentation')
 
       tree.on('move', function (n, newParent, previousParent, newIndex, previousIndex) {
         t.equal(n.id, 1003, 'moved node id matches 1003')
@@ -343,7 +343,7 @@ test('dnd flat forest', function (t) {
 
       d3.event.y = 76 // This position would indent 1003 by default
       dnd.drag.apply(node, [data, 2])
-      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate3d(0px,0px,0px)', '0px y indentation')
+      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(0px,0px)', '0px y indentation')
 
       d3.event.y = 65 // This keeps moving 1003 up
       dnd.drag.apply(node, [data, 2])

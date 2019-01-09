@@ -252,9 +252,9 @@ test('selected nodes descendants transition from correct location', function (t)
     tree.updater = function () {
       // Enter called by now, so the node is in the dom.
       var n = tree.el.select('.tree ul li.node:nth-child(17)')
-        , _translate = /translate3d\((.*)\)/.exec(n.attr('style'))[0]
+        , _translate = /translate\((.*)\)/.exec(n.attr('style'))[0]
       t.equal(n.datum().id, 1016, 'selected the correct node')
-      t.equal(_translate, 'translate3d(0px, 36px, 0px)', '1016 enters at 1002 spot')
+      t.equal(_translate, 'translate(0px, 36px)', '1016 enters at 1002 spot')
       t.end()
     }
     tree.toggle({id: 1002})
