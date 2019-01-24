@@ -1045,16 +1045,6 @@ Tree.prototype._edit = function (obj, opts) {
     d = opts.patch ? merge(obj, d) : obj
     this.nodes[obj.id] = d
 
-    // merge doesn't remove properties, but the extra class name could have been removed, so
-    // make sure it's updated
-    if (!obj.className && d.className) {
-      let clazz = d.className
-      // Clean up the actual state on the object
-      delete d.className
-      // Store a a field on our object indicating this className needs to be removed on the DOM node when update runs.
-      _d._exitingClassName = clazz
-    }
-
     // Check is the visible property has been set
     if (typeof obj.visible !== 'undefined') {
       if (obj.visible === false) {

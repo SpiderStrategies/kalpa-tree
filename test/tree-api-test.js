@@ -832,9 +832,10 @@ test('edit changes class name on a node', function (t) {
 
     t.equal(el.querySelector('.tree ul li.node.foo.bar .label').innerHTML, 'Huge Scorecard', '1001 has classnames of foo and bar')
 
-    tree.edit({
-      id: 1001
-    })
+    let n = tree.get(1001)
+    // To remove a class name, you have to do an edit with `patch: false`
+    delete n.className
+    tree.edit(n, {patch: false})
 
     t.notOk(el.querySelectorAll('.tree ul li.node.foo').length, 'No nodes with class name of `foo`')
 
