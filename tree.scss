@@ -55,7 +55,7 @@ $timing-fn: ease-out;
       vertical-align: middle;
       margin-left: 10px;
       color: #ADB8BC;
-      text-shadow: 0 1px 0 rgba(0, 0, 0, 0.23);
+      text-shadow: 0 1px 0 rgba(#000000, 0.23);
     }
   }
 
@@ -121,7 +121,7 @@ $timing-fn: ease-out;
     }
 
     .label-mask {
-      @include gradientBackground(rgba(57, 60, 64, 0) 0%, #D9E2E8 90%);
+      @include gradientBackground(rgba(#393c40, 0) 0%, #D9E2E8 90%);
     }
 
     &.illegal {
@@ -263,10 +263,10 @@ $timing-fn: ease-out;
         }
 
         .label-mask {
-          @include gradientBackground(rgba(57,60,64,0) 0%, #393c40 90%);
+          @include gradientBackground(rgba(#393c40,0) 0%, #393c40 90%);
 
           &.indicator {
-            @include gradientBackground(rgba(57,60,64,0) 0%, #393c40 50%);
+            @include gradientBackground(rgba(#393c40,0) 0%, #393c40 50%);
           }
         }
 
@@ -310,10 +310,10 @@ $timing-fn: ease-out;
             color: #e1e8eb;
           }
           .label-mask {
-            @include gradientBackground(rgba(45,49,53,0) 0%, #2D3640 90%);
+            @include gradientBackground(rgba(#2D3640,0) 0%, #2D3640 90%);
 
             &.indicator {
-              @include gradientBackground(rgba(45,49,53,0) 0%, #2D3640 50%);
+              @include gradientBackground(rgba(#2D3640,0) 0%, #2D3640 50%);
             }
           }
         }
