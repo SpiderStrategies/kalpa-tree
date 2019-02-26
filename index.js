@@ -167,36 +167,11 @@ Tree.prototype.render = function () {
   this.root = this.options.forest ? [] : null
 
   this.options.stream.on('data', function (n) {
-    // Add the node in its incoming form to nodes
-    self.nodes[n.id] = n
-
-    var p = self._layout[n.parentId]
-      , _n = self._layout[n.id] = { // internal version which we'll use to modify the node's layout
-        id: n.id,
-        collapsed: true // by default incoming nodes are collapsed
-      }
-
-    if (n.visible === false) {
-      _n.visible = false
-    }
-
-    if (p) {
-      _n.parent = p
-      // Simple array that we use to keep track of children
-      ;(p._allChildren || (p._allChildren = [])).push(_n)
-    } else {
-      // Some type of root nodes. We treat those as expanded nodes
-      if (self.options.forest) {
-        self.root.push(_n)
-      } else {
-        _n.collapsed = false
-        self.root = _n
-      }
-    }
+    let _n = self._store(n) // Internal store tracking nodes and layout
 
     if (self.options.initialSelection == _n.id) {
       self.select(_n.id, { silent: true, animate: false })
-    } else if (!_n.collapsed || (p && !p.collapsed)) {
+    } else if (!_n.collapsed || (_n.parent && !_n.parent.collapsed)) {
       // Need to draw the tree to show the incoming node if
       // we have a parent and its show its children, or the node was set to expand (probably a root)
       self._fly()
@@ -831,37 +806,68 @@ Tree.prototype._onToggle = function (d) {
 }
 
 /*
+ * Adds the node to our incoming data store. Returns the layout node
+ */
+Tree.prototype._store = function (node, parent, idx) {
+  if (this._layout[node.id]) {
+    // can't add a node that we already have
+    return this._layout[node.id]
+  }
+
+  this.nodes[node.id] = node // Add the node in its incoming form to nodes
+
+  var p = parent || this._layout[node.parentId]
+    , _n = this._layout[node.id] = { // internal version which we'll use to modify the node's layout
+      id: node.id,
+      collapsed: true // by default incoming nodes are collapsed
+    }
+
+  if (node.visible === false) {
+    _n.visible = false
+  }
+
+  if (p) {
+    // Node has a parent (i.e. not a root)
+    _n.parent = p
+
+    if (typeof idx !== 'undefined' && idx !== null) {
+      parent._allChildren.splice(idx, 0, _n)
+    } else {
+      // Simple array that we use to keep track of children
+      ;(p._allChildren || (p._allChildren = [])).push(_n)
+    }
+  } else {
+    // Some type of root nodes. We treat those as expanded nodes
+    if (this.options.forest) {
+      this.root.splice(typeof idx === 'number' ? idx : this.root.length, 0, _n)
+    } else {
+      _n.collapsed = false
+      this.root = _n
+    }
+  }
+
+  return _n
+}
+
+/*
  * Adds a new node to the tree. Pass in d as the data that represents
  * the node, parent (which can be the parent object or an id), and an optional
  * index. If the index is sent, the node will be inserted at that index within the
  * parent's children.
+ *
+ * Receives optional `opts`, which supports:
+ *    `expand`: defaults to true, which will expand the incoming node's parent if the parent is selected
  */
-Tree.prototype.add = function (d, parent, idx) {
+Tree.prototype.add = function (d, parent, idx, opts = { expand: true }) {
   if (this._layout[d.id]) {
-    // can't add a node that we already have
+    // Already have this node, ignore
     return
   }
 
-  // internal node used for computing the layout
-  var _d = { id: d.id }
+  // Turn parent into a parent object
+  parent = this._layout[parent !== null && typeof parent === 'object' ? parent.id : parent]
 
-  if (!parent && this.options.forest) {
-    // Forest tree and the new node is a new root
-    this.nodes[d.id] = d // Store the real node
-    this._layout[_d.id] = _d
-    this.root.splice(typeof idx === 'number' ? idx : this.root.length, 0, _d)
-    this._transitionWrap(this._slide)()
-    return d
-  } else if (parent) {
-    parent = this._layout[parent !== null && typeof parent === 'object' ? parent.id : parent]
-  } else if (!parent && !this.root) {
-    this.root = _d
-  } else {
-    // No parent, and not a new root node
-    return
-  }
-
-  if (parent && parent.selected && parent.collapsed) {
+  if (opts.expand && parent && parent.selected && parent.collapsed) {
     // The parent is selected and collapsed, we want to expand its children (#259)
     delete parent.collapsed
     // Show the children immediately
@@ -869,21 +875,40 @@ Tree.prototype.add = function (d, parent, idx) {
     this._forceRedraw()
   }
 
-  _d.parent = parent
-  this.nodes[d.id] = d
-  this._layout[_d.id] = _d
-
-  if (typeof idx !== 'undefined') {
-    parent._allChildren.splice(idx, 0, _d)
-  } else if (parent) {
-    if (!parent._allChildren) {
-      parent._allChildren = []
-    }
-    parent._allChildren.push(_d)
-  }
+  let _d = this._store(d, parent, idx)
 
   this._transitionWrap(this._slide)()
+
   return d
+}
+
+/*
+ * Adds multiple nodes to the tree. This is more efficient than invoking `.add` on each node
+ * as it only draws the nodes once, after the internal tree representation has been updated.
+ * Each node in the array should contain the arguments that should be passed to `.add`:
+ *  ```
+ *  {
+ *    data: // the node's data
+ *    parent: // optional parent of the node
+ *    idx: // idx to insert in the parent
+ *  }
+ *  ```
+ * This method does not expand any nodes.
+ *
+ */
+Tree.prototype.addAll = function (nodes = []) {
+  nodes.forEach(node => {
+    if (this._layout[node.data.id]) {
+      // ignore this node. already in the tree
+      return
+    }
+    // Turn parent into a parent object
+    let parent = this._layout[node.parent !== null && typeof node.parent === 'object' ? node.parent.id : node.parent]
+
+    this._store(node.data, parent, node.idx)
+  })
+
+  this._transitionWrap(this._slide)()
 }
 
 /*
