@@ -883,6 +883,35 @@ Tree.prototype.add = function (d, parent, idx, opts = { expand: true }) {
 }
 
 /*
+ * Adds multiple nodes to the tree. This is more efficient than invoking `.add` on each node
+ * as it only draws the nodes once, after the internal tree representation has been updated.
+ * Each node in the array should contain the arguments that should be passed to `.add`:
+ *  ```
+ *  {
+ *    data: // the node's data
+ *    parent: // optional parent of the node
+ *    idx: // idx to insert in the parent
+ *  }
+ *  ```
+ * This method does not expand any nodes.
+ *
+ */
+Tree.prototype.addAll = function (nodes = []) {
+  nodes.forEach(node => {
+    if (this._layout[node.data.id]) {
+      // ignore this node. already in the tree
+      return
+    }
+    // Turn parent into a parent object
+    let parent = this._layout[node.parent !== null && typeof node.parent === 'object' ? node.parent.id : node.parent]
+
+    this._store(node.data, parent, node.idx)
+  })
+
+  this._transitionWrap(this._slide)()
+}
+
+/*
  * Returns if the tree is in edit mode.
  */
 Tree.prototype.isEditable = function () {

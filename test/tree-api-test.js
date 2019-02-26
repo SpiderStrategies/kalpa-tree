@@ -762,6 +762,30 @@ test('add node toggles tree nodes if parent is selected', function (t) {
   })
 })
 
+test('addAll adds a bunch of nodes', function (t) {
+   var s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  s.on('end', function () {
+    tree.expandAll()
+    t.equal(el.querySelectorAll('.tree ul li.node').length, 37, '37 nodes visible')
+    t.equal(Object.keys(tree.nodes).length, 37, '37 tree nodes')
+    let parent = 1001
+      , nodes = [
+        {data: {id: 393030384, label: 'New Node 1', parentId: parent, color: 'gray', nodeType: 'metric'}, parent: parent},
+        {data: {id: 393030385, label: 'New Node 2', parentId: parent, color: 'gray', nodeType: 'metric'}, parent: parent}]
+
+    tree.addAll(nodes)
+    t.equal(Object.keys(tree.nodes).length, 39, '39 tree nodes')
+
+    process.nextTick(function () {
+      t.equal(el.querySelectorAll('.tree ul li.node').length, 39, '39 nodes visible')
+      t.end()
+    })
+  })
+})
+
 test('edits a node (patch=true - default)', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
