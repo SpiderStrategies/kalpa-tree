@@ -113,7 +113,7 @@ $timing-fn: ease-out;
       }
 
       .label {
-        color: #2d3135;
+        color: #2D3640;
         transition-property: color;
         transition-duration: $delay;
         transition-timing-function: $timing-fn;
@@ -273,7 +273,7 @@ $timing-fn: ease-out;
         &.placeholder, &.transition-placeholder {
           &.transition-placeholder {
             // This is for transition placeholder nodes popping in or out
-            background-color: #2d3135;
+            background-color: #2D3640;
           }
 
           * {
@@ -291,7 +291,7 @@ $timing-fn: ease-out;
         }
 
         &.selected {
-          background-color: #2d3135;
+          background-color: #2D3640;
           z-index: 1;
 
           &:not(.placeholder):before {
@@ -310,10 +310,10 @@ $timing-fn: ease-out;
             color: #e1e8eb;
           }
           .label-mask {
-            @include gradientBackground(rgba(45,49,53,0) 0%, #2d3135 90%);
+            @include gradientBackground(rgba(45,49,53,0) 0%, #2D3640 90%);
 
             &.indicator {
-              @include gradientBackground(rgba(45,49,53,0) 0%, #2d3135 50%);
+              @include gradientBackground(rgba(45,49,53,0) 0%, #2D3640 50%);
             }
           }
         }
