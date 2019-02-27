@@ -15,6 +15,12 @@ module.exports = function () {
       return stream.push(clone[i++])
     }
     stream.push(null)
+
+    // Just for testing purposes, when the stream emits 'end', the render function
+    // requests an animation frame for a final paint. After that happens, we can start testing
+    requestAnimationFrame(() => {
+      stream.emit('test-stream-ready')
+    })
   }
 
   return stream

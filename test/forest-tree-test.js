@@ -32,6 +32,10 @@ function stream () {
       return stream.push(n)
     }
     stream.push(null)
+
+    requestAnimationFrame(() => {
+      stream.emit('test-stream-ready')
+    })
   }
 
   return stream
@@ -41,7 +45,7 @@ test('forest tree render populates multiple roots', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
 
-  s.on('end', function () {
+  s.on('test-stream-ready', function () {
     tree.expandAll()
     t.equal(Object.keys(tree.nodes).length, nodes.length, 'nodes contains all data')
     t.equal(Object.keys(tree._layout).length, nodes.length, '_layout contains all data')
@@ -67,7 +71,7 @@ test('forest tree render populates multiple roots', function (t) {
 test('allows addition of new root elements', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
-  s.on('end', function () {
+  s.on('test-stream-ready', function () {
     t.equal(tree.root.length, 2, 'two root nodes')
 
     var totalNodes = Object.keys(tree.nodes).length
@@ -84,7 +88,7 @@ test('allows addition of new root elements at an index', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
 
-  s.on('end', function () {
+  s.on('test-stream-ready', function () {
     tree.add({label: 'New root node', id: 1010}, null, 0)
     t.equal(tree.root.length, 3, 'three root nodes')
     t.equal(tree.root[0].id, 1010, 'first root node is the new node')
@@ -97,7 +101,7 @@ test('root nodes can be removed', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
 
-  s.on('end', function () {
+  s.on('test-stream-ready', function () {
     tree.removeNode(1002)
     t.equal(tree.root.length, 1, 'one root node')
     t.equal(tree.root[0].id, 1001, 'only root is 1001')
@@ -111,7 +115,7 @@ test('root nodes return their siblings', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
 
-  s.on('end', function () {
+  s.on('test-stream-ready', function () {
     t.deepEqual(tree.nextSibling(1001), tree.get(1002), 'root has the next sibling')
     t.deepEqual(tree.previousSibling(1002), tree.get(1001), 'root has the previous sibling')
     t.ok(!tree.previousSibling(1001), 'first root has no previous sibling')
@@ -124,7 +128,7 @@ test('copies with explicit null to', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
 
-  s.on('end', function (d) {
+  s.on('test-stream-ready', function (d) {
     t.equal(tree.root.length, 2, 'two root nodes')
     tree.copy(1003, null, function (n) {
       n.id *= 100
@@ -142,7 +146,7 @@ test('copies a node to a new root', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
 
-  s.on('end', function () {
+  s.on('test-stream-ready', function () {
     t.equal(tree.root.length, 2, 'two root nodes')
     tree.copy(1003, function (n) {
       n.id *= 100
@@ -161,7 +165,7 @@ test('moves a node to a new root', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
 
-  s.on('end', function () {
+  s.on('test-stream-ready', function () {
     tree.move(1003)
 
     process.nextTick(function () {
@@ -180,7 +184,7 @@ test('moves a node to a new root at some position', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
 
-  s.on('end', function () {
+  s.on('test-stream-ready', function () {
     tree.move(1003, null, 0)
 
     t.deepEqual(tree.root[0], tree._layout[1003], 'first root node is 1003')
@@ -202,7 +206,7 @@ test('dnd allows a root nodes to change order', function (t) {
   document.body.appendChild(container)
   container.appendChild(tree.el.node())
 
-  s.on('end', function () {
+  s.on('test-stream-ready', function () {
     tree.select(1003, {animate: false})
     var node = tree.node.nodes()[2]
       , data = tree._layout[1003]
@@ -255,7 +259,7 @@ test('dnd allows a node to become a new root', function (t) {
   document.body.appendChild(container)
   container.appendChild(tree.el.node())
 
-  s.on('end', function () {
+  s.on('test-stream-ready', function () {
     tree.select(1003, {animate: false})
 
     process.nextTick(function () {
@@ -380,12 +384,16 @@ test('hides visible: false root nodes', function (t) {
     done()
   }
 
-  var s = stream().pipe(map)
-    , tree = new Tree({stream: s, forest: true}).render()
+  var s = stream()
+    , mapStream = s.pipe(map)
+    , tree = new Tree({stream: mapStream, forest: true}).render()
 
-  s.on('end', function (d) {
-    t.equal(tree.root.length, 2, 'two root nodes')
-    t.equal(tree.node.size(), 1, '1 node visible')
-    t.end()
+  s.on('test-stream-ready', function (d) {
+    setTimeout(function () {
+      t.equal(tree.root.length, 2, 'two root nodes')
+      t.equal(tree.node.size(), 1, '1 node visible')
+      t.end()
+    }, 100)
+
   })
 })

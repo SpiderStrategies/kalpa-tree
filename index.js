@@ -166,6 +166,24 @@ Tree.prototype.render = function () {
 
   this.root = this.options.forest ? [] : null
 
+  /*
+   * When loading the tree, we could overwhelm the browser if we're
+   * supposed to draw each node as it arrives (e.g. if there are a lot of immediate children from root).
+   * This slows down the number of times we try to draw the tree, by using rAF
+   */
+  let scheduledRaf = false
+    , draw = () => {
+      if (scheduledRaf) {
+        // We're already waiting for the browser to draw the tree, ignore
+        return
+      }
+      scheduledRaf = true
+      requestAnimationFrame(() => {
+        this._fly()
+        scheduledRaf = false
+      })
+    }
+
   this.options.stream.on('data', function (n) {
     let _n = self._store(n) // Internal store tracking nodes and layout
 
@@ -174,13 +192,11 @@ Tree.prototype.render = function () {
     } else if (!_n.collapsed || (_n.parent && !_n.parent.collapsed)) {
       // Need to draw the tree to show the incoming node if
       // we have a parent and its show its children, or the node was set to expand (probably a root)
-      self._fly()
+      draw()
     }
     self.emit('node', n)
   })
-  .on('end', function () {
-    self._fly()
-  })
+  .on('end', draw)
 
   return this
 }
