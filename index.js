@@ -847,7 +847,7 @@ Tree.prototype._store = function (node, parent, idx) {
     _n.parent = p
 
     if (typeof idx !== 'undefined' && idx !== null) {
-      parent._allChildren.splice(idx, 0, _n)
+      p._allChildren.splice(idx, 0, _n)
     } else {
       // Simple array that we use to keep track of children
       ;(p._allChildren || (p._allChildren = [])).push(_n)
