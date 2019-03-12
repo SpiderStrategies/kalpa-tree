@@ -9,7 +9,7 @@ test('get', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.deepEqual(tree.get(), tree.root, 'get returns root by default')
     t.deepEqual(tree.get(1002), tree.nodes[1002], 'get returns a node by id')
     t.ok(tree.get(1006), 'get returns nodes that are hidden')
@@ -22,7 +22,7 @@ test('parent', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.deepEqual(tree.parent(1002), tree.get(1001), 'returns a nodes parent by id')
     t.deepEqual(tree.parent(tree.get(1002)), tree.get(1001), 'returns a nodes parent by object')
     t.ok(!tree.parent(1001), 'returns null for root')
@@ -35,7 +35,7 @@ test('children', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.equal(tree.children(1001).length, 2, 'root has two children')
     t.equal(tree.children(1007).length, 0, 'a leaf has no children')
     t.equal(tree.children(1058).length, 5, 'a collapsed node has children')
@@ -54,7 +54,7 @@ test('siblings', function (t) {
   var s = stream()
     , tree = new Tree({stream: s, forest: true}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.ok(!tree.previousSibling(1001), 'root has no previous sibling')
     t.ok(!tree.nextSibling(1001), 'root has no next sibling')
 
@@ -74,7 +74,7 @@ test('moves a node', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var orgParent = tree._layout[1003].parent
       , orgChildrenLength = orgParent._allChildren.length
 
@@ -95,7 +95,7 @@ test('moves a node without showing new layout', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var orgParent = tree._layout[1003].parent
       , orgChildrenLength = orgParent._allChildren.length
 
@@ -116,7 +116,7 @@ test('moves a node with index', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var orgParent = tree._layout[1003].parent
       , orgChildrenLength = orgParent._allChildren.length
 
@@ -134,7 +134,7 @@ test('copies a node', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var orgParent = tree._layout[1003].parent
        , orgChildrenLength = orgParent._allChildren.length
 
@@ -155,7 +155,7 @@ test('selects a node', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.select(1003)
 
     var selected = tree.selected()
@@ -192,7 +192,7 @@ test('select a node adds transitions by default', function (t) {
   document.body.appendChild(container)
   container.appendChild(tree.render().el.node())
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.ok(!tree.el.select('.tree').classed('transitions'), 'tree el does not have transitions by default')
 
     tree.on('selected', function () {
@@ -215,7 +215,7 @@ test('marks freshly selected nodes as `selecting`', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var redraw = tree._forceRedraw
     tree._forceRedraw = function () {
       var n = tree.el.selectAll('.tree li.node.selecting')
@@ -236,7 +236,7 @@ test('selected nodes descendants transition from correct location', function (t)
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.select(1004, {animate: false}) // Expand 1004 (M1)
     tree.select(1015, {animate: false}) // Expand 1015 (This has a different parent)
     // Now collapse P1 so the tree is basically collapsed
@@ -265,7 +265,7 @@ test('selects a node without animations', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.ok(!tree.el.select('.tree').classed('transitions'), 'tree el does not have transitions by default')
     var toggler = tree.toggle
     tree.toggle = function () {
@@ -285,7 +285,7 @@ test('select will not toggle an already expanded node', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.expandAll()
     tree.select(1003)
     t.ok(tree._layout[1003].children, 'previously expanded node is still expanded after select')
@@ -300,7 +300,7 @@ test('selects a node with options', function (t) {
     , tree = new Tree({stream: s}).render()
     , calls = 0
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.on('select', function (node) {
       t.equal(node.label, 'O1', 'select event provides real node, not layout node')
       t.equal(node.id, 1003, 'select node event is correct')
@@ -319,7 +319,7 @@ test('select disables animations if selected node parent is not visible', functi
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     process.nextTick(function () {
       var updater = tree.updater
       tree.updater = function () {
@@ -338,7 +338,7 @@ test('select scrolls into view', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.el.select('.tree')
              .style('overflow', 'auto')
              .style('height', '36px')
@@ -355,7 +355,7 @@ test('select does not scroll if node is within viewport', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.el.select('.tree')
              .style('overflow', 'auto')
              .style('height', '150px')
@@ -372,7 +372,7 @@ test('getSelectedEl returns the selected node\'s dom element', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.select(1003)
 
     var data = tree.selected()
@@ -390,7 +390,7 @@ test('editable', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.editable()
     t.ok(el.querySelector('.tree.editable'), 'there is an tree editable object')
     t.ok(tree.isEditable(), 'the tree is editable')
@@ -409,7 +409,7 @@ test('expand', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var d = tree.get(1002)
     tree.expand(d) // 1002 is the first child of root
     t.ok(tree._layout[1002].children, 'node should have children')
@@ -424,7 +424,7 @@ test('collapse', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var d = tree.get(1002)
     tree.collapse(d) // 1002 is the first child of root
     t.ok(!tree._layout[1002].children, 'node should not have children')
@@ -437,7 +437,7 @@ test('expand all', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var el = tree.el.node()
     process.nextTick(function () {
       t.equal(el.querySelectorAll('.tree ul li').length, 3, 'tree has 3 nodes initially')
@@ -455,7 +455,7 @@ test('expand all disables animations if there are too many nodes', function (t) 
   var s = stream()
     , tree = new Tree({stream: s, maxAnimatable: 3})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     // Wait for default end to remove transitions, which is applied on initial render
     process.nextTick(function () {
       t.ok(!tree.el.select('.tree').classed('transitions'), 'tree el does not have transitions')
@@ -481,7 +481,7 @@ test('collapseTo', function (t) {
     , tree = new Tree({stream:s, maxAnimatable: 0}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.expandAll()
     tree.collapseTo(3)
     t.equal(el.querySelectorAll('.tree ul li').length, 37, 'root + its children + grandchildren should be visible')
@@ -508,7 +508,7 @@ test('collapse all disables animations if there are too many nodes alredy expand
   var s = stream()
     , tree = new Tree({stream: s, maxAnimatable: 5})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.select(1006)
     process.nextTick(function () {
       t.ok(tree.node.size() > 5, 'there are more nodes than our set maxAnimatable')
@@ -533,7 +533,7 @@ test('removes a node by id', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var el = tree.el.node()
 
     tree.expandAll() // start expanded
@@ -558,7 +558,7 @@ test('removes a node by data object', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     process.nextTick(function () {
       var el = tree.el.node()
       tree.removeNode(tree.get(1002))
@@ -575,7 +575,7 @@ test('removes root', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     process.nextTick(function () {
       var el = tree.el.node()
       tree.removeNode(1001)
@@ -600,7 +600,7 @@ test('removeNode calls `enter` when the tree is performance tuned', function (t)
   container.style.height = '50px'
   document.body.appendChild(container)
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     container.appendChild(tree.el.node())
     process.nextTick(function () {
       tree.expandAll()
@@ -621,7 +621,7 @@ test('adds a new root', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     process.nextTick(function () {
       tree.removeNode(1001)
       setTimeout(function () {
@@ -649,7 +649,7 @@ test('prevents add for a node w/ that id', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var d = tree.add({
       id: 1001
     })
@@ -664,7 +664,7 @@ test('adds a node to a parent without children', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var d = tree.add({
       id: 1001010101,
       label: 'Newest node',
@@ -685,7 +685,7 @@ test('adds a node to a parent', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.expandAll()
 
     var d = tree.add({
@@ -709,7 +709,7 @@ test('adds a node to a parent and before sibling', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.expandAll()
 
     var d = tree.add({
@@ -734,7 +734,7 @@ test('add node toggles tree nodes if parent is selected', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     // Select the parent, but keep it collapsed
     tree.select(1003, {toggleOnSelect: false})
     t.ok(!tree._layout[1003].children, 'selected node is not expanded so it does not have children')
@@ -767,7 +767,7 @@ test('addAll adds a bunch of nodes', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.expandAll()
     t.equal(el.querySelectorAll('.tree ul li.node').length, 37, '37 nodes visible')
     t.equal(Object.keys(tree.nodes).length, 37, '37 tree nodes')
@@ -791,7 +791,7 @@ test('edits a node (patch=true - default)', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.edit({
       id: 1001,
       label: 'New label for root',
@@ -815,7 +815,7 @@ test('edits a node with patch=false', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.edit({
       id: 1001,
       type: 'foo',
@@ -840,7 +840,7 @@ test('edit changes class name on a node', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.notOk(el.querySelectorAll('.tree ul li.node.foo').length, 'No nodes with class name of `foo`')
     tree.edit({
       id: 1001,
@@ -902,7 +902,7 @@ test('edit the tree by array of changes', function (t) {
     , tree = new Tree({stream: s, indicator: true}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.edit([{id: 1002, color: 'red', nodeType: 'perspective', label: 'Patched 1002'}])
 
     var d = tree.get(1002)
@@ -924,7 +924,7 @@ test('edit changes nodes visibility', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     process.nextTick(function () {
       var el = tree.el.node()
       tree.expandAll()
@@ -951,7 +951,7 @@ test('patch visibility toggling', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var el = tree.el.node()
       , parent = tree._layout[1003]
 
@@ -1001,7 +1001,7 @@ test('edit the tree with stream of data events containing the changes', function
     editStream.push(null)
   }
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     editStream.on('end', function () {
       t.equal(tree.get(1002).label, 'Patched 1002', '1002 labels are equal')
       t.equal(tree.get(1003).label, 'Patched 1003', '1003 labels are equal')
@@ -1017,7 +1017,7 @@ test('toggle a specific node', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var d = tree.get(1002)
     tree.toggle(d) // 1002 is the first child of root
     t.ok(tree._layout[1002].children, 'node should have children')
@@ -1031,7 +1031,7 @@ test('click toggler listener', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}, {})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     setTimeout(function () {
       var node = tree._layout[1002]
       t.ok(!node.children, 'first child has hidden children')
@@ -1048,7 +1048,7 @@ test('click toggler disabled on root', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     process.nextTick(function () {
       var el = tree.el.node()
       t.ok(tree.get().children, 'root starts with exposed children')
@@ -1068,7 +1068,7 @@ test('sets `tree-overflow` based on scrollable content', function (t) {
 
   container.style.height = '100px'
   document.body.appendChild(container)
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     container.appendChild(tree.el.node())
     t.ok(tree.el.select('.tree').classed('tree-overflow'), 'tree has `tree-overflow`')
     container.style.height = '2000px'

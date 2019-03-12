@@ -41,7 +41,7 @@ test('tree is in performance mode', function (t) {
     , tree = new Tree({stream: extender}).render()
   container.appendChild(tree.el.node())
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.expandAll()
     t.equal(tree.el.node().querySelectorAll('.tree ul li').length, Math.floor(300 / tree.options.height) + 3, 'Show a subset of nodes based on scroll height')
 
@@ -70,10 +70,10 @@ test('collapsing a large tuned tree scrolls the nodes into view', function (t) {
   var s = stream()
     , extender = s.pipe(new Extender({objectMode: true}))
     , container = _container()
-    , tree = new Tree({stream: s}).render()
+    , tree = new Tree({stream: extender})
 
-  container.appendChild(tree.el.node())
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
+    console.log('tree rendered')
     tree.expandAll()
     tree.el.select('.tree').node().scrollTop = 10
 
@@ -83,4 +83,6 @@ test('collapsing a large tuned tree scrolls the nodes into view', function (t) {
     container.remove()
     t.end()
   })
+  tree.render()
+  container.appendChild(tree.el.node())
 })

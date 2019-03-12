@@ -8,7 +8,7 @@ test('allows transient nodes', function (t) {
 
   t.equal(tree.options.transientId, -1, '-1 transientId by default')
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.expandAll()
 
     t.ok(!tree.el.select('.tree').classed('has-transient'), 'tree does not have has-transient class')

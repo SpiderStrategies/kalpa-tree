@@ -25,7 +25,7 @@ test('emits node events', function (t) {
     nodes.push(node)
   })
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.equal(nodes.length, data.length, 'node event emitted for each node in stream')
     tree.remove()
     t.end()
@@ -37,7 +37,7 @@ test('render populates data from stream', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.equal(Object.keys(tree.nodes).length, data.length, 'nodes contains all data')
     tree.remove()
     t.end()
@@ -59,7 +59,7 @@ test('allow label element overrides', function (t) {
     }
   }).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.equal(tree, that, 'tree label `this` is bound to the tree')
     t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child .label')[0].innerHTML, 'Foo<span>Bar</span>', 'label override sets html')
     t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child .label.quux').length, 1, 'label override sets class')
@@ -88,7 +88,7 @@ test('allows node contents overrides', function (t) {
     }
   }).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child')[0].innerHTML, '<div class="node-child" style="-webkit-transform:translate(0px,0px)">node-child-1001</div>', 'node contents overriden')
     tree.remove()
     t.end()
@@ -109,10 +109,10 @@ test('allows additional class names to be set on the node', function (t) {
   var s = stream()
     , mapStream = s.pipe(map)
     , tree = new Tree({
-      stream: s
+      stream: mapStream
     }).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var foo = tree.el.node().querySelector('.tree li.node.foo')
 
     t.equal(tree.el.node().querySelectorAll('.tree li.node.foo').length, 1, '1 node with class name of `foo`')
@@ -129,7 +129,7 @@ test('tree can be editable on initial render based on options', function (t) {
       editable: true
     }).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.ok(tree.el.node().querySelector('.tree.editable'), 'tree is marked as editable')
     t.ok(tree.isEditable(), 'the tree is editable according to its api')
     tree.remove()
@@ -142,7 +142,7 @@ test('does not apply indicator class to label-mask by default', function (t) {
     , tree = new Tree({stream: s}).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.equal(el.querySelectorAll('.tree ul li:first-child .label-mask').length, 1, 'we have a label mask')
     t.equal(el.querySelectorAll('.tree ul li:first-child .label-mask.indicator').length, 0, 'label mask is missing an indicator class')
     tree.remove()
@@ -194,7 +194,7 @@ test('render populates and hides visible: false nodes', function (t) {
     , tree = new Tree({stream: mapStream }).render()
     , el = tree.el.node()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.expandAll()
     t.equal(Object.keys(tree.nodes).length, data.length, 'nodes contains all data')
     t.equal(Object.keys(tree._layout).length, data.length, '_layout contains all data')
@@ -216,7 +216,7 @@ test('displays root and its children by default', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     process.nextTick(function () {
       t.equal(tree.node.size(), 3, '3 nodes by default')
       tree.remove()
@@ -230,7 +230,7 @@ test('root node has a class of root', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.ok(d3.select(tree.node.nodes()[0]).classed('root'), 'root node has root class')
     tree.node.each(function (d, i) {
       if (i !== 0) {
@@ -249,7 +249,7 @@ test('top tree node has denoted class', function (t) {
 
   document.body.appendChild(container)
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.ok(tree.el.select('.tree li.node[data-id="1001"]').classed('kalpa-top-node'), 'root node (top) has `kalpa-top-node` class')
     t.equal(tree.el.selectAll('.tree li.node.kalpa-top-node').size(), 1, 'only one kalpa-top-node')
     tree.remove()
@@ -266,7 +266,7 @@ test('tree drawing adjusts `tree-overflow` based on bound node data', function (
   container.style.height = '50px'
 
   document.body.appendChild(container)
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     container.appendChild(tree.el.node())
     t.ok(tree.el.select('.tree').classed('tree-overflow'), 'tree overflow set')
     tree.remove()
@@ -286,7 +286,7 @@ test('displays a node as selected on render', function (t) {
     t.fail('should not fire select on initial selection')
   })
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     process.nextTick(function () {
       t.equal(tree.node.size(), 18, '3 nodes by default')
       tree.remove()
@@ -324,7 +324,7 @@ test('adjust root node size', function (t) {
       rootHeight: 50
     }).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.equal(tree._rootOffset, 14, 'sets root offset')
     t.ok(tree.el.select('.tree').classed('detached-root'), 'tree has detached-root class')
     t.equal(tree.node.data()[0]._y, 0, 'root _y is 0')
@@ -338,7 +338,7 @@ test('adjust root node size', function (t) {
 test('rebind stores private fields', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     // Once the tree has rendered, the class should have been removed
     tree.node.data().forEach(function (d, i) {
       t.equal(d._y, i * tree.options.height, '_y is equal to index * height')
@@ -359,7 +359,7 @@ test('renders without transitions', function (t) {
   })
 
   tree.render()
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     // Once the tree has rendered, the class should have been removed
     t.ok(!tree.node.classed('transitions'), 'tree nodes transitions class removed')
     tree.remove()
@@ -371,7 +371,7 @@ test('transitioning-node applied to entering nodes', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     process.nextTick(function () {
       var node = tree._layout[1002]
       t.ok(!node.children, 'first child has hidden children')
@@ -397,7 +397,7 @@ test('disables transitions animation if opts.maxAnimatable is exceeded', functio
   var s = stream()
     , tree = new Tree({stream: s, maxAnimatable: 3}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     var toggler = tree.toggle
 
     tree.on('selected', function () {
@@ -427,14 +427,10 @@ test('sets icon class on svg', function (t) {
       icon: 'root'
     })
     stream.push(null)
-
-    setTimeout(() => {
-      stream.emit('test-stream-ready')
-    }, 100)
   }
   var tree = new Tree({stream: stream}).render()
 
-  stream.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.equal(tree.el.select('.tree ul li.node:first-child svg.icon').attr('class'), 'icon red icon-root', 'svg icon classes set')
     t.end()
   })
@@ -472,17 +468,11 @@ test('sets toggler class based on node state', function (t) {
     let node = data.shift()
 
     stream.push(node || null)
-
-    if (!node) {
-      setTimeout(() => {
-        stream.emit('test-stream-ready')
-      }, 100)
-    }
   }
 
   var tree = new Tree({stream: stream}).render()
 
-  stream.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.ok(tree.el.selectAll('.tree ul li:nth-child(1) .toggler').classed('expanded'), 'root toggler is marked expanded')
     t.ok(tree.el.selectAll('.tree ul li:nth-child(2) .toggler').classed('leaf'), 'P1 toggler is marked as leaf')
     t.ok(tree.el.selectAll('.tree ul li:nth-child(3) .toggler').classed('leaf'), 'P2 toggler is marked as leaf')
@@ -502,7 +492,7 @@ test('double click toggle does not break with transitioning nodes', function (t)
   var s = stream()
     , tree = new Tree({stream: s})
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.expandAll()
     process.nextTick(function () {
       t.equal(tree.el.selectAll('li.node').size(), 37, 'all nodes initially visible')
@@ -548,10 +538,6 @@ test('slow stream with api call before end', function (t) {
       return
     }
     stream.push(null)
-
-    requestAnimationFrame(() => {
-      stream.emit('test-stream-ready')
-    })
   }
 
   var tree = new Tree({stream: stream}).render()
@@ -563,7 +549,7 @@ test('slow stream with api call before end', function (t) {
     }
   })
 
-  stream.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.equal(tree.el.selectAll('.tree ul li.node').size(), 3, 'three nodes in tree')
     t.end()
   })

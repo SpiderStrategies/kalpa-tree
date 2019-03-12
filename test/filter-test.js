@@ -18,7 +18,7 @@ test('filter call is noop if not displaying filter results', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.select(1058)
     t.equal(tree.node.size(), 8, '8 initial nodes')
     tree.filter()
@@ -37,7 +37,7 @@ test('filter function shows by nodeType', function (t) {
 
   c.appendChild(tree.el.node())
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.select(1058)
     t.equal(tree.node.size(), 8, '8 initial nodes')
     tree.filter(function (d) {
@@ -57,7 +57,7 @@ test('search', function (t) {
 
   c.appendChild(tree.el.node())
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.equal(tree.node.size(), 3, '3 initial nodes')
     tree.search('M')
     t.equal(tree.node.size(), 25, '25 nodes visible')
@@ -78,7 +78,7 @@ test('search allows different characters', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.search('as\\')
     t.equal(tree.node.size(), 0, '0 nodes visible')
     t.end()
@@ -101,7 +101,7 @@ test('search ignores `visible: false` nodes', function (t) {
     , mapStream = s.pipe(map)
     , tree = new Tree({stream: mapStream}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.equal(tree.node.size(), 2, '2 initial nodes')
     tree.search('O1')
     t.equal(tree.node.size(), 0, '0 nodes visible')
@@ -117,7 +117,7 @@ test('search for null clears search', function (t) {
 
   c.appendChild(tree.el.node())
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.equal(tree.node.size(), 3, '3 initial nodes')
     tree.search('M')
     t.equal(tree.node.size(), 25, '25 nodes visible')
@@ -141,7 +141,7 @@ test('clearing search does not fire select event', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.on('select', function () {
       t.fail('should not fire select')
     })
@@ -159,7 +159,7 @@ test('shows selected search result in a collapsed tree', function (t) {
 
   c.appendChild(tree.el.node())
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.expandAll()
     tree.search('M')
     t.equal(tree.node.size(), 25, '25 nodes visible')
@@ -179,7 +179,7 @@ test('ignores rootHeight overrides while showing results', function (t) {
       rootHeight: 50
     }).render()
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     t.ok(tree.el.select('.tree').classed('detached-root'), 'detached root')
     t.equal(tree.el.select('.tree ul li:nth-child(2)').datum()._y, 50, 'second node is at 50')
     tree.search('M')
@@ -203,7 +203,7 @@ test('forces tree into performance mode when filtering', function (t) {
   c.style.height = '100px'
   c.appendChild(tree.el.node())
 
-  s.on('test-stream-ready', function () {
+  tree.on('rendered', function () {
     tree.select(1058)
     t.equal(tree.node.size(), 8, '8 initial nodes') // Not in performance mode, so all nodes will be there
     tree.filter(function (d) {
