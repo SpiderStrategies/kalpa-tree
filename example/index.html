@@ -184,12 +184,21 @@
     // http.get('/documents.json', function (res) {
     // http.get('/15-k-nodes.json', function (res) {
     http.get('/sms-tree.json', function (res) {
+      let stream = res.pipe(JSONStream.parse([true]))
       tree = new Tree({
-        stream: res.pipe(JSONStream.parse([true])),
+        stream,
         accessors: {
           icon: 'nodeType'
         },
         initialSelection: 1005
+      })
+
+      stream.on('end', () => {
+        console.log('stream ended')
+      })
+
+      tree.on('rendered', () => {
+        console.log('tree is rendered in the dom')
       })
 
       tree.on('error', function (e) {

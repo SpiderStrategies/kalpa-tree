@@ -171,16 +171,18 @@ Tree.prototype.render = function () {
    * supposed to draw each node as it arrives (e.g. if there are a lot of immediate children from root).
    * This slows down the number of times we try to draw the tree, by using rAF
    */
-  let scheduledRaf = false
-    , draw = () => {
+  let scheduledRaf = null
+    , draw = (done) => {
       if (scheduledRaf) {
         // We're already waiting for the browser to draw the tree, ignore
         return
       }
-      scheduledRaf = true
-      requestAnimationFrame(() => {
+      scheduledRaf = requestAnimationFrame(() => {
         this._fly()
-        scheduledRaf = false
+        scheduledRaf = null
+        if (done) {
+          done()
+        }
       })
     }
 
@@ -196,7 +198,18 @@ Tree.prototype.render = function () {
     }
     self.emit('node', n)
   })
-  .on('end', draw)
+  .on('end', () => {
+    if (scheduledRaf) {
+      // A draw is queued. Cancel it, so we can queue a new function which will
+      // allow us to fire an event indicating the tree is loaded and rendered
+      window.cancelAnimationFrame(scheduledRaf)
+      scheduledRaf = null
+    }
+    draw(() => {
+      // The tree has been painted in the DOM
+      self.emit('rendered')
+    })
+  })
 
   return this
 }
