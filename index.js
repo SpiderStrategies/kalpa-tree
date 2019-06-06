@@ -848,7 +848,7 @@ Tree.prototype._store = function (node, parent, idx) {
   var p = parent || this._layout[node.parentId]
     , _n = this._layout[node.id] = { // internal version which we'll use to modify the node's layout
       id: node.id,
-      collapsed: true // by default incoming nodes are collapsed
+      collapsed: typeof node.collapsed === 'undefined' ? true : node.collapsed // by default incoming nodes are collapsed
     }
 
   if (node.visible === false) {
