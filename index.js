@@ -1333,4 +1333,12 @@ Tree.prototype.removeTransient = function () {
   this.removeNode(this.options.transientId)
 }
 
+/*
+ * Returns the currently expanded nodes
+ */
+Tree.prototype.expandedNodes = function () {
+  return this._layout.filter(node => !node.collapsed)
+                     .map(node => this.nodes[node.id])
+}
+
 module.exports = Tree
