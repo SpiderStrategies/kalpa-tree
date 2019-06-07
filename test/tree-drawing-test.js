@@ -212,6 +212,39 @@ test('render populates and hides visible: false nodes', function (t) {
   })
 })
 
+test('initial render respects `collapsed` property on the nodes', (t) => {
+  t.plan(5)
+  var map = new Transform( { objectMode: true } )
+    , expand = [1002, 1070, 1081]
+
+  map._transform = function(obj, encoding, done) {
+    if (expand.indexOf(obj.id) !== -1) {
+      obj.collapsed = false
+    }
+    this.push(obj)
+    done()
+  }
+
+  var s = stream()
+    , mapStream = s.pipe(map)
+    , tree = new Tree({stream: mapStream }).render()
+
+  tree.on('rendered', function () {
+    let expandedNodes = tree.expandedNodes()
+                            .map(node => node.id)
+
+    t.equal(expandedNodes.length, 4, '4 expanded nodes')
+
+    t.equal(expandedNodes[0], 1001, 'root expanded')
+
+    expand.forEach(id => {
+      t.ok(expandedNodes.indexOf(id) != -1, `${id} is expanded`)
+    })
+
+    t.end()
+  })
+})
+
 test('displays root and its children by default', function (t) {
   var s = stream()
     , tree = new Tree({stream: s})

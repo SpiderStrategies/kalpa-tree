@@ -1097,3 +1097,25 @@ test('emits `rebind` event when rebinding data', function (t) {
 
   tree.render()
 })
+
+test('returns expanded nodes', function (t) {
+  var s = stream()
+    , tree = new Tree({stream: s})
+
+  t.plan(4)
+
+  tree.on('rendered', () => {
+    t.equal(tree.expandedNodes().length, 1, 'one expanded node')
+    t.equal(tree.expandedNodes()[0].id, 1001, 'root is only expanded node')
+
+    tree.select(1003)
+
+    t.equal(tree.expandedNodes().length, 3, 'three expanded nodes')
+
+    tree.expandAll()
+    t.equal(tree.expandedNodes().length, Object.keys(tree.nodes).length, 'All nodes are expanded')
+
+    t.end()
+  })
+  tree.render()
+})
