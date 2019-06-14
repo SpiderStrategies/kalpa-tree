@@ -464,7 +464,28 @@ test('sets icon class on svg', function (t) {
   var tree = new Tree({stream: stream}).render()
 
   tree.on('rendered', function () {
-    t.equal(tree.el.select('.tree ul li.node:first-child svg.icon').attr('class'), 'icon red icon-root', 'svg icon classes set')
+    t.equal(tree.el.select('.tree ul li.node:first-child svg.icon').attr('class'), 'icon red has-color icon-root', 'svg icon classes set')
+    t.end()
+  })
+})
+
+test('non-colored icons do not have `has-color` class', function (t) {
+  var stream = new Readable({objectMode: true})
+
+  stream._read = function () {
+    stream.push({
+      id: 1001,
+      label: 'Folder A',
+      icon: 'root'
+    })
+    stream.push(null)
+  }
+  var tree = new Tree({stream: stream}).render()
+
+  tree.on('rendered', function () {
+    t.ok(tree.el.select('.tree ul li.node:first-child svg.icon').classed('icon'), 'svg icon classes set')
+    t.ok(tree.el.select('.tree ul li.node:first-child svg.icon').classed('icon-root'), 'svg icon-root classes set')
+    t.notOk(tree.el.select('.tree ul li.node:first-child svg.icon').classed('has-color'), 'svg does not have `has-color`')
     t.end()
   })
 })
