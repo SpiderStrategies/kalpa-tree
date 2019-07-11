@@ -859,11 +859,13 @@ Tree.prototype._store = function (node, parent, idx) {
     // Node has a parent (i.e. not a root)
     _n.parent = p
 
+    let children = (p._allChildren || (p._allChildren = []))
+
     if (typeof idx !== 'undefined' && idx !== null) {
-      p._allChildren.splice(idx, 0, _n)
+      children.splice(idx, 0, _n)
     } else {
       // Simple array that we use to keep track of children
-      ;(p._allChildren || (p._allChildren = [])).push(_n)
+      children.push(_n)
     }
   } else {
     // Some type of root nodes. We treat those as expanded nodes
