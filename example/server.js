@@ -4,6 +4,7 @@ var http = require('http')
   , sass = require('node-sass')
   , request = require('request')
   , spawn = require('child_process').spawn
+  , colors = require('scoreboard-colors')
 
 http.createServer(function (req, res) {
   var _url = url.parse(req.url, true)
@@ -13,7 +14,8 @@ http.createServer(function (req, res) {
     return fs.createReadStream(__dirname + '/index.html').pipe(res)
   } else if (path == '/tree.css') {
     sass.render({
-        file: './tree.scss'
+        file: './style/tree.scss',
+        includePaths: colors.includePaths
       }, function (err, result) {
       res.writeHead(200, { 'Content-Type': 'text/css' })
         res.end(result.css)
