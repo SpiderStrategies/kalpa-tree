@@ -1,5 +1,10 @@
+@import "scoreboard-colors";
+
 $delay: 300ms;
 $timing-fn: ease-out;
+$tree-label-mask-stop: 90%;
+$traveling-overlap: 17px;
+$tree-item-height: 36px;
 
 @mixin prefix($property, $value, $prefixes: ()) {
    @each $prefix in $prefixes {
@@ -37,7 +42,7 @@ $timing-fn: ease-out;
 
   .node-contents {
     padding: 10px 0px 8px;
-    font-size: 13px;
+    font-size: 14px;
     line-height: 1; // automatically the same as font size
     text-align: left;
     white-space: nowrap;
@@ -48,14 +53,15 @@ $timing-fn: ease-out;
       margin-left: 2px;
       width: 12px;
       height: 11px;
+      fill: $color-tree-node-text-color;
     }
 
     .label {
       display: inline-block;
       vertical-align: middle;
       margin-left: 10px;
-      color: #ADB8BC;
-      text-shadow: 0 1px 0 rgba(#000000, 0.23);
+      color: $color-tree-node-text-color;
+      text-shadow: 0 1px 0 $color-tree-node-text-shadow;
     }
   }
 
@@ -81,7 +87,7 @@ $timing-fn: ease-out;
 
 .tree-container {
   position: relative;
-  background-color: #393c40;
+  background-color: $color-tree-background;
   width: 100%;
   height: 100%;
 
@@ -96,13 +102,18 @@ $timing-fn: ease-out;
   .traveling-node {
     @include base-node;
 
-    background-color: #D9E2E8;
-    width: calc(#{"100% + 13px"});
+    height: $tree-item-height;
+    background: $color-tree-traveling-node-background;
+    box-shadow: 0 2px 6px 0 $color-tree-traveling-node-shadow;
+    width: calc(100% + #{$traveling-overlap});
+    opacity: 0.9;
+    border-top-right-radius: 3px;
+    border-bottom-right-radius: 3px;
     cursor: move;
     overflow-x: hidden;
 
     .node-contents {
-      padding: 11px 0px 11px 14px;
+      padding: 10px 0px 8px 14px;
       transition-property: transform, opacity;
       transition-duration: $delay;
       transition-timing-function: $timing-fn;
@@ -110,10 +121,12 @@ $timing-fn: ease-out;
       // Align with non traveling icons
       svg.icon {
         margin-left: 8px;
+        margin-top: 1px;
+        fill: $color-tree-node-selected-text-color;
       }
 
       .label {
-        color: #2d3135;
+        color: $color-tree-node-selected-text-color;
         transition-property: color;
         transition-duration: $delay;
         transition-timing-function: $timing-fn;
@@ -121,7 +134,18 @@ $timing-fn: ease-out;
     }
 
     .label-mask {
-      @include gradientBackground(rgba(#393c40, 0) 0%, #D9E2E8 90%);
+      @include gradientBackground(rgba($color-tree-background, 0) 0%, $color-tree-background $tree-label-mask-stop);
+      // Round off the right edge of the traveling node
+      border-top-right-radius: 3px;
+      border-bottom-right-radius: 3px;
+    }
+
+    &.selected {
+      box-shadow: inset 4px 0 0 $color-tree-editable-highlight;
+
+      &.illegal {
+        box-shadow: inset 4px 0 0 $color-warning;
+      }
     }
 
     &.illegal {
@@ -131,21 +155,22 @@ $timing-fn: ease-out;
         opacity: .7;
 
         .icon {
-          fill: #f35132;
+          fill: $color-error;
         }
 
         .label {
-          color: #f35132;
+          color: $color-error;
         }
       }
 
       &:after {
-        color: #f35132;
-        background: #f35132;
-        box-shadow: 0 0.25em 0 0 #f35132, 0 0.5em 0 0 #f35132;
+        color: $color-error;
+        background: $color-error;
+        box-shadow: 0 0.25em 0 0 $color-error, 0 0.5em 0 0 $color-error;
       }
     }
 
+    // The traveling drag handle
     &:after {
       content: "";
       position: absolute;
@@ -153,8 +178,9 @@ $timing-fn: ease-out;
       top: 13px;
       right: 10px;
       height: .1em;
-      background: #7fe1f4;
-      box-shadow: 0 0.25em 0 0 #7fe1f4, 0 0.5em 0 0 #7fe1f4;
+      background: $color-tree-node-selected-text-color;
+      box-shadow: 0 0.25em 0 0 $color-tree-node-selected-text-color, 0 0.5em 0 0 $color-tree-node-selected-text-color;
+      opacity: 0.9;
 
       transition-property: background, box-shadow, color;
       transition-duration: $delay;
@@ -164,6 +190,19 @@ $timing-fn: ease-out;
     .toggler, .indicator:after {
       display: none;
     }
+  }
+
+  // Selected traveling nodes use yellow drag handles when in edit mode
+  .tree.editable:not(.filtered-results) + .traveling-node.selected:not(.illegal):after {
+      background: $color-tree-editable-highlight;
+      box-shadow: 0 0.25em 0 0 $color-tree-editable-highlight, 0 0.5em 0 0 $color-tree-editable-highlight;
+  }
+
+  // Without setting the correct transparent end color for this gradient, the
+  // gradient will be off in Safari
+  // https://github.com/SpiderStrategies/Scoreboard/issues/6382
+  .traveling-node .label-mask {
+    @include gradientBackground(rgba($color-tree-traveling-node-background, 0) 0%, $color-tree-traveling-node-background $tree-label-mask-stop);
   }
 
   .tree {
@@ -252,7 +291,7 @@ $timing-fn: ease-out;
               height: 6px;
               top: 9px;
               right: 8px;
-              fill: #818b8f;
+              fill: $color-tree-node-text-color;
             }
 
             &.expanded {
@@ -263,17 +302,17 @@ $timing-fn: ease-out;
         }
 
         .label-mask {
-          @include gradientBackground(rgba(#393c40,0) 0%, #393c40 90%);
+          @include gradientBackground(rgba($color-tree-background,0) 0%, $color-tree-background $tree-label-mask-stop);
 
           &.indicator {
-            @include gradientBackground(rgba(#393c40,0) 0%, #393c40 50%);
+            @include gradientBackground(rgba($color-tree-background,0) 0%, $color-tree-background 50%);
           }
         }
 
         &.placeholder, &.transition-placeholder {
           &.transition-placeholder {
             // This is for transition placeholder nodes popping in or out
-            background-color: #2d3135;
+            background-color: $color-tree-node-selected-background;
           }
 
           * {
@@ -281,9 +320,25 @@ $timing-fn: ease-out;
           }
         }
 
+        // Styling for the transient tree node which appears when creating a new item
         &.transient {
           pointer-events: none;
           overflow: hidden; // prevent scrollbar for opening animation
+          border: 1px dashed $color-tree-node-transient-border;
+          border-radius: 2px;
+          background-color: $color-tree-node-selected-background;
+
+          div.label-mask {
+            @include gradientBackground(rgba($color-tree-node-selected-background,0) 0%, $color-tree-node-selected-background $tree-label-mask-stop);
+
+            &:after {
+              display: none;
+            }
+          }
+
+          .node-contents {
+            margin-left: -1px; // Compensate for added node border
+          }
         }
 
         &.fading-node {
@@ -291,36 +346,68 @@ $timing-fn: ease-out;
         }
 
         &.selected {
-          background-color: #2d3135;
+          background-color: $color-tree-node-selected-background;
           z-index: 1;
 
-          &:not(.placeholder):before {
-            content: "";
-            left: 0;
-            position: absolute;
-            width: 3px;
-            height: 100%;
-            background-color: #dde5e8;
+          &:not(.placeholder) {
+            // left white vertical bar
+            box-shadow: inset 4px 0 0 $color-tree-node-selected-text-color;
           }
 
-          svg.icon {
-            fill: #e1e8eb;
-          }
-          .label {
-            color: #e1e8eb;
-          }
           .label-mask {
-            @include gradientBackground(rgba(#2D3135,0) 0%, #2d3135 90%);
+            @include gradientBackground(rgba($color-tree-node-selected-background,0) 0%, $color-tree-node-selected-background $tree-label-mask-stop);
 
             &.indicator {
-              @include gradientBackground(rgba(#2D3135,0) 0%, #2d3135 50%);
+              @include gradientBackground(rgba($color-tree-node-selected-background,0) 0%, $color-tree-node-selected-background 50%);
             }
+          }
+        }
+
+        &:hover, &.selected, &.transient {
+          svg.icon {
+            fill: $color-tree-node-selected-text-color
+          }
+
+          .label {
+            color: $color-tree-node-selected-text-color;
           }
         }
       }
     }
 
+    // Bottom yellow highlight displayed when in edit mode
+    &:after {
+      position: absolute;
+      bottom: 0px;
+      content: '';
+      width: 100%;
+      display: block;
+      height: 0;
+      background: $color-tree-editable-highlight;
+      opacity: .5;
+    }
+
     &.editable {
+      &:after {
+        height: 3px;
+      }
+
+      // Yellow selected node highlight to the left of the node
+      li.node.selected:not(.placeholder) {
+        box-shadow: inset 4px 0 0 $color-tree-editable-highlight;
+      }
+
+      li.node.selected, + .traveling-node.selected {
+        &:not(.illegal) {
+          .label {
+            color: $color-tree-editable-highlight;
+          }
+          .node-contents .icon, .node-contents .toggler svg {
+            fill: $color-tree-editable-highlight;
+          }
+        }
+      }
+
       &.dragging {
         li.node {
           &.selected.placeholder {
@@ -336,24 +423,26 @@ $timing-fn: ease-out;
         li.node.movable:not(.root):not(.transient) {
           cursor: move;
 
-          &:hover {
-            &:after {
-              content: "";
-              position: absolute;
-              width: 5px;
-              top: 13px;
-              right: 0;
-              height: .1em;
-              background: #ADB8BC;
-              box-shadow: 0 0.25em 0 0 #ADB8BC, 0 0.5em 0 0 #ADB8BC;
-            }
+          &:after {
+            content: "";
+            position: absolute;
+            width: 5px;
+            top: 13px;
+            right: 0;
+            height: .1em;
+            background: $color-tree-node-drag-handle-fill;
+            box-shadow: 0 0.25em 0 0 $color-tree-node-drag-handle-fill, 0 0.5em 0 0 $color-tree-node-drag-handle-fill;
           }
-        }
-      }
 
-      li.node:not(.transient):not(.selected):not(.transitioning-node) {
-        .node-contents, .label-mask:after {
-          opacity: .6;
+          &:hover:after {
+            background: $color-tree-node-selected-text-color;
+            box-shadow: 0 0.25em 0 0 $color-tree-node-selected-text-color, 0 0.5em 0 0 $color-tree-node-selected-text-color;
+          }
+
+          &.selected:hover:after {
+            background: $color-tree-editable-highlight;
+            box-shadow: 0 0.25em 0 0 $color-tree-editable-highlight, 0 0.5em 0 0 $color-tree-editable-highlight;
+          }
         }
       }
     }

@@ -8,7 +8,8 @@
     "d3-selection": "^1.0.2",
     "d3-transition": "^1.0.3",
     "escape-string-regexp": "^1.0.3",
-    "node-sass": "^4.9.0"
+    "node-sass": "^4.9.0",
+    "scoreboard-colors": "git+ssh://git@github.com/SpiderStrategies/scoreboard-colors.git#v4.2.0"
   },
   "devDependencies": {
     "JSONStream": "^1.0.6",
@@ -22,7 +23,7 @@
   },
   "scripts": {
     "bundle": "browserify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
-    "css": "node-sass tree.scss > dist/tree.css",
+    "css": "node scripts/css.js",
     "postinstall": "npm run css",
     "start": "node example/server.js",
     "test": "browserify -t browserify-css test/* | double-tap smokestack",
