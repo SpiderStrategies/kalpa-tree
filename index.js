@@ -654,6 +654,8 @@ Tree.prototype.copy = function (node, to, transformer, expandAncestors = true) {
 
 /*
  * Selects a node in the tree. The node will be marked as selected and shown in the tree.
+ * If nothing is passed to select or the incoming `id` isn't in the tree, we deselect the currently
+ * selected node.
  *
  * opt supports:
  *    - silent: Don't fire the select event
@@ -686,6 +688,10 @@ Tree.prototype.select = function (id, opt) {
     }
 
     this._onSelect(d, null, null, opt)
+  } else {
+    // We don't have this node to select, clear the selected node
+    this._deselect()
+    this.node.classed('selected', d => d.selected)
   }
 }
 
@@ -773,19 +779,26 @@ Tree.prototype._scrollIntoView = function (d, opt) {
   }
 }
 
+/*
+ * tree_.selected stores a previously selected node. If there's a selected node,
+ * this clears the selected node and returns its id
+ */
+Tree.prototype._deselect = function () {
+  if (this._selected) {
+    let prev = this._selected.id
+    delete this._selected.selected // delete the selected field from that node
+    this._selected = null
+    return prev
+  }
+}
+
 Tree.prototype._onSelect = function (d, i, j, opt) {
   opt = opt || {}
 
   // determines if we should toggle the node. We don't toggle if it's the root node
   // or the node is already expanded, but not selected.
-  var toggle = opt.toggleOnSelect && !(!d.collapsed && !d.selected) && d !== this.root
-
-  // tree_.selected stores a previously selected node
-  if (this._selected) {
-    var prev = this._selected.id
-    // delete the selected field from that node
-    delete this._selected.selected
-  }
+  let toggle = opt.toggleOnSelect && !(!d.collapsed && !d.selected) && d !== this.root
+    , prev = this._deselect()
 
   d.selected = true
   this._selected = d
@@ -800,13 +813,8 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
   }
 
   // Adjust selected properties
-  this.node.classed('selected', function (d) {
-             return d.selected
-           })
-           .classed('selecting', function (d) {
-             // Mark as `selecting` if it's newly selected
-             return d.selected && d.id !== prev
-           })
+  this.node.classed('selected', d => d.selected)
+           .classed('selecting', d => d.selected && d.id !== prev) // Mark as `selecting` if it's newly selected
 
   // Trigger a reflow to start any transitions
   this._forceRedraw()
