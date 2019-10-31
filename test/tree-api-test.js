@@ -179,6 +179,25 @@ test('selects a node', function (t) {
   })
 })
 
+test('deselects a node', function (t) {
+  let s = stream()
+    , tree = new Tree({
+      stream: s,
+      initialSelection: '1003'
+    }).render()
+
+  tree.on('rendered', function () {
+    let selected = tree.selected()
+    t.ok(selected.id, 1003, '1003 is selected')
+    t.ok(tree._layout[selected.id].selected, 'layout node is marked `selected`')
+    tree.select()
+
+    t.notOk(tree.selected(), 'tree no longer has a selected node')
+    t.notOk(tree._layout[selected.id].selected, '1003 layout node no longer marked `selected`')
+    t.end()
+  })
+})
+
 test('select a node adds transitions by default', function (t) {
   t.plan(3)
 
