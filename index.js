@@ -964,10 +964,12 @@ Tree.prototype.editable = function () {
   var tree = this.el.select('.tree')
     , self = this
   tree.classed('editable', !tree.classed('editable'))
-  this._join(this.layout(this.root), function (enter) {
-    // if any nodes entered on this call, make sure they are drawn in case
-    // editable is fired before the end event fires
+  this._join(this.layout(this.root), function (enter, update, exit) {
+    // Changing editable will change the tree state, e.g. clearing search results
+    // so update all the collections
     enter.call(self.enter)
+    update.call(self.updater)
+    exit.remove()
   })
 }
 
