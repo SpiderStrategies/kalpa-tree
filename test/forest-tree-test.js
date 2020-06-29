@@ -126,7 +126,7 @@ test('copies with explicit null to', function (t) {
 
   tree.on('rendered', function (d) {
     t.equal(tree.root.length, 2, 'two root nodes')
-    tree.copy(1003, null, function (n) {
+    tree.copy(1003, null, null, function (n) {
       n.id *= 100
       return n
     })
@@ -144,7 +144,7 @@ test('copies a node to a new root', function (t) {
 
   tree.on('rendered', function () {
     t.equal(tree.root.length, 2, 'two root nodes')
-    tree.copy(1003, function (n) {
+    tree.copy(1003, null, null, function (n) {
       n.id *= 100
       return n
     })

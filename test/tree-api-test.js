@@ -81,7 +81,7 @@ test('moves a node', function (t) {
     t.notOk(tree._layout[1003].parent.children, 'new parent is not expanded')
     tree.move(1003, 1025)
     process.nextTick(function () {
-      t.equal(orgParent._allChildren.length, orgChildrenLength - 1, 'orginal parent is missing a child')
+      t.equal(orgParent._allChildren.length, orgChildrenLength - 1, 'original parent is missing a child')
       t.deepEqual(tree._layout[1003].parent, tree._layout[1025], 'moved node has new parent')
       t.equal(tree._layout[1003].parent.children.length, 5, 'new parent is expanded')
       t.deepEqual(tree._layout[1025]._allChildren[tree._layout[1025]._allChildren.length -1], tree._layout[1003], '1003 was pushed to end of 1025')
@@ -103,7 +103,7 @@ test('moves a node without showing new layout', function (t) {
     tree.move(1003, 1025, null, false)
 
     process.nextTick(function () {
-      t.equal(orgParent._allChildren.length, orgChildrenLength - 1, 'orginal parent is missing a child')
+      t.equal(orgParent._allChildren.length, orgChildrenLength - 1, 'original parent is missing a child')
       t.deepEqual(tree._layout[1003].parent, tree._layout[1025], 'moved node has new parent')
       t.notOk(tree._layout[1003].parent.children, 'new parent is still not expanded')
       t.end()
@@ -138,14 +138,36 @@ test('copies a node', function (t) {
     var orgParent = tree._layout[1003].parent
        , orgChildrenLength = orgParent._allChildren.length
 
-    tree.copy(1003, 1025, function (d) {
+    tree.copy(1003, 1025, undefined, function (d) {
       d.id = d.id + 10000
       return d
     })
 
     process.nextTick(function () {
-      t.equal(orgParent._allChildren.length, orgChildrenLength, 'orginal parent has its children')
+      t.equal(orgParent._allChildren.length, orgChildrenLength, 'original parent has its children')
       t.deepEqual(tree._layout[11003].parent, tree._layout[1025], 'moved node has new parent')
+      t.end()
+    })
+  })
+})
+
+test('copies a node to a specific index of a parent', function (t) {
+  let s = stream()
+    , tree = new Tree({stream: s}).render()
+    , el = tree.el.node()
+
+  tree.on('rendered', function () {
+    let orgParent = tree._layout[1003].parent
+      , orgChildrenLength = orgParent._allChildren.length
+
+    tree.copy(1003, 1025, 2, function (d) {
+      d.id = d.id + 10000
+      return d
+    })
+
+    process.nextTick(function () {
+      t.deepEqual(tree._layout[11003].parent, tree._layout[1025], 'moved node has new parent')
+      t.deepEqual(tree._layout[1025]._allChildren[2], tree._layout[1003 + 10000], 'copied top level node was set as third child of 1025')
       t.end()
     })
   })
