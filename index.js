@@ -585,21 +585,21 @@ Tree.prototype._descendants = function (node, prop) {
 }
 
 /*
- * Copies a node to some new parent. `transformer` can be used to transform
- * each node that will be copied.
+ * Copies a node to some new parent.
  *
- * If to is missing and the tree is a forest, the node will be copied
- * to a new root node of the forest tree.
+ * `to` is the node we're copying to. Can be the node or id. If it's not
+ *      defined and the tree is a forest, the node will be copied to a new root
+ *      node of the forest tree.
+ * `idx` used to insert the node at this index within the `to`'s children
+ * `transformer` can be used to transform each node that will be copied.
+ * `expandAncestors` is used to expand the ancestors of the node when it's copied, so
+ *      the copied node will be visible.
  */
-Tree.prototype.copy = function (node, to, transformer, expandAncestors = true) {
+Tree.prototype.copy = function (node, to, idx, transformer = identity, expandAncestors = true) {
   var _node = getObject(this._layout, node)
+
   if (!_node) {
     return
-  }
-
-  if (!transformer) {
-    transformer = to
-    to = undefined
   }
 
   // We need a clone of the node and the layout
@@ -609,7 +609,7 @@ Tree.prototype.copy = function (node, to, transformer, expandAncestors = true) {
   this._descendants(_node)
       .map(function (node) {
         var result = {
-          transformed: (transformer || identity)(util._extend({}, self.nodes[node.id])),
+          transformed: transformer(util._extend({}, self.nodes[node.id])),
           originalId: node.id,
           prevParent: self._layout[node.id].parent
         }
@@ -625,7 +625,8 @@ Tree.prototype.copy = function (node, to, transformer, expandAncestors = true) {
         if (i === 0) {
           // Top node in the subtree (node that is being copied)
           if (_to) {
-            ;(_to._allChildren || (_to._allChildren = [])).push(d)
+            let children = _to._allChildren || (_to._allChildren = [])
+            children.splice(typeof idx === 'number' ? idx : children.length, 0, d)
 
             if (expandAncestors) {
               self._expandAncestors(_to)
@@ -633,7 +634,7 @@ Tree.prototype.copy = function (node, to, transformer, expandAncestors = true) {
 
             _to.collapsed = false
           } else if (self.options.forest) {
-            self.root.push(d)
+            self.root.splice(typeof idx === 'number' ? idx : self.root.length, 0, d)
           }
         } else {
           // Find the new parent id
