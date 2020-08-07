@@ -162,7 +162,7 @@ Tree.prototype.render = function () {
   this._layout = []
 
   // Public node data. The tree won't modify the objects in this structure
-  this.nodes = []
+  this.nodes = {}
 
   this.root = this.options.forest ? [] : null
 
