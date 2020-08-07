@@ -5,3 +5,6 @@ example/.bundle.js
 .sass-cache
 coverage
 package-lock.json
+.idea/*
+.DS_Store
+*.iml
