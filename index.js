@@ -354,6 +354,9 @@ Tree.prototype._join = function (data, next) {
                      })
     , enter = _node.enter()
                    .insert('li')
+                   .classed('node', true) // enter should take care of this, but
+                                          // see Impact #32542. For some reason performanced tuned dnd scrolling
+                                          // causes issues. This is a hack
     , exit = _node.exit()
     , update = this.node = enter.merge(_node)
 
