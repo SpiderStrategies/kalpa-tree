@@ -966,13 +966,20 @@ Tree.prototype.isEditable = function () {
  */
 Tree.prototype.editable = function () {
   var tree = this.el.select('.tree')
-    , self = this
+
   tree.classed('editable', !tree.classed('editable'))
-  this._join(this.layout(this.root), function (enter, update, exit) {
+  this.redraw()
+}
+
+/*
+ * Redraws each node in the tree
+ */
+Tree.prototype.redraw = function () {
+  this._join(this.layout(this.root), (enter, update, exit) => {
     // Changing editable will change the tree state, e.g. clearing search results
     // so update all the collections
-    enter.call(self.enter)
-    update.call(self.updater)
+    enter.call(this.enter)
+    update.call(this.updater)
     exit.remove()
   })
 }
