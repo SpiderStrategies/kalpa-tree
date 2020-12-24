@@ -40,6 +40,10 @@ var defaults = function () {
     indicator: false, // show indicator light nodes on the right
     forest: false, // Indicates whether this tree can have multiple root nodes
     dndDelay: 250, // Time between a mousedown/mouseup event before we allow a dnd move to fire
+    scrollableContainer: function () {
+      // Default container used for scrolling the tree
+      return this.el.select('.tree').node()
+    },
     movable: function (d) {
       // `d` is the node
       // `this` is a reference to the tree
@@ -103,6 +107,7 @@ var Tree = function (options) {
     }
   }
 
+  this.options.scrollableContainer = this.options.scrollableContainer.bind(this)
   this._rootOffset = Math.max(this.options.rootHeight - this.options.height, 0)
   this.prefix = prefix
   this.transitionTimeout = 300 // Copied in css
@@ -144,7 +149,7 @@ Tree.prototype.render = function () {
                        .attr('class', 'tree')
                        .classed('editable', this.options.editable) // In case trees are initialized with `editable: true`
                        .on('scroll', function () {
-                         var scroll = self.el.select('.tree').node().scrollTop
+                         var scroll = self.options.scrollableContainer().scrollTop
                          if (!self._scrollTop) {
                            self._scrollTop = scroll
                          }
@@ -318,7 +323,7 @@ Tree.prototype._rebind = function (next) {
 Tree.prototype._join = function (data, next) {
   var self = this
     , height = 'auto'
-    , n = this.el.select('.tree').node()
+    , n = this.options.scrollableContainer()
     , viewport = {
       top: Math.max(0, n.scrollTop - this.options.height * 2),
       bottom: n.scrollTop + n.offsetHeight + this.options.height * 2
@@ -346,6 +351,7 @@ Tree.prototype._join = function (data, next) {
   this.resize(data.length)
   this.el.select('.tree ul')
            .style('height', height)
+  this.emit('change:height', height)
 
   var _node = this.el.select('.tree ul')
                      .selectAll('li:not(.outgoing-node)') // Ignore outgoing nodes, because they are about to be removed from the DOM.
@@ -756,7 +762,7 @@ Tree.prototype._expandAncestors = function (d) {
  */
 Tree.prototype._scrollIntoView = function (d, opt) {
   // check if we need to scroll this element into view
-  var n = this.el.select('.tree').node()
+  var n = this.options.scrollableContainer()
 
   if (!d) {
     // Defensive exit early if we don't have a node so we don't blow up
