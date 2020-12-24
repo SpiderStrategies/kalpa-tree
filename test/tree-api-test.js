@@ -173,6 +173,20 @@ test('copies a node to a specific index of a parent', function (t) {
   })
 })
 
+test('emits change:height events', function (t) {
+  t.plan(1)
+  var s = stream()
+    , tree = new Tree({stream: s}).render()
+
+  tree.on('rendered', function () {
+    tree.on('change:height', () => {
+      t.pass('change:height event emitted')
+    })
+    tree.select(1003)
+    t.end()
+  })
+})
+
 test('selects a node', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()

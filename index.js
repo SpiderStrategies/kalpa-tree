@@ -346,6 +346,7 @@ Tree.prototype._join = function (data, next) {
   this.resize(data.length)
   this.el.select('.tree ul')
            .style('height', height)
+  this.emit('change:height', height)
 
   var _node = this.el.select('.tree ul')
                      .selectAll('li:not(.outgoing-node)') // Ignore outgoing nodes, because they are about to be removed from the DOM.
