@@ -366,6 +366,11 @@ Tree.prototype._join = function (data, next) {
     , exit = _node.exit()
     , update = this.node = enter.merge(_node)
 
+  if (exit.size()) {
+    // Nodes are being removed, trigger an event for interested parties
+    this.emit('rebind:exit', exit)
+  }
+
   if (this.el.select('.tree').classed('editable')) {
     update.filter(function (d) {
             return self.options.movable.call(self, self.nodes[d.id])
