@@ -1161,6 +1161,25 @@ test('sets `tree-overflow` based on scrollable content', function (t) {
   tree.render()
 })
 
+test('emits `rebind:exit` with nodes being removed', function (t) {
+  t.plan(2)
+  let s = stream()
+    , tree = new Tree({stream: s})
+
+  tree.on('rebind:exit', selection => {
+    t.ok(data, 'rebind:exit called')
+    t.equal(selection.size(), 34, 'nodes removed')
+    t.end()
+  })
+
+  tree.render()
+
+  tree.on('rendered', function () {
+    tree.expandAll() // Show everything
+    tree.collapseAll() // Collapse which will remove a bunch of nodes
+  })
+})
+
 test('emits `rebind` event when rebinding data', function (t) {
   t.plan(1)
   var s = stream()
