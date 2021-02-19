@@ -775,8 +775,9 @@ Tree.prototype._scrollIntoView = function (d, opt) {
     return
   }
 
-  if (d._y < n.scrollTop || d._y > n.offsetHeight + n.scrollTop) {
-    // Now scroll the node into view
+  if (d._y < n.scrollTop || (d._y + this.options.height) > n.offsetHeight + n.scrollTop) {
+    // Now scroll the node into view if the node is above the top of the container
+    // or the bottom of the node is below the container
 
     if (this.el.select('.tree').classed('transitions')) {
       // We're in the process of transitioning the tree, wait until they are done, then scroll
