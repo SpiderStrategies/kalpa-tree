@@ -1,11 +1,8 @@
 var sass = require('node-sass')
   , fs = require('fs')
-  , colors = require('scoreboard-colors')
+  , renderProperties = require('../render-properties')
 
-sass.render({
-  file: __dirname + '/../style/tree.scss',
-  includePaths: colors.includePaths
-}, function (err, result) {
+sass.render(renderProperties, function (err, result) {
   if (err) {
     throw err
   }
