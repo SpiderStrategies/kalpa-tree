@@ -9,7 +9,7 @@
     "d3-transition": "^1.0.3",
     "escape-string-regexp": "^1.0.3",
     "node-sass": "^4.9.0",
-    "scoreboard-colors": "git+ssh://git@github.com/SpiderStrategies/scoreboard-colors.git#v4.2.0"
+    "scoreboard-colors": "git+https://github.com/SpiderStrategies/scoreboard-colors.git#v4.2.0"
   },
   "devDependencies": {
     "JSONStream": "^1.0.6",
