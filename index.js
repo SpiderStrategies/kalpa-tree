@@ -489,6 +489,10 @@ Tree.prototype.children = function (obj) {
   var node = getObject(this._layout, obj)
     , self = this
 
+  if (!node) {
+    return []
+  }
+
   return (node._allChildren || []).map(function (n) {
     return self.nodes[n.id]
   })
