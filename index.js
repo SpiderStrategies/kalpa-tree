@@ -1169,9 +1169,11 @@ Tree.prototype._removeFromParent = function (node) {
 }
 
 /*
- * Removes a node from the tree. obj can be the node id or the node itself
+ * Removes a node from the tree. obj can be the node id or the node itself.
+ * Supports an options argument, where `animate: false` can be set to disable
+ * animations
  */
-Tree.prototype.removeNode = function (obj) {
+Tree.prototype.removeNode = function (obj, opt = {}) {
   var node = getObject(this.nodes, obj)
 
   if (!node) {
@@ -1210,7 +1212,7 @@ Tree.prototype.removeNode = function (obj) {
       update.call(self.updater)
       exit.call(self.slideExit, _node)
     })
-  })()
+  }, opt.animate)()
 }
 
 /*
@@ -1361,8 +1363,11 @@ Tree.prototype.saveTransient = function (id) {
   })
 }
 
-Tree.prototype.removeTransient = function () {
-  this.removeNode(this.options.transientId)
+/*
+ * Delegates to `removeNode` for the transient node.
+ */
+Tree.prototype.removeTransient = function (opts) {
+  this.removeNode(this.options.transientId, opts)
 }
 
 /*
