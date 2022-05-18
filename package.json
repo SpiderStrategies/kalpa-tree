@@ -8,14 +8,14 @@
     "d3-selection": "^1.0.2",
     "d3-transition": "^1.0.3",
     "escape-string-regexp": "^1.0.3",
-    "node-sass": "^4.9.0",
+    "sass": "^1.51.0",
     "scoreboard-colors": "git+https://github.com/SpiderStrategies/scoreboard-colors.git#v4.2.0"
   },
   "devDependencies": {
-    "JSONStream": "^1.0.6",
     "browserify": "^12.0.1",
     "browserify-css": "^0.8.1",
     "double-tap": "^1.0.2",
+    "JSONStream": "^1.0.6",
     "request": "^2.36.0",
     "smokestack": "^3.4.1",
     "tape": "^3.5.0",
@@ -23,7 +23,7 @@
   },
   "scripts": {
     "bundle": "browserify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
-    "css": "node scripts/css.js",
+    "css": "sass --no-source-map --load-path=$(node -p 'require(\"scoreboard-colors\").includePaths[0]') style/tree.scss dist/tree.css",
     "postinstall": "npm run css",
     "start": "node example/server.js",
     "test": "browserify -t browserify-css test/* | double-tap smokestack",
