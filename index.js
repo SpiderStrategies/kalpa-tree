@@ -1057,7 +1057,8 @@ Tree.prototype.collapseTo = function (depth) {
         enter.call(self.enter) // Seems odd, but needed in case we're showing a subset of the tree (i.e. filtered results)
         update.call(self.updater)
         exit.call(self.flyExit, null, function (d) {
-          var c = p = d.parent
+          let c, p
+          c = p = d.parent
 
           // Determine our top ancestor
           while (p.parent) {
