@@ -1,10 +1,10 @@
-var test = require('tape').test
-  , Tree = require('../')
-  , css = require('./../dist/tree.css')
-  , stream = require('./tree-stream')
-  , Dnd = require('../lib/dnd')
-  , Event = require('./_event')
-  , d3 = require('d3-selection')
+import { test } from 'tape'
+import Tree from '../'
+import css from './../dist/tree.css'
+import stream from './tree-stream'
+import Dnd from '../lib/dnd'
+import Event from './_event.js'
+import * as d3 from 'd3-selection'
 
 function before (next, opts) {
   opts = opts || {
@@ -32,7 +32,7 @@ function before (next, opts) {
   })
 }
 
-test('fires dnd events', function (t) {
+test.only('fires dnd events', function (t) {
   t.plan(15)
   before(function (tree, dnd) {
     tree.editable()
@@ -63,7 +63,7 @@ test('fires dnd events', function (t) {
     })
     dnd.start.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     dnd._dragging = true
-    d3.event.y = tree._layout[1004]._y + 20// new y location
+    d3.event.y = tree._layout[1004]._y + 20 // new y location
     dnd.drag.apply(tree.node.nodes()[3], [tree._layout[1004], 3])
     d3.event.keyCode = 27
     dnd._escape(tree.node.nodes()[3])

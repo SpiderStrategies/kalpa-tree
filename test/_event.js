@@ -1,4 +1,4 @@
-module.exports = function () {
+export default function () {
   this.stopPropagation = function () {}
   this.sourceEvent = {
     stopPropagation: function () {},

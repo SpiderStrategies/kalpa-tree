@@ -2,7 +2,8 @@
   "name": "kalpa-tree",
   "version": "3.4.0",
   "description": "An efficient hierarchical tree for the dom",
-  "main": "index.js",
+  "node": ">=14.16",
+  "type": "module",
   "dependencies": {
     "d3-drag": "^1.0.1",
     "d3-selection": "^1.0.2",
@@ -15,6 +16,7 @@
     "browserify": "^12.0.1",
     "browserify-css": "^0.8.1",
     "double-tap": "^1.0.2",
+    "esmify": "^2.1.1",
     "JSONStream": "^1.0.6",
     "request": "^2.36.0",
     "smokestack": "^3.4.1",
@@ -22,12 +24,12 @@
     "watchify": "^3.6.1"
   },
   "scripts": {
-    "bundle": "browserify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
+    "bundle": "browserify -p esmify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
     "css": "sass --no-source-map --load-path=$(node -p 'require(\"scoreboard-colors\").includePaths[0]') style/tree.scss dist/tree.css",
     "postinstall": "npm run css",
     "start": "node example/server.js",
-    "test": "browserify -t browserify-css test/* | double-tap smokestack",
-    "watch": "watchify -r ./index.js:tree -r http -r JSONStream -o example/bundle.js -d"
+    "test": "browserify -p esmify -t browserify-css test/* | double-tap smokestack",
+    "watch": "watchify -p esmify -r ./index.js:tree -r http -r JSONStream -o example/bundle.js -d"
   },
   "repository": {
     "type": "git",

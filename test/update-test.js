@@ -1,6 +1,7 @@
-var test = require('tape').test
-  , d3 = require('d3-selection')
-  , update = require('../lib/update')
+import { test } from 'tape'
+import * as d3 from 'd3-selection'
+import update from '../lib/update.js'
+import contents from '../lib/contents.js'
 
 test('setup', function (t) {
   d3.select(document.body)
@@ -28,7 +29,7 @@ test('update adjusts node styles', function (t) {
           // filler
         },
         indentableSelector: ':first-child',
-        contents: require('../lib/contents'),
+        contents,
         accessors: {
           id: 'id'
         }
@@ -39,6 +40,7 @@ test('update adjusts node styles', function (t) {
             classed: function (clazz, value) {
               t.equal(clazz, 'has-transient', 'setting has-transient class')
               t.ok(!value, 'has-transient is false')
+              return this
             }
           }
         }

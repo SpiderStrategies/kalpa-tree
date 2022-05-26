@@ -1,21 +1,23 @@
-var d3 = require('d3-selection')
-  , DnD = require('./lib/dnd')
-  , drag = require('d3-drag').drag
-  , EventEmitter = require('events').EventEmitter
-  , regexEscape = require('escape-string-regexp')
-  , Stream = require('stream').Stream
-  , util = require('util')
-  , styles = window.getComputedStyle(document.documentElement, '')
-  , prefix = Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/)[0]
-  , enter = require('./lib/enter')
-  , flyExit = require('./lib/fly-exit')
-  , slideExit = require('./lib/slide-exit')
-  , update = require('./lib/update')
-  , layout = require('./lib/layout')
-  , identity = function (v) { return v }
+import * as d3 from 'd3-selection'
+import DnD from './lib/dnd.js'
+import { drag } from 'd3-drag'
+import { EventEmitter } from 'events'
+import regexEscape from 'escape-string-regexp'
+import * as Stream from 'stream'
+import util from 'util'
+import enter from './lib/enter.js'
+import flyExit from './lib/fly-exit.js'
+import slideExit from './lib/slide-exit.js'
+import update from './lib/update.js'
+import layout from './lib/layout.js'
+import contents from './lib/contents.js'
+
+const styles = window.getComputedStyle(document.documentElement, '')
+    , identity = v => f
+    , prefix = Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/)[0]
 
 // Mix transitions into d3-selection's prototype
-require('d3-transition')
+import 'd3-transition'
 
 var merge = function (from, to) {
   to = to || {}
@@ -63,7 +65,7 @@ var defaults = function () {
         return tree.nodes[d.id][tree.options.accessors.label]
       })
     },
-    contents: require('./lib/contents'),
+    contents,
     indentableSelector: ':first-child', // The element within the `.node` which will be used for showing tree indentations
                                         // Only need to update if using different `contents`
     performanceThreshold: 1000, // If the node data count exceeds this threshold, the tree goes into performance mode
@@ -1379,4 +1381,4 @@ Tree.prototype.expandedNodes = function () {
                      .map(node => this.nodes[node.id])
 }
 
-module.exports = Tree
+export default Tree

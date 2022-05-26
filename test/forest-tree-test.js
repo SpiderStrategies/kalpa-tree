@@ -1,11 +1,12 @@
-var test = require('tape').test
-  , Tree = require('../')
-  , css = require('./../dist/tree.css')
-  , Readable = require('stream').Readable
-  , Transform = require('stream').Transform
-  , Dnd = require('../lib/dnd')
-  , Event = require('./_event')
-  , nodes = [{
+import { test } from 'tape'
+import Tree from '../index.js'
+import css from './../dist/tree.css'
+import { Readable, Transform } from 'stream'
+import Dnd from '../lib/dnd.js'
+import Event from './_event.js'
+import d3 from 'd3-selection'
+
+var nodes = [{
       "id": 1001,
       "label": "Folder A"
     }, {
@@ -19,8 +20,7 @@ var test = require('tape').test
       "id": 1004,
       "label": "The cat's second birthday",
       "parentId": 1002
-    }]
-  , d3 = require('d3-selection')
+    }];
 
 function stream () {
   var stream = new Readable({objectMode: true})

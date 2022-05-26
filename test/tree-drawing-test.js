@@ -1,10 +1,10 @@
-var test = require('tape').test
-  , d3 = require('d3-selection')
-  , Tree = require('../')
-  , Transform = require('stream').Transform
-  , Readable = require('stream').Readable
-  , stream = require('./tree-stream')
-  , data = require('./tree.json')
+import { test } from 'tape'
+import * as d3 from 'd3-selection'
+import Tree from '../index.js'
+import { Transform } from 'stream'
+import { Readable } from 'stream'
+import stream from './tree-stream'
+import data from './tree.json'
 
 test('multiple trees have their own options', function (t) {
   var tree1 = new Tree({stream: stream(), depth: 390}).render()
