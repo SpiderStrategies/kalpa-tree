@@ -1,5 +1,5 @@
-var test = require('tape').test
-  , layout = require('../lib/layout')
+import { test } from 'tape'
+import layout from '../lib/layout.js'
 
 function tree () {
   return {

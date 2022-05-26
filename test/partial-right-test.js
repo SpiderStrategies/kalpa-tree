@@ -1,5 +1,5 @@
-var test = require('tape').test
-  , pr = require('../lib/partial-right')
+import { test } from 'tape'
+import pr from '../lib/partial-right.js'
 
 test('partial right', function (t) {
   var add = function (a, b) {

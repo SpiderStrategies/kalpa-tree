@@ -1,9 +1,9 @@
-var test = require('tape').test
-  , Readable = require('stream').Readable
-  , Tree = require('../')
-  , css = require('./../dist/tree.css')
-  , stream = require('./tree-stream')
-  , data = require('./tree.json')
+import { test } from 'tape'
+import { Readable } from 'stream'
+import Tree from '../index.js'
+import css from './../dist/tree.css'
+import stream from './tree-stream.js'
+import data from './tree.json'
 
 test('get', function (t) {
   var s = stream()

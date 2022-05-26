@@ -1,7 +1,6 @@
 var http = require('http')
   , fs = require('fs')
   , url = require('url')
-  , sass = require('node-sass')
   , request = require('request')
   , spawn = require('child_process').spawn
   , colors = require('scoreboard-colors')
@@ -13,13 +12,7 @@ http.createServer(function (req, res) {
   if (path == '/index.html' || path == '/') {
     return fs.createReadStream(__dirname + '/index.html').pipe(res)
   } else if (path == '/tree.css') {
-    sass.render({
-        file: './style/tree.scss',
-        includePaths: colors.includePaths
-      }, function (err, result) {
-      res.writeHead(200, { 'Content-Type': 'text/css' })
-        res.end(result.css)
-      })
+    return fs.createReadStream(__dirname + '/../dist/tree.css').pipe(res)
   } else if (path === '/lots-o-docs.json') {
     return request('https://gist.githubusercontent.com/nathanbowser/7eda0518120d7bac6847/raw/c7de51421ef571232f2a2acb690edc2ba8261fac/gistfile1.json').pipe(res)
   } else if (path === '/documents.json') {

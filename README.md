@@ -106,7 +106,7 @@ new Tree({
     // This call be used to override how the label is drawn using the default
     // `contents`
   },
-  contents: require('./lib/contents'), // Override the default html structure of each node
+  contents, // Override the default html structure of each node
   performanceThreshold: 1000, // If the node data count exceeds this threshold, the tree goes into performance mode
   accessors: { // Used to grab information out of the data object in the stream
     id: 'id',

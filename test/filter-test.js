@@ -1,10 +1,10 @@
-var test = require('tape').test
-  , d3 = require('d3-selection')
-  , css = require('./../dist/tree.css')
-  , Tree = require('../')
-  , stream = require('./tree-stream')
-  , Transform = require('stream').Transform
-  , PassThrough = require('stream').PassThrough
+import { test } from 'tape'
+import * as d3 from 'd3-selection'
+import css from './../dist/tree.css'
+import Tree from '../index.js'
+import stream from './tree-stream.js'
+import { Transform } from 'stream'
+import { PassThrough } from 'stream'
 
 function container () {
   var container = document.createElement('div')

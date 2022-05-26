@@ -1,9 +1,9 @@
-var test = require('tape').test
-  , css = require('./../dist/tree.css')
-  , Transform = require('stream').Transform
-  , Tree = require('../')
-  , stream = require('./tree-stream')
-  , util = require('util')
+import { test } from 'tape'
+import css from './../dist/tree.css'
+import { Transform } from 'stream'
+import Tree from '../index.js'
+import stream from './tree-stream.js'
+import util from 'util'
 
 function _container () {
   var container = document.createElement('div')

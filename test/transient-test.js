@@ -1,6 +1,6 @@
-var test = require('tape').test
-  , Tree = require('../')
-  , stream = require('./tree-stream')
+import { test } from 'tape'
+import Tree from '../index.js'
+import stream from './tree-stream'
 
 test('allows transient nodes', function (t) {
   var s = stream()
