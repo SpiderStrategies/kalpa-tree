@@ -708,7 +708,7 @@ Tree.prototype.select = function (id, opt) {
       }
     }
 
-    this._onSelect(d, null, null, opt)
+    this._onSelect(null, d, opt)
   } else {
     // We don't have this node to select, clear the selected node
     this._deselect()
@@ -814,7 +814,7 @@ Tree.prototype._deselect = function () {
   }
 }
 
-Tree.prototype._onSelect = function (d, i, j, opt) {
+Tree.prototype._onSelect = function (e, d, opt) {
   opt = opt || {}
 
   // determines if we should toggle the node. We don't toggle if it's the root node
@@ -855,8 +855,8 @@ Tree.prototype._onSelect = function (d, i, j, opt) {
   }
 }
 
-Tree.prototype._onToggle = function (d) {
-  d3.event.stopPropagation()
+Tree.prototype._onToggle = function (e, d) {
+  e.stopPropagation()
   if (d === this.root) {
     // Never toggle root
     return
