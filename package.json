@@ -13,23 +13,22 @@
     "scoreboard-colors": "git+https://github.com/SpiderStrategies/scoreboard-colors.git#v4.2.0"
   },
   "devDependencies": {
-    "browserify": "^12.0.1",
-    "browserify-css": "^0.8.1",
     "double-tap": "^1.0.2",
-    "esmify": "^2.1.1",
-    "JSONStream": "^1.0.6",
+    "esbuild": "^0.14.43",
+    "esbuild-plugin-fileloc": "^0.0.6",
+    "JSONStream": "^1.3.5",
+    "node-stdlib-browser": "^1.2.0",
     "request": "^2.36.0",
     "smokestack": "^3.4.1",
-    "tape": "^3.5.0",
-    "watchify": "^3.6.1"
+    "tape": "^5.5.3"
   },
   "scripts": {
-    "bundle": "browserify -p esmify -r ./index.js:tree -r http -r JSONStream > example/bundle.js -d",
+    "bundle": "node example/build.js",
     "css": "sass --no-source-map --load-path=$(node -p 'require(\"scoreboard-colors\").includePaths[0]') style/tree.scss dist/tree.css",
     "postinstall": "npm run css",
     "start": "node example/server.js",
-    "test": "browserify -p esmify -t browserify-css test/* | double-tap smokestack",
-    "watch": "watchify -p esmify -r ./index.js:tree -r http -r JSONStream -o example/bundle.js -d"
+    "test": "node test/runner.js | double-tap smokestack",
+    "watch": "node example/build.js --watch"
   },
   "repository": {
     "type": "git",

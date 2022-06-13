@@ -5,6 +5,8 @@ import css from './../dist/tree.css'
 import stream from './tree-stream.js'
 import data from './tree.json'
 
+document.head.innerHTML = `<style>${css}</style>`
+
 test('get', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()

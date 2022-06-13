@@ -5,6 +5,8 @@ import Tree from '../index.js'
 import stream from './tree-stream.js'
 import util from 'util'
 
+document.head.innerHTML = `<style>${css}</style>`
+
 function _container () {
   var container = document.createElement('div')
   container.className = 'container'

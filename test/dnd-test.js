@@ -6,6 +6,8 @@ import Dnd from '../lib/dnd'
 import event from './event'
 import * as d3 from 'd3-selection'
 
+document.head.innerHTML = `<style>${css}</style>`
+
 function before (next, opts) {
   opts = opts || {
     stream: stream(),
@@ -19,6 +21,7 @@ function before (next, opts) {
   container.className = 'container'
   container.style.height = '700px'
   document.body.appendChild(container)
+
   container.appendChild(tree.el.node())
 
   opts.stream.on('end', function () {
