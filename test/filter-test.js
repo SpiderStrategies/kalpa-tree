@@ -6,6 +6,8 @@ import stream from './tree-stream.js'
 import { Transform } from 'stream'
 import { PassThrough } from 'stream'
 
+document.head.innerHTML = `<style>${css}</style>`
+
 function container () {
   var container = document.createElement('div')
   container.className = 'container'

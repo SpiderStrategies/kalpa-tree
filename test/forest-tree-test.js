@@ -6,6 +6,8 @@ import Dnd from '../lib/dnd.js'
 import * as d3 from 'd3-selection'
 import event from './event.js'
 
+document.head.innerHTML = `<style>${css}</style>`
+
 var nodes = [{
   "id": 1001,
   "label": "Folder A"
