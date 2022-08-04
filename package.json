@@ -10,7 +10,7 @@
     "d3-transition": "^3.0.1",
     "escape-string-regexp": "^1.0.3",
     "sass": "^1.51.0",
-    "scoreboard-colors": "git+https://github.com/SpiderStrategies/scoreboard-colors.git#v4.2.0"
+    "scoreboard-colors": "^6.0.0"
   },
   "devDependencies": {
     "double-tap": "^1.0.2",
@@ -24,7 +24,7 @@
   },
   "scripts": {
     "bundle": "node example/build.js",
-    "css": "sass --no-source-map --load-path=$(node -p 'require(\"scoreboard-colors\").includePaths[0]') style/tree.scss dist/tree.css",
+    "css": "sass --no-source-map --load-path=$(node -p 'require(\"scoreboard-colors/__resolve.cjs\")') style/tree.scss dist/tree.css",
     "postinstall": "npm run css",
     "start": "node example/server.js",
     "test": "node test/runner.js | double-tap smokestack",
