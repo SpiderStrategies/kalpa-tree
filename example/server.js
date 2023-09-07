@@ -3,7 +3,6 @@ import fs from 'fs'
 import url from 'url'
 import request from 'request'
 import { spawn } from 'child_process'
-import colors from 'scoreboard-colors'
 
 http.createServer(function (req, res) {
   var _url = url.parse(req.url, true)
