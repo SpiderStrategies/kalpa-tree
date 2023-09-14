@@ -275,6 +275,55 @@ test('root node has a class of root', function (t) {
   })
 })
 
+test('tree sets `_isRtl` appropriately', function (t) {
+  let s = stream()
+    , tree = new Tree({stream: s})
+
+  t.notOk(tree._isRtl, '_isRtl is false by default')
+
+  // Update document's direction to rtl
+  document.documentElement.setAttribute('dir', 'rtl')
+  let tree2 = new Tree({stream: s})
+  t.ok(tree2._isRtl, '_isRtl is true (document is in rtl mode)')
+
+  // Cleanup
+  document.documentElement.removeAttribute('dir')
+
+  t.end()
+})
+
+test('tree node-contents respects the RTL', function (t) {
+  // Update document's direction to rtl
+  document.documentElement.setAttribute('dir', 'rtl')
+
+  let s = stream()
+    , tree = new Tree({ stream: s }).render()
+
+  tree.on('rendered', function () {
+    tree.expandAll()
+
+    let contents = tree.el.selectAll('.node-contents')
+      , hasPositiveX = false
+
+    contents.each(function (d, i) {
+      // Get the style of the elements
+      let style = d3.select(this).attr('style')
+        , x = style.match(/translate\((.*)px,(.*)px\)/)[1]
+
+      if (x > 0) {
+        hasPositiveX = true
+      }
+    })
+
+    t.notOk(hasPositiveX, 'node-contents is adjusted correctly for the RTL')
+
+    // Clean up after the test
+    tree.remove()
+    document.documentElement.removeAttribute('dir')
+    t.end()
+  })
+})
+
 test('top tree node has denoted class', function (t) {
   var s = stream()
     , tree = new Tree({stream: s}).render()

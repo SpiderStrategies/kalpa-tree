@@ -22,6 +22,7 @@ test('update adjusts node styles', function (t) {
       prefix: '-webkit-',
       _onToggle: Function.prototype,
       nodes: [[]],
+      _rtlTransformX: x => x, // mock an identity function
       options: {
         transientId: -1,
         height: 10,

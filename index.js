@@ -109,6 +109,7 @@ var Tree = function (options) {
   }
 
   this.options.scrollableContainer = this.options.scrollableContainer.bind(this)
+  this._isRtl = document.documentElement.getAttribute('dir') === 'rtl'
   this._rootOffset = Math.max(this.options.rootHeight - this.options.height, 0)
   this.prefix = prefix
   this.transitionTimeout = 300 // Copied in css
@@ -218,6 +219,13 @@ Tree.prototype.render = function () {
   })
 
   return this
+}
+
+/*
+ * Translates a `x` value based on the browser RTL
+ */
+Tree.prototype._rtlTransformX = function (x) {
+  return this._isRtl ? -x : x
 }
 
 /*
