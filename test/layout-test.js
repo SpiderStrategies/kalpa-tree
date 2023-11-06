@@ -35,7 +35,7 @@ test('generates a forest tree', function (t) {
   var l = layout(20, 40, 0, function (d) {
             return d.children
           })
-    , nodes = l(forest)
+    , nodes = l({root: forest})
 
   t.equal(nodes.length, 8, '8 nodes in tree')
 
@@ -79,7 +79,7 @@ test('generates a forest tree with hidden roots', function (t) {
   var l = layout(20, 40, 0, function (d) {
             return d.children
           })
-    , nodes = l(forest)
+    , nodes = l({root: forest})
 
   t.equal(nodes.length, 5, '5 nodes in tree')
   t.end()
@@ -88,7 +88,7 @@ test('generates a forest tree with hidden roots', function (t) {
 test('generates an empty tree', function (t) {
   var l = layout()
   t.plan(1)
-  t.deepEqual(l(null), [], 'empty tree with null root')
+  t.deepEqual(l({root: null}), [], 'empty tree with null root')
   t.end()
 })
 
@@ -96,7 +96,7 @@ test('generates a tree layout', function (t) {
   var l = layout(20, 40, 0, function (d) {
         return d.children
       })
-    , nodes = l(tree())
+    , nodes = l({root: tree()})
 
   t.equal(nodes.length, 5, '5 nodes in tree')
   t.equal(nodes[0].depth, 0, 'root has depth 0')
@@ -120,7 +120,7 @@ test('applies a root offset', function (t) {
   var l = layout(20, 40, 10, function (d) {
         return d.children
       })
-    , nodes = l(tree())
+    , nodes = l({root: tree()})
 
   t.equal(nodes[0]._y, 0, 'root _y does not use offset')
   t.equal(nodes[1]._y, 50, 'first child includes offset')
