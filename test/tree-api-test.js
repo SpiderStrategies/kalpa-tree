@@ -85,6 +85,7 @@ test('moves a node', function (t) {
     process.nextTick(function () {
       t.equal(orgParent._allChildren.length, orgChildrenLength - 1, 'original parent is missing a child')
       t.deepEqual(tree._layout[1003].parent, tree._layout[1025], 'moved node has new parent')
+      t.deepEqual(tree.nodes[1003].parentId, 1025, 'original node parentId was modified')
       t.equal(tree._layout[1003].parent.children.length, 5, 'new parent is expanded')
       t.deepEqual(tree._layout[1025]._allChildren[tree._layout[1025]._allChildren.length -1], tree._layout[1003], '1003 was pushed to end of 1025')
       t.end()

@@ -273,12 +273,15 @@ test('drag changes data', function (t) {
 
     let e1 = event('mouse')
     e1.y = 290
+
+    t.equal(tree.nodes[1004].parentId, 1003, 'original node parentId set')
     dnd.drag.apply(node, [e1, data, 3])
 
     tree.once('move', function (n, newParent, previousParent, newIndex, previousIndex) {
       t.equal(n.label, 'M1', 'moved node label is correct')
       t.equal(newParent.label, 'M5', 'moved node new parent label is correct')
       t.equal(previousParent.label, 'O1', 'moved node previous parent label is correct')
+      t.equal(tree.nodes[1004].parentId, newParent.id, 'source node parentId has changed')
       t.equal(newIndex, 0, 'new index is correct')
       t.equal(previousIndex, 0, 'previous index is correct')
       tree.remove()

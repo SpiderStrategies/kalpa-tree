@@ -320,7 +320,7 @@ Tree.prototype._rebind = function (next) {
       .select('.tree')
       .classed('detached-root', !!this._rootOffset)
 
-  var data = this.layout(this.root)
+  var data = this.layout(this)
   this.emit('rebind', data) // Trigger an event indicating the tree data changed
   return this._join(data, next)
 }
@@ -589,6 +589,9 @@ Tree.prototype.move = function (node, to, idx, expandAncestors = true) {
     var children = (_to._allChildren || (_to._allChildren = []))
     children.splice(typeof idx === 'number' ? idx : children.length, 0, _node)
     _node.parent = _to
+
+    // Modify the source node's parentId
+    getObject(this.nodes, node).parentId = _to.id
     if (expandAncestors) {
       this._expandAncestors(_to)
     }
@@ -993,7 +996,7 @@ Tree.prototype.editable = function () {
   var tree = this.el.select('.tree')
     , self = this
   tree.classed('editable', !tree.classed('editable'))
-  this._join(this.layout(this.root), function (enter, update, exit) {
+  this._join(this.layout(this), function (enter, update, exit) {
     // Changing editable will change the tree state, e.g. clearing search results
     // so update all the collections
     enter.call(self.enter)
@@ -1174,6 +1177,8 @@ Tree.prototype._removeFromParent = function (node) {
     }
   }
   node.parent = null
+
+  delete getObject(this.nodes, node)?.parentId
 
   return this
 }
