@@ -89,7 +89,7 @@ test('allows node contents overrides', function (t) {
   }).render()
 
   tree.on('rendered', function () {
-    t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child')[0].innerHTML, '<div class="node-child" style="-webkit-transform:translate(0px,0px)">node-child-1001</div>', 'node contents overriden')
+    t.equal(tree.el.node().querySelectorAll('.tree ul li:first-child')[0].innerHTML, '<div class="node-child" style="-webkit-transform: translate(0px, 0px);width: calc(100% - 0px)">node-child-1001</div>', 'node contents overriden')
     tree.remove()
     t.end()
   })
