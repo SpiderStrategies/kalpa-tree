@@ -248,12 +248,12 @@ test('drag moves traveler', function (t) {
       t.ok(tree.el.select('.traveling-node').datum()._y > data._y, 'traveler _y moved down')
       var _translate = /translate\((.*)\)/.exec(tree.el.select('.traveling-node').attr('style'))[0]
       t.equal(_translate, 'translate(0px, 290px)', 'transform changed')
-      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(60px, 0px);width: calc(100% - 60px)', '60px y indentation')
+      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(60px, 0px); width: calc(100% - 60px)', '60px y indentation')
       e1.y = 290 // move the node up a little
       dnd.drag.apply(node, [e1, data, 3])
 
       // now it should be embedded
-      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(80px, 0px);width: calc(100% - 80px)', '80px y indentation')
+      t.equal(tree.el.select('.traveling-node').select('.node-contents').attr('style'), tree.prefix + 'transform:translate(80px, 0px); width: calc(100% - 80px)', '80px y indentation')
       dnd.end.apply(node, [e1, data, 3])
       tree.remove()
       document.querySelector('.container').remove()
