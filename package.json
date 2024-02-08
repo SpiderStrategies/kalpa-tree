@@ -1,6 +1,6 @@
 {
   "name": "kalpa-tree",
-  "version": "4.2.0",
+  "version": "4.3.0",
   "description": "An efficient hierarchical tree for the dom",
   "node": ">=14.16",
   "type": "module",
