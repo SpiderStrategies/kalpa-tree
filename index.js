@@ -13,7 +13,7 @@ import contents from './lib/contents.js'
 
 const styles = window.getComputedStyle(document.documentElement, '')
     , identity = v => f
-    , prefix = Array.prototype.slice.call(styles).join('').match(/-(moz|webkit|ms)-/)[0]
+    , prefix = Array.prototype.slice.call(styles).join('').match(/-(webkit|ms)-/)[0]
 
 // Mix transitions into d3-selection's prototype
 import 'd3-transition'
