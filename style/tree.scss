@@ -233,7 +233,7 @@ $tree-item-height: 36px;
     width: 100%;
     height: 100%;
 
-    @include prefix(user-select, none, webkit moz ms);
+    @include prefix(user-select, none, webkit ms);
 
     // Most tree functions that modify the dom send a callback into transitionWrap where has some magic
     // to determine whether or not we actually want transitions. It's in charge of adding the .transitions
