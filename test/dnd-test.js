@@ -262,6 +262,76 @@ test('drag moves traveler', function (t) {
   })
 })
 
+test('drag moves traveler in RTL mode', function (t) {
+  function rtlBefore(next) {
+    let opts = {
+      stream: stream(),
+      dndDelay: 0 // Don't delay tests by default
+    }
+
+    // Set the document's direction to RTL
+    document.documentElement.setAttribute('dir', 'rtl')
+
+    var rtlTree = new Tree(opts).render(),
+        rtlTreeDnd = new Dnd(rtlTree),
+        container = document.createElement('div')
+
+    container.className = 'rtl-container'
+    container.style.height = '700px'
+    document.body.appendChild(container)
+
+    container.appendChild(rtlTree.el.node())
+
+    opts.stream.on('end', function () {
+      rtlTree.select(1004) // Ensure it's expanded
+      next(rtlTree, rtlTreeDnd) // Continue after tree is ready
+    })
+  }
+
+  rtlBefore(function (rtlTree, rtlTreeDnd) {
+    var node = rtlTree.node.nodes()[3],
+        data = rtlTree._layout[1004]
+
+    rtlTree.editable()
+
+    process.nextTick(function () {
+      rtlTreeDnd.start.apply(node, [event('mouse'), data, 3])
+      rtlTreeDnd._dragging = true
+      t.ok(rtlTreeDnd._travelerTimeout, 'timeout was set')
+
+      let e1 = event('mouse')
+      e1.y = data._y
+      rtlTreeDnd.drag.apply(node, [e1, data, 3])
+      t.equal(rtlTree.el.select('.traveling-node').datum()._y, data._y - rtlTree.options.height / 2, 'traveler _y starts centered on the src')
+
+      e1.y = data._y + 200 // new y location
+      rtlTreeDnd.drag.apply(node, [e1, data, 3])
+      t.ok(rtlTree.el.select('.traveling-node').datum()._y > data._y, 'traveler _y moved down')
+
+      var _translate = /translate\((.*)\)/.exec(rtlTree.el.select('.traveling-node').attr('style'))[0]
+      t.equal(_translate, 'translate(0px, 290px)', 'transform changed')
+
+      // Check the RTL-specific transform
+      t.equal(rtlTree.el.select('.traveling-node').select('.node-contents').attr('style'), rtlTree.prefix + 'transform:translate(-60px, 0px); width: calc(100% - 60px)', '60px y indentation for RTL')
+
+      e1.y = 290 // move the node up a little
+      rtlTreeDnd.drag.apply(node, [e1, data, 3])
+
+      // now it should be embedded
+      t.equal(rtlTree.el.select('.traveling-node').select('.node-contents').attr('style'), rtlTree.prefix + 'transform:translate(-80px, 0px); width: calc(100% - 80px)', '80px y indentation for RTL')
+
+      rtlTreeDnd.end.apply(node, [e1, data, 3])
+      rtlTree.remove()
+
+      // Cleanup: remove RTL setting and container
+      document.documentElement.removeAttribute('dir')
+      document.querySelector('.rtl-container').remove()
+
+      t.end()
+    })
+  })
+})
+
 test('drag changes data', function (t) {
   before(function (tree, dnd) {
     var node = tree.node.nodes()[3]
